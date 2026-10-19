@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Liner</string>
+    <string name="channel_playback">Playback</string>
+    <string name="channel_playback_description">Media controls for the current track</string>
+    <string name="action_previous">Previous</string>
+    <string name="action_next">Next</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_like">Like</string>
+    <string name="action_unlike">Remove from favorites</string>
+    <string name="open_export">Open export</string>
+    <string name="ui_scale_toast">Interface size: %1$d %%</string>
+    <string name="ui_scale_tip">Tip: pinch with two fingers to make the interface bigger or smaller</string>
+    <string name="overlay_permission_hint">Allow \"Display over other apps\" for the Liner overlay</string>
+</resources>

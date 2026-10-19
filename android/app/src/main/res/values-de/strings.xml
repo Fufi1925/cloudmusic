@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel_playback">Wiedergabe</string>
+    <string name="channel_playback_description">Mediensteuerung für den aktuellen Titel</string>
+    <string name="action_previous">Zurück</string>
+    <string name="action_next">Weiter</string>
+    <string name="action_play">Abspielen</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_like">Gefällt mir</string>
+    <string name="action_unlike">Aus Favoriten entfernen</string>
+    <string name="open_export">Export öffnen</string>
+    <string name="ui_scale_toast">Oberflächengröße: %1$d %%</string>
+    <string name="ui_scale_tip">Tipp: Mit zwei Fingern zoomen, um die Oberfläche größer oder kleiner zu machen</string>
+    <string name="overlay_permission_hint">Erlaube \"Über anderen Apps einblenden\" für das Liner-Overlay</string>
+</resources>
