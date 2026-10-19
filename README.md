@@ -60,6 +60,25 @@
 
 ---
 
+## Layouts
+
+CloudMusic ships two layouts from one renderer:
+
+- **Desktop (≥ 768 px)** – the original electron shell: 58 px icon rail, floating search island,
+  440 px queue/lyrics drawer, bottom player bar.
+- **Portrait (< 768 px, Android phones)** – bottom navigation (Home, Search, Library, Settings),
+  compact player bar above it, stacked page headers, full-screen search and settings, and the
+  queue/lyrics panel as a bottom sheet. Phones are locked to portrait, tablets may rotate freely.
+
+The home page starts with a curated **Chill** row (quiet pop: Lana Del Rey, Billie Eilish,
+Taylor Swift, Gracie Abrams, Olivia Rodrigo, Adele, Phoebe Bridgers, girl in red), assembled
+client-side from search results because the backend has no editorial endpoint.
+
+The **Website** entry in *Settings → Info* is intentionally disabled and greyed out
+(“coming soon”).
+
+---
+
 ## Architecture
 
 ```

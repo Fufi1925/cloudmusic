@@ -252,7 +252,7 @@ function ArtistContent() {
         <div className="relative z-1 grid grid-cols-1 items-start w-full">
           {isReady && data && (
             <div className="col-start-1 row-start-1 w-full pb-[32px]">
-              <div className="relative w-full min-h-[340px] md:min-h-[380px] flex flex-col justify-between overflow-hidden">
+              <div className="relative w-full min-h-[340px] md:min-h-[380px] max-md:min-h-[250px] flex flex-col justify-between overflow-hidden">
                 {data.coverUrl ? (
                   <div
                     className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
@@ -285,13 +285,13 @@ function ArtistContent() {
                 )}
 
 
-                <div className="relative z-10 px-[32px] pt-[56px]" data-window-drag />
+                <div className="relative z-10 px-[32px] max-md:px-[16px] pt-[56px] max-md:pt-[calc(env(safe-area-inset-top,0px)+56px)]" data-window-drag />
 
-              <div className="relative z-10 px-[32px] pb-[20px] flex flex-col md:flex-row items-start md:items-end justify-between gap-[24px]">
+              <div className="relative z-10 px-[32px] max-md:px-[16px] pb-[20px] flex flex-col md:flex-row items-start md:items-end justify-between gap-[24px] max-md:gap-[14px]">
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-[8px] md:gap-[10px]">
                     <h1
-                      className="m-0 text-[38px] md:text-[48px] font-[700] tracking-[-0.03em] leading-[1.05] text-text-primary"
+                      className="m-0 text-[38px] md:text-[48px] max-md:text-[29px] font-[700] tracking-[-0.03em] leading-[1.05] text-text-primary"
                       style={{
                         fontFamily: "var(--font-inter), sans-serif",
                       }}
@@ -451,7 +451,7 @@ function ArtistContent() {
               </div>
             </div>
 
-            <div className="relative z-10 px-[32px] pt-[24px]">
+            <div className="relative z-10 px-[32px] max-md:px-[16px] pt-[24px]">
               <div className="flex flex-col gap-[40px]">
                 <section id="artist-tracks-section" ref={tracksSectionRef}>
                   <div className="flex items-center justify-between mb-[16px]">

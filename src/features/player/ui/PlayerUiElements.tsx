@@ -100,7 +100,7 @@ export function PlayerUiElements({
     <>
       {/* Artwork (Compact, flat, no drop shadows) */}
       <div
-        className={`relative shrink-0 overflow-hidden rounded-xl w-[280px] h-[280px] bg-black/20 ${
+        className={`relative shrink-0 overflow-hidden rounded-xl w-[280px] h-[280px] max-md:w-[min(320px,74vw)] max-md:h-[min(320px,74vw)] bg-black/20 ${
           coverUrl && !isCoverLoaded ? "animate-pulse" : ""
         }`}
       >
@@ -166,10 +166,10 @@ export function PlayerUiElements({
       </div>
 
       {/* Track info */}
-      <div className="w-[280px] flex items-start justify-center min-w-0">
+      <div className="w-[280px] max-md:w-[min(280px,78vw)] flex items-start justify-center min-w-0">
         <div className="flex flex-col gap-[2px] min-w-0 text-center">
           <p
-            className="m-0 text-[15px] font-[600] text-white flex items-center justify-center gap-[6px] max-w-[280px]"
+            className="m-0 text-[15px] max-md:text-[16px] font-[600] text-white flex items-center justify-center gap-[6px] max-w-[280px] max-md:max-w-[78vw]"
             style={{ letterSpacing: "-0.03em" }}
           >
             <span className="min-w-0 truncate">{trackTitle}</span>
@@ -200,7 +200,7 @@ export function PlayerUiElements({
         onSeek={(pos) => playerEngine.seek(pos)}
         showTime
         size="md"
-        className="w-[320px]"
+        className="w-[320px] max-md:w-[calc(100vw-64px)]"
       />
 
       {/* Primary Playback Controls */}
@@ -231,7 +231,9 @@ export function PlayerUiElements({
           onClick={() => void playerEngine.togglePlayPause()}
           className="inline-flex h-[36px] w-[36px] items-center justify-center text-white opacity-85 transition-all duration-150 ease-out hover:opacity-100 active:scale-[0.94] shrink-0 border-none bg-transparent cursor-pointer"
         >
-          <PlayPauseIcon status={player.status} />
+          <span className="max-md:scale-125">
+            <PlayPauseIcon status={player.status} />
+          </span>
         </button>
 
         <button
@@ -265,7 +267,9 @@ export function PlayerUiElements({
       </div>
 
       {/* Volume (Compact smooth slider, size sm) */}
-      <VolumePicker className="w-[180px]" size="sm" />
+      <div className="max-md:hidden">
+        <VolumePicker className="w-[180px]" size="sm" />
+      </div>
     </>
   );
 }

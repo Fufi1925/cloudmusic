@@ -10,6 +10,8 @@ import {
 } from "../hooks/usePopularTracks";
 import { useRecentlyPlayed } from "../hooks/useRecentlyPlayed";
 import { useDailyMixes } from "../hooks/useDailyMixes";
+import { useChillTracks } from "../hooks/useChillTracks";
+import ChillSection from "./ChillSection";
 import { useLikedTracks } from "@/features/library/hooks/useLikedTracks";
 import { playerEngine } from "@/features/player";
 import SongCard from "@/features/player/ui/SongCard";
@@ -40,6 +42,7 @@ export default function HomePage() {
   const { data: recentlyPlayed, isLoading: recentLoading } =
     useRecentlyPlayed(20);
   const { data: dailyMixes } = useDailyMixes();
+  const { data: chillTracks, isLoading: chillLoading } = useChillTracks(24);
 
   const isDataLoading =
     tracksLoading ||
@@ -108,10 +111,12 @@ export default function HomePage() {
       <div className="relative z-1 grid grid-cols-1 items-start w-full">
         {/* Real Content Layer */}
         {isReady && (
-          <div className="col-start-1 row-start-1 w-full pb-[16px]">
+          <div className="col-start-1 row-start-1 w-full pb-[16px] max-md:pt-[calc(env(safe-area-inset-top,0px)+10px)]">
+            <ChillSection items={chillTracks} loading={chillLoading} />
+
             {hasEnoughQuickData && (
               <div className="flex flex-col">
-              <div className="mt-[20px] px-8 flex items-center justify-between">
+              <div className="mt-[20px] px-8 max-md:px-4 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="flex items-center shrink-0">
                     <FlashCircleFill className="w-5 h-5 text-amber-400" />
@@ -125,7 +130,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="px-8 mt-[12px] relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="px-8 max-md:px-4 mt-[12px] relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   <SongCard
                     title={t("library.liked_songs")}
                     artists={`${likedData.total} ${likedData.total === 1 ? t("library.song") : t("library.songs")}`}

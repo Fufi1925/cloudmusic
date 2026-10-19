@@ -190,6 +190,10 @@
   },
   "home": {
     "speedDial": "Schnellzugriff",
+    "chill": {
+      "title": "Chill",
+      "subtitle": "Ruhiger Pop für späte Abende"
+    },
     "goodMorning": "Guten Morgen",
     "goodAfternoon": "Guten Tag",
     "goodEvening": "Guten Abend",

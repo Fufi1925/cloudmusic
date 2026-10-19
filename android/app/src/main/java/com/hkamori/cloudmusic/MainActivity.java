@@ -64,7 +64,7 @@ import java.util.function.Consumer;
  * The single cloudmusic window. Mirrors electron/main.ts createWindow(): one WebView
  * running the unchanged renderer, a native bridge in place of preload.ts, the
  * request hooks in place of session.webRequest, plus the android specifics
- * (system bars, back button, media notification, landscape on phones).
+ * (system bars, back button, media notification, portrait lock on phones).
  */
 public class MainActivity extends Activity {
     private static final String TAG = "CloudMusic";
@@ -121,8 +121,9 @@ public class MainActivity extends Activity {
         uiScale = clamp(prefs.getFloat("ui_scale", 1f), MIN_UI_SCALE, MAX_UI_SCALE);
         immersive = prefs.getBoolean("immersive", isPhone());
 
-        // the desktop layout needs a landscape canvas; tablets may rotate freely
-        if (isPhone()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        // the renderer now has a dedicated portrait layout: phones stay upright,
+        // tablets are free to rotate between portrait and landscape
+        if (isPhone()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

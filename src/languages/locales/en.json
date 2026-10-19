@@ -192,6 +192,10 @@
   },
   "home": {
     "speedDial": "Speed dial",
+    "chill": {
+      "title": "Chill",
+      "subtitle": "Calm pop for late evenings"
+    },
     "goodMorning": "Good morning",
     "goodAfternoon": "Good afternoon",
     "goodEvening": "Good evening",

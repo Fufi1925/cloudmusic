@@ -229,10 +229,10 @@ function SongCard({
         </div>
       </div>
 
-      <div className="flex items-center shrink-0 ml-[16px] gap-[16px]">
+      <div className="flex items-center shrink-0 ml-[16px] gap-[16px] max-md:ml-[8px] max-md:gap-[6px]">
         {releaseDate && (
           <span
-            className="text-[14px] text-text-tertiary"
+            className="text-[14px] text-text-tertiary max-md:hidden"
             style={{
               fontFamily: "var(--font-inter), sans-serif",
               fontWeight: 400,
@@ -243,7 +243,7 @@ function SongCard({
         )}
         {duration && (
           <span
-            className="text-[14px] text-text-tertiary"
+            className="text-[14px] text-text-tertiary max-md:hidden"
             style={{
               fontFamily: "var(--font-inter), sans-serif",
               fontWeight: 400,

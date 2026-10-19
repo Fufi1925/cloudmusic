@@ -434,3 +434,36 @@ button.apple-glass-action:hover,
     display: none;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   Portrait / phone layout (android WebView + narrow browser windows).
+   The styles above are tuned for the 1100px+ desktop window; below 768px
+   the shell switches to the compact layout (bottom bar, stacked pages).
+   ────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  html,
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* the compact shell already accounts for the android system bars */
+  .rounded-5xl {
+    border-radius: 0 !important;
+  }
+}
+
+@supports (height: 100dvh) {
+  @media (max-width: 767px) {
+    #root {
+      height: 100dvh;
+    }
+  }
+}

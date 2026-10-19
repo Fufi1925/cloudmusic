@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { isWindowDraggingActive } from "@/shared/hooks";
 import { isEscapeGuarded } from "@/shared/utils/escapeGuard";
+import { useIsCompact } from "@/shared/hooks/useCompactLayout";
 
 export interface DialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ export default function Dialog({
   zIndex,
 }: DialogProps) {
   const [mounted, setMounted] = useState(false);
+  const isCompact = useIsCompact();
   const pointerStartRef = useRef<{ x: number; y: number; target: EventTarget | null } | null>(null);
 
   useEffect(() => {
@@ -66,6 +68,11 @@ export default function Dialog({
   }, [open, onOpenChange]);
 
   if (!mounted || typeof document === "undefined") return null;
+
+  // wide dialogs (settings, pickers) take the whole portrait screen, small
+  // confirmations slide up as a bottom sheet
+  const numericMax = typeof maxWidth === "number" ? maxWidth : Number.POSITIVE_INFINITY;
+  const compactFullScreen = isCompact && numericMax >= 600;
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     pointerStartRef.current = {
@@ -116,14 +123,24 @@ export default function Dialog({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97, y: 10 }}
           transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
+          className={`fixed inset-0 z-[200] flex justify-center pointer-events-none ${
+            isCompact ? "items-end" : "items-center"
+          }`}
           style={zIndex ? { zIndex } : undefined}
         >
           <div
-            className={`pointer-events-auto w-full mx-[16px] max-h-[85vh] flex flex-col rounded-xl border border-border-primary bg-bg-primary overflow-hidden relative ${
-              className || "pt-[16px]"
-            }`}
-            style={{ maxWidth, minHeight, ...(maxHeight ? { maxHeight } : {}) }}
+            className={`pointer-events-auto w-full flex flex-col border border-border-primary bg-bg-primary overflow-hidden relative ${
+              isCompact
+                ? compactFullScreen
+                  ? "mx-0 h-full max-h-full rounded-none border-0"
+                  : "mx-0 mb-0 max-h-[88vh] rounded-t-2xl rounded-b-none border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)]"
+                : "mx-[16px] max-h-[85vh] rounded-xl"
+            } ${className || "pt-[16px]"}`}
+            style={
+              isCompact && compactFullScreen
+                ? { minHeight: undefined, maxHeight: undefined }
+                : { maxWidth, minHeight, ...(maxHeight ? { maxHeight } : {}) }
+            }
           >
             {children}
           </div>

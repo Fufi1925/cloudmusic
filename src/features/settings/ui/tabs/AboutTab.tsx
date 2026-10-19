@@ -168,11 +168,17 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => openUrl("https://github.com/Fufi1925/Music./releases")}
-            className="!h-[28px] !px-[10px] !text-[12px] gap-[6px]"
+            disabled
+            aria-disabled="true"
+            title={t("common.coming_soon") || "Coming soon"}
+            onClick={(event) => event.preventDefault()}
+            className="!h-[28px] !px-[10px] !text-[12px] gap-[6px] opacity-45 grayscale cursor-not-allowed select-none"
           >
             <FaGlobe size={12} className="text-text-tertiary" />
-            {t("settings.about.website")}
+            <span className="text-text-tertiary">{t("settings.about.website")}</span>
+            <span className="ml-[2px] rounded-full bg-border-alpha-14 px-[6px] py-[1px] text-[10px] font-[500] text-text-tertiary">
+              {t("common.coming_soon") || "Coming soon"}
+            </span>
           </Button>
         </div>
       </div>

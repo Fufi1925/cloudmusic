@@ -293,7 +293,7 @@ function CollectionContent() {
   return (
     <div className="relative h-full w-full overflow-hidden bg-transparent">
 
-      <div className="absolute top-0 left-0 right-0 h-[56px] z-10 flex flex-row items-stretch select-none pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 h-[56px] z-10 flex flex-row items-stretch select-none pointer-events-none max-md:hidden">
         <div
           data-window-drag
           onContextMenu={(e) => e.preventDefault()}
@@ -312,7 +312,7 @@ function CollectionContent() {
         aria-label={t("common.back")}
         data-no-tooltip="true"
         data-no-window-drag
-        className={`absolute top-[12px] left-[32px] z-20 group inline-flex h-[32px] shrink-0 items-center gap-[6px] rounded-md px-[10px] active:scale-[0.94] transition-all cursor-pointer select-none pointer-events-auto text-[13px] font-[500] border-0 !border-none ${
+        className={`max-md:hidden absolute top-[12px] left-[32px] z-20 group inline-flex h-[32px] shrink-0 items-center gap-[6px] rounded-md px-[10px] active:scale-[0.94] transition-all cursor-pointer select-none pointer-events-auto text-[13px] font-[500] border-0 !border-none ${
           hasCustomBg
             ? "apple-glass-pill !border-none"
             : "bg-bg-panel/85 backdrop-blur-xl text-text-primary hover:bg-bg-panel border-0 !border-none"
@@ -327,7 +327,7 @@ function CollectionContent() {
       </button>
       {/* track search sits centred in the page header */}
       {data && isReady && (
-        <div className="absolute top-[12px] left-0 right-0 z-20 flex justify-center pointer-events-none">
+        <div className="absolute top-[12px] left-0 right-0 z-20 flex justify-center pointer-events-none max-md:hidden">
           <TrackSearchField
             search={search}
             totalCount={data.tracks.length}
@@ -344,12 +344,14 @@ function CollectionContent() {
               isReady ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
-            <div className="relative z-10 flex flex-row items-stretch gap-[16px] pl-[32px] pr-[16px] h-full w-full min-h-0 box-border">
+            <div className="relative z-10 flex flex-row items-stretch gap-[16px] pl-[32px] pr-[16px] h-full w-full min-h-0 box-border max-md:flex-col max-md:gap-0 max-md:pl-[16px] max-md:pr-[16px]">
               <div
-                className="shrink-0 w-[280px] self-start pt-[56px] pb-[24px]"
+                className="shrink-0 w-[280px] self-start pt-[56px] pb-[24px] max-md:w-full max-md:pt-[calc(env(safe-area-inset-top,0px)+12px)] max-md:pb-[4px]"
                 data-no-window-drag
               >
                 <EntitySidebar
+                onBack={handleBack}
+                backLabel={t("common.back") || "Back"}
                 coverClassName={
                   hasCustomBg && !data.coverUrl
                     ? "apple-glass-static pointer-events-none"
@@ -464,7 +466,7 @@ function CollectionContent() {
                           variant={hasCustomBg ? "glass-action" : "outline"}
                           onClick={handleAddToQueue}
                           disabled={!data || data.tracks.length === 0}
-                          className={`!h-[36px] flex-1 min-w-0 !text-[13px] !font-[500] px-[12px] flex items-center justify-center gap-[6px] ${
+                          className={`!h-[36px] flex-1 min-w-0 !text-[13px] !font-[500] px-[12px] max-md:!px-0 max-md:!flex-none max-md:!w-[36px] flex items-center justify-center gap-[6px] ${
                             // optical centring: with three icon buttons beside it the label reads 1px right
                             !isDailyMix ? "[&>*]:-translate-x-px" : ""
                           }`}
@@ -495,7 +497,7 @@ function CollectionContent() {
                               </motion.span>
                             )}
                           </AnimatePresence>
-                          <span className="truncate">{t("common.add_to_queue")}</span>
+                          <span className="truncate max-md:hidden">{t("common.add_to_queue")}</span>
                         </Button>
 
                         <Button
@@ -569,7 +571,7 @@ function CollectionContent() {
                     targetScrollTopRef.current = null;
                   }
                 }}
-                className="min-w-0 flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-[8px] pt-[56px] pb-[24px] overscroll-contain"
+                className="min-w-0 flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-[8px] pt-[56px] pb-[24px] overscroll-contain max-md:px-0 max-md:pt-[10px] max-md:pb-[24px]"
                 style={{ willChange: "scroll-position" }}
               >
               <section>

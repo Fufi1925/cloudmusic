@@ -19,6 +19,7 @@ import {
   PlaylistFill,
 } from "@mingcute/react";
 import Sidebar from "./Sidebar";
+import BottomNav from "./BottomNav";
 import WindowControls from "./WindowControls";
 import PageTransition from "./PageTransition";
 import RightDrawer from "./RightDrawer";
@@ -54,6 +55,8 @@ import {
 } from "@/features/library";
 import { SettingsModal, useCustomizationStore, getBlockStyle } from "@/features/settings";
 import { UpdateModal, UpdateToastBridge } from "@/features/updater";
+import CompactPlayerBar from "@/features/player/ui/CompactPlayerBar";
+import { useIsCompact } from "@/shared/hooks/useCompactLayout";
 
 
 interface AppFrameProps {
@@ -76,6 +79,7 @@ export default function AppFrame({ children }: AppFrameProps) {
   const { pathname, search } = location;
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isCompact = useIsCompact();
 
   const searchOpen = useModalStore((state) => state.searchOpen);
   const openSearch = useModalStore((state) => state.openSearch);
@@ -683,7 +687,11 @@ export default function AppFrame({ children }: AppFrameProps) {
     <div
       ref={appFrameRef}
       data-custom-bg={hasCustomBg ? "true" : undefined}
-      className="relative flex flex-row h-full w-full overflow-hidden rounded-5xl bg-bg-canvas p-1.5 gap-1.5"
+      className={`relative flex h-full w-full overflow-hidden bg-bg-canvas ${
+        isCompact
+          ? "flex-col gap-0 rounded-none p-0"
+          : "flex-row gap-1.5 rounded-5xl p-1.5"
+      }`}
       onScroll={(e) => {
         if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
         if (e.currentTarget.scrollTop !== 0) e.currentTarget.scrollTop = 0;
@@ -691,7 +699,9 @@ export default function AppFrame({ children }: AppFrameProps) {
     >
       {hasCustomBg && backgroundImage && (
         <div
-          className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-5xl"
+          className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${
+            isCompact ? "rounded-none" : "rounded-5xl"
+          }`}
           aria-hidden="true"
         >
           <img
@@ -712,25 +722,31 @@ export default function AppFrame({ children }: AppFrameProps) {
         </div>
       )}
 
-      <aside
-        ref={sidebarRef}
-        className="w-[58px] h-full shrink-0 z-[45] relative"
-      >
-        <Sidebar
-          searchOpen={searchOpen}
-          onSearchToggle={handleSearchToggle}
-        />
-      </aside>
+      {!isCompact && (
+        <aside
+          ref={sidebarRef}
+          className="w-[58px] h-full shrink-0 z-[45] relative"
+        >
+          <Sidebar
+            searchOpen={searchOpen}
+            onSearchToggle={handleSearchToggle}
+          />
+        </aside>
+      )}
 
-      <div className="flex-1 flex flex-col min-w-0 h-full relative gap-1.5 overflow-hidden">
+      <div
+        className={`flex-1 flex flex-col min-w-0 h-full relative overflow-hidden ${
+          isCompact ? "gap-0" : "gap-1.5"
+        }`}
+      >
         <main
           data-custom-bg={hasCustomBg ? "true" : undefined}
           className={`flex-1 min-w-0 flex flex-col relative h-full ${
             hasCustomBg ? "" : "bg-bg-primary"
-          } rounded-sm ${
-            isFullscreenPlayer
-              ? "rounded-tr-none"
-              : "rounded-tr-xl"
+          } ${
+            isCompact
+              ? "rounded-none"
+              : `rounded-sm ${isFullscreenPlayer ? "rounded-tr-none" : "rounded-tr-xl"}`
           } overflow-hidden`}
           style={mainStyle}
         >
@@ -767,12 +783,16 @@ export default function AppFrame({ children }: AppFrameProps) {
                 <motion.aside
                   key="right-drawer"
                   ref={queueDrawerRef}
-                  initial={{ x: RIGHT_DRAWER_WIDTH }}
-                  animate={{ x: 0 }}
-                  exit={{ x: RIGHT_DRAWER_WIDTH }}
+                  initial={isCompact ? { y: "100%" } : { x: RIGHT_DRAWER_WIDTH }}
+                  animate={isCompact ? { y: 0 } : { x: 0 }}
+                  exit={isCompact ? { y: "100%" } : { x: RIGHT_DRAWER_WIDTH }}
                   transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="pointer-events-auto absolute inset-y-0 right-0 z-[50]"
-                  style={{ width: RIGHT_DRAWER_WIDTH }}
+                  className={`pointer-events-auto absolute z-[50] ${
+                    isCompact
+                      ? "inset-x-0 bottom-0 h-[88%] overflow-hidden rounded-t-2xl border-t border-border-primary/50 shadow-[0_-18px_48px_rgba(0,0,0,0.28)]"
+                      : "inset-y-0 right-0"
+                  }`}
+                  style={isCompact ? undefined : { width: RIGHT_DRAWER_WIDTH }}
                 >
                   <RightDrawer
                     activeTab={rightDrawerTab}
@@ -785,7 +805,7 @@ export default function AppFrame({ children }: AppFrameProps) {
           )}
         </main>
 
-        {shouldShowMiniPlayer && (
+        {shouldShowMiniPlayer && !isCompact && (
           <div
             ref={miniPlayerContainerRef}
             // Above the right drawer (z-50) so the player's volume/speed/queue
@@ -799,6 +819,20 @@ export default function AppFrame({ children }: AppFrameProps) {
               onFullscreenOpen={openFullscreenPlayer}
             />
           </div>
+        )}
+
+        {isCompact && shouldShowMiniPlayer && !fullscreenPlayerOpen && (
+          <CompactPlayerBar
+            onFullscreenOpen={openFullscreenPlayer}
+            onQueueToggle={handleQueuePopupToggleRequest}
+          />
+        )}
+
+        {isCompact && !fullscreenPlayerOpen && (
+          <BottomNav
+            searchOpen={searchOpen}
+            onSearchToggle={handleSearchToggle}
+          />
         )}
       </div>
 
@@ -835,16 +869,28 @@ export default function AppFrame({ children }: AppFrameProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.99 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className={`absolute right-0 z-[60] flex flex-col items-center pointer-events-none pt-[56px]`}
-            style={{
-              left: SIDEBAR_WIDTH + SHELL_EDGE_GAP,
-              right: SHELL_EDGE_GAP,
-              top: 12,
-            }}
+            className={`absolute z-[60] flex flex-col pointer-events-none ${
+              isCompact
+                ? "inset-0 bg-bg-canvas pb-[env(safe-area-inset-bottom)]"
+                : "right-0 items-center pt-[56px]"
+            }`}
+            style={
+              isCompact
+                ? undefined
+                : {
+                    left: SIDEBAR_WIDTH + SHELL_EDGE_GAP,
+                    right: SHELL_EDGE_GAP,
+                    top: 12,
+                  }
+            }
           >
             {/* 1. Search Input Island */}
             <div
-              className="w-[min(660px,calc(100vw-72px))] h-[54px] rounded-[8px] pointer-events-auto flex items-center px-[18px] gap-[14px] bg-bg-panel/95 border border-border-primary/50 backdrop-blur-2xl"
+              className={`pointer-events-auto flex items-center gap-[14px] ${
+                isCompact
+                  ? "pt-[env(safe-area-inset-top)] w-full min-h-[58px] px-[16px] rounded-none border-0 border-b border-border-primary/60 bg-bg-surface"
+                  : "w-[min(660px,calc(100vw-72px))] h-[54px] rounded-[8px] px-[18px] bg-bg-panel/95 border border-border-primary/50 backdrop-blur-2xl"
+              }`}
             >
               <span className="shrink-0 flex items-center justify-center text-text-tertiary">
                 <AnimatePresence mode="wait" initial={false}>
@@ -915,6 +961,17 @@ export default function AppFrame({ children }: AppFrameProps) {
                   </motion.button>
                 )}
               </AnimatePresence>
+
+              {isCompact && (
+                <button
+                  type="button"
+                  onClick={closeSearch}
+                  className="shrink-0 border-none bg-transparent px-[4px] text-[14px] font-[500] text-text-secondary active:text-text-primary"
+                  style={{ fontFamily: "var(--font-inter), sans-serif" }}
+                >
+                  {t("common.cancel") || "Cancel"}
+                </button>
+              )}
             </div>
 
             <AnimatePresence mode="wait">
@@ -925,7 +982,11 @@ export default function AppFrame({ children }: AppFrameProps) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -6, scale: 0.99 }}
                   transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-[min(660px,calc(100vw-72px))] mt-[8px] max-h-[500px] h-[500px] rounded-[8px] pointer-events-auto flex flex-col overflow-hidden bg-bg-panel/95 border border-border-primary/50 backdrop-blur-2xl"
+                  className={`pointer-events-auto flex flex-col overflow-hidden ${
+                    isCompact
+                      ? "w-full flex-1 mt-0 max-h-none rounded-none border-0 bg-bg-primary"
+                      : "w-[min(660px,calc(100vw-72px))] mt-[8px] max-h-[500px] h-[500px] rounded-[8px] bg-bg-panel/95 border border-border-primary/50 backdrop-blur-2xl"
+                  }`}
                 >
                   <div className="flex gap-[6px] px-[14px] pt-[12px] pb-[6px] shrink-0 overflow-x-auto">
                     {filterKeys.map((key) => {
@@ -1038,7 +1099,11 @@ export default function AppFrame({ children }: AppFrameProps) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -6, scale: 0.99 }}
                   transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-[min(660px,calc(100vw-72px))] mt-[8px] max-h-[480px] h-auto rounded-[8px] pointer-events-auto flex flex-col overflow-hidden bg-bg-panel/95 border border-border-primary/50 backdrop-blur-2xl"
+                  className={`pointer-events-auto flex flex-col overflow-hidden ${
+                    isCompact
+                      ? "w-full flex-1 mt-0 max-h-none rounded-none border-0 bg-bg-primary"
+                      : "w-[min(660px,calc(100vw-72px))] mt-[8px] max-h-[480px] h-auto rounded-[8px] bg-bg-panel/95 border border-border-primary/50 backdrop-blur-2xl"
+                  }`}
                 >
                   <SearchHistoryList
                     onSelectQuery={handleSelectHistoryQuery}
@@ -1068,6 +1133,7 @@ export default function AppFrame({ children }: AppFrameProps) {
       <SettingsModal />
       <UpdateModal />
       <UpdateToastBridge />
+      {!isCompact && (
       <WindowControls
         isFullscreen={isFullscreenPlayer}
         style={{
@@ -1077,6 +1143,7 @@ export default function AppFrame({ children }: AppFrameProps) {
           zIndex: 80,
         }}
       />
+      )}
     </div>
   );
 }

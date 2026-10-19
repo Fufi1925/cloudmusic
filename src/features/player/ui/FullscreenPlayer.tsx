@@ -24,6 +24,7 @@ import "@braccato/core/styles/lyrics.css";
 import "@braccato/core/styles/instrumental.css";
 import KawarpWrapper from "./KawarpWrapper";
 import { useTranslation } from "@/languages";
+import { useIsCompact } from "@/shared/hooks/useCompactLayout";
 
 const BRACCATO_TAG = "braccato-lyrics";
 
@@ -296,6 +297,7 @@ export function FullscreenPlayer({
   onClose,
 }: FullscreenPlayerProps) {
   const { t } = useTranslation();
+  const isCompact = useIsCompact();
   const player = usePlayerState();
   const coverUrl = player.currentTrack?.coverUrl;
   const kawarpSrc = useCoverSrc(coverUrl);
@@ -368,12 +370,25 @@ export function FullscreenPlayer({
 
       <div className="absolute inset-0 z-[1] bg-black/40" />
 
-      <div className="absolute inset-0 z-10 flex">
-        <div className="flex-1 flex flex-col items-center justify-center gap-5">
+      <div className={`absolute inset-0 z-10 flex ${isCompact ? "flex-col" : ""}`}>
+        <div
+          className={`flex flex-col items-center justify-center gap-5 ${
+            isCompact
+              ? "flex-[1.15] min-h-0 w-full pt-[env(safe-area-inset-top)] pb-[8px]"
+              : "flex-1"
+          }`}
+        >
           <PlayerUiElements onClose={onClose} />
         </div>
 
-        <div className="flex-1 h-full min-h-0 pl-2 pr-6 flex flex-col relative">
+        {(!isCompact || hasLyrics) && (
+        <div
+          className={`flex flex-col relative min-h-0 ${
+            isCompact
+              ? "flex-1 w-full pl-0 pr-0 border-t border-white/10"
+              : "flex-1 h-full pl-2 pr-6"
+          }`}
+        >
           {showProviderIsland && (
             <div className="absolute top-[12px] left-1/2 -translate-x-1/2 z-30 pointer-events-none flex justify-center">
               <LyricsProviderIsland />
@@ -473,6 +488,7 @@ export function FullscreenPlayer({
             ) : null}
           </AnimatePresence>
         </div>
+        )}
       </div>
 
       <button
@@ -481,7 +497,7 @@ export function FullscreenPlayer({
         title={t("player.close_fullscreen") || "Close"}
         onClick={onClose}
         data-no-window-drag
-        className="absolute top-[12px] left-[12px] z-30 inline-flex h-[32px] w-[32px] items-center justify-center rounded-lg border-none bg-black/50 backdrop-blur-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-[0.94] transition-all cursor-pointer select-none pointer-events-auto"
+        className="absolute left-[12px] z-30 inline-flex items-center justify-center rounded-lg border-none bg-black/50 backdrop-blur-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-[0.94] transition-all cursor-pointer select-none pointer-events-auto h-[32px] w-[32px] max-md:h-[38px] max-md:w-[38px] top-[max(12px,env(safe-area-inset-top))]"
       >
         <DownLine size={18} />
       </button>

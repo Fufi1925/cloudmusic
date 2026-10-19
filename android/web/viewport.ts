@@ -1,23 +1,28 @@
-// The renderer is a fixed desktop layout (electron enforces a 1100x705 minimum
-// window). On android the layout keeps that exact design and the WebView is
-// zoomed so it fits the screen: the css viewport is enlarged (`width=` in the
-// viewport meta) and scaled down by the same factor. The native side reports
-// the usable screen size in dp (system bars / display cutout removed, the soft
-// keyboard intentionally NOT removed so typing never re-zooms the layout) plus
-// the user's pinch-to-zoom ui scale.
+// The renderer is responsive: below 768px it switches to the portrait layout
+// (bottom navigation, stacked page headers, full screen sheets), above it the
+// desktop layout is used unchanged.
+//
+// On android the WebView therefore gets the real screen size in dp as the css
+// viewport (no more shrinking the 1100x705 desktop canvas onto a phone), and
+// the user's pinch-to-zoom only scales that viewport: a pinch factor > 1
+// zooms in (fewer css pixels), < 1 zooms out.
+//
+// The native side reports the usable screen size in dp (system bars / display
+// cutout removed, the soft keyboard intentionally NOT removed so typing never
+// re-zooms the layout) plus the user's pinch factor.
 
 export const DESKTOP_MIN_WIDTH = 1100;
 export const DESKTOP_MIN_HEIGHT = 705;
-// lower bound of the automatic fit so text stays readable on phones; below it
-// the layout gets a bit less room than the desktop minimum (still fully usable)
-export const PHONE_SCALE_FLOOR = 0.68;
-export const TABLET_SCALE_FLOOR = 0.7;
-// pinch-to-zoom never shrinks the css canvas below this: sidebar + content +
-// player bar and the fullscreen player stop fitting underneath it
-export const HARD_MIN_WIDTH = 960;
-export const HARD_MIN_HEIGHT = 470;
-export const MIN_SCALE = 0.4;
-export const MAX_SCALE = 2;
+/** smallest css canvas we ever hand to the renderer */
+export const MIN_VIEWPORT_WIDTH = 320;
+export const MIN_VIEWPORT_HEIGHT = 480;
+export const MIN_SCALE = 0.6;
+export const MAX_SCALE = 1.6;
+/** legacy export kept for the native "maxUiScale" round trip */
+export const HARD_MIN_WIDTH = MIN_VIEWPORT_WIDTH;
+export const HARD_MIN_HEIGHT = MIN_VIEWPORT_HEIGHT;
+export const PHONE_SCALE_FLOOR = MIN_SCALE;
+export const TABLET_SCALE_FLOOR = MIN_SCALE;
 
 export interface ViewportMetrics {
   wDp: number;
@@ -30,28 +35,33 @@ export interface ComputedViewport {
   width: number;
   height: number;
   scale: number;
-  /** automatic scale before the user's pinch factor */
+  /** automatic scale before the user's pinch factor (always 1 now) */
   base: number;
-  /** largest pinch factor that still respects HARD_MIN_WIDTH / HARD_MIN_HEIGHT */
+  /** largest pinch factor that keeps the css canvas above the minimum size */
   maxUiScale: number;
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
 export function computeViewport(metrics: ViewportMetrics): ComputedViewport {
-  const wDp = Math.max(1, metrics.wDp || window.innerWidth || DESKTOP_MIN_WIDTH);
-  const hDp = Math.max(1, metrics.hDp || window.innerHeight || DESKTOP_MIN_HEIGHT);
-  const fit = Math.min(1, wDp / DESKTOP_MIN_WIDTH, hDp / DESKTOP_MIN_HEIGHT);
-  const floor = metrics.phone ? PHONE_SCALE_FLOOR : TABLET_SCALE_FLOOR;
-  const ceiling = Math.max(fit, Math.min(wDp / HARD_MIN_WIDTH, hDp / HARD_MIN_HEIGHT));
-  const base = Math.min(Math.max(fit, floor), ceiling);
+  const wDp = Math.max(1, metrics.wDp || window.innerWidth || 360);
+  const hDp = Math.max(1, metrics.hDp || window.innerHeight || 640);
   const userScale = Number.isFinite(metrics.uiScale) && metrics.uiScale > 0 ? metrics.uiScale : 1;
-  const raw = Math.min(base * userScale, Math.max(base, ceiling));
-  const scale = Math.round(Math.min(MAX_SCALE, Math.max(MIN_SCALE, raw)) * 10000) / 10000;
+
+  // the css canvas shrinks when zooming in, grows when zooming out
+  const widthLimitScale = wDp / MIN_VIEWPORT_WIDTH;
+  const heightLimitScale = hDp / MIN_VIEWPORT_HEIGHT;
+  const maxUiScale = Math.max(1, Math.min(MAX_SCALE, widthLimitScale, heightLimitScale));
+  const scale = Math.round(clamp(userScale, MIN_SCALE, maxUiScale) * 10000) / 10000;
+
   return {
-    width: Math.max(320, Math.round(wDp / scale)),
-    height: Math.max(240, Math.round(hDp / scale)),
+    width: Math.max(MIN_VIEWPORT_WIDTH, Math.round(wDp / scale)),
+    height: Math.max(MIN_VIEWPORT_HEIGHT, Math.round(hDp / scale)),
     scale,
-    base,
-    maxUiScale: Math.max(1, Math.round((Math.max(base, ceiling) / base) * 100) / 100),
+    base: 1,
+    maxUiScale: Math.round(maxUiScale * 100) / 100,
   };
 }
 

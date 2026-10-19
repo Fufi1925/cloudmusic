@@ -14,6 +14,7 @@ import {
 } from "@solar-icons/react";
 import Dialog from "@/shared/ui/Dialog";
 import { UserAvatar } from "@/shared/ui";
+import { useIsCompact } from "@/shared/hooks/useCompactLayout";
 import { useTranslation, getTranslationsForAllLocales } from "@/languages";
 import { useModalStore } from "@/features/library";
 import { useAuthStore } from "@/features/auth";
@@ -110,6 +111,7 @@ const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
 
 export default function SettingsModal() {
   const { t } = useTranslation();
+  const isCompact = useIsCompact();
   const open = useModalStore((state) => state.settingsOpen);
   const close = useModalStore((state) => state.closeSettings);
 
@@ -235,8 +237,76 @@ export default function SettingsModal() {
       open={open}
       onOpenChange={(next) => (!next ? handleClose() : undefined)}
       maxWidth={880}
-      className="p-0 h-[620px] max-h-[86vh] !flex-row overflow-hidden !bg-bg-elevated !border-0"
+      className={
+        isCompact
+          ? "p-0 !flex-col overflow-hidden !bg-bg-primary !border-0"
+          : "p-0 h-[620px] max-h-[86vh] !flex-row overflow-hidden !bg-bg-elevated !border-0"
+      }
     >
+      {isCompact && (
+        <div className="shrink-0 border-b border-border-primary/60 bg-bg-elevated pt-[env(safe-area-inset-top)]">
+          <div className="flex items-center gap-[8px] px-[12px] pt-[8px]">
+            <div className="relative flex flex-1 items-center">
+              <Search2Line
+                size={15}
+                className="pointer-events-none absolute left-[10px] text-text-tertiary"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t("settings.search_placeholder")}
+                className="h-[36px] w-full rounded-[8px] border-0 bg-border-alpha-14 pl-[30px] pr-[26px] text-[13px] text-text-primary outline-none transition-colors placeholder:text-text-tertiary focus:bg-border-alpha-20"
+                style={font}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-[6px] flex items-center justify-center border-0 bg-transparent p-0 text-text-tertiary"
+                >
+                  <CloseCircleFill size={14} />
+                </button>
+              )}
+            </div>
+            <button
+              type="button"
+              aria-label={t("common.close") || "Close"}
+              onClick={handleClose}
+              className="inline-flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-md border-0 bg-transparent p-0 text-text-tertiary active:text-text-primary"
+            >
+              <CloseLine size={19} />
+            </button>
+          </div>
+
+          <div className="flex gap-[6px] overflow-x-auto px-[12px] py-[10px]">
+            {TAB_GROUPS.flatMap((group) => group.ids).map((id) => {
+              const Icon = TAB_ICONS[id];
+              const isActive = id === activeTab;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(id)}
+                  className={`flex shrink-0 items-center gap-[6px] rounded-full border-0 px-[11px] py-[7px] text-[12.5px] transition-colors ${
+                    isActive
+                      ? "bg-text-primary text-bg-primary font-[600]"
+                      : "bg-border-alpha-14 text-text-secondary"
+                  }`}
+                  style={font}
+                >
+                  <Icon size={14} weight="Bold" className="shrink-0" />
+                  <span className="whitespace-nowrap leading-none">{tabLabels[id]}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!isCompact && (
       <aside className="w-[248px] shrink-0 flex flex-col min-h-0 bg-transparent">
         <div className="px-[12px] pt-[14px] pb-[8px]">
           <div className="relative flex items-center">
@@ -365,11 +435,12 @@ export default function SettingsModal() {
           </div>
         </div>
       </aside>
+      )}
 
       {/* ── Right secondary frame: same roundness, inset with padding, darker ── */}
-      <div className="flex-1 min-w-0 min-h-0 p-[2px] flex">
+      <div className="flex-1 min-w-0 min-h-0 p-[2px] max-md:p-0 flex">
         <div className="flex-1 min-w-0 min-h-0 flex flex-col rounded-xl bg-bg-primary overflow-hidden">
-        <div className="flex items-start justify-between gap-[16px] px-[24px] pt-[20px] pb-[10px] shrink-0">
+        <div className="flex items-start justify-between gap-[16px] px-[24px] max-md:px-[16px] pt-[20px] max-md:pt-[14px] pb-[10px] shrink-0">
           <div className="min-w-0">
             <h3
               className="text-text-primary text-[15px] m-0 font-[600] tracking-[-0.01em]"
@@ -388,13 +459,13 @@ export default function SettingsModal() {
             type="button"
             aria-label={t("common.close") || "Close"}
             onClick={handleClose}
-            className="w-[28px] h-[28px] shrink-0 inline-flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-border-alpha-14 transition-colors border-0 bg-transparent p-0 cursor-pointer"
+            className="w-[28px] h-[28px] shrink-0 inline-flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-border-alpha-14 transition-colors border-0 bg-transparent p-0 cursor-pointer max-md:hidden"
           >
             <CloseLine size={17} />
           </button>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto px-[24px] pb-[16px] flex flex-col">
+        <div className="flex-1 min-h-0 overflow-y-auto px-[24px] max-md:px-[16px] pb-[16px] pb-[max(16px,env(safe-area-inset-bottom))] flex flex-col">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 7 }}
