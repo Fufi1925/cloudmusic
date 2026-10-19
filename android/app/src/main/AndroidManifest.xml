@@ -44,6 +44,16 @@
             </intent-filter>
         </activity>
 
+        <!-- in-app browser for the discord login (Settings -> Discord) -->
+        <activity
+            android:name=".DiscordLoginActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density|fontScale|locale|layoutDirection"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="Discord"
+            android:theme="@style/Theme.CloudMusic"
+            android:windowSoftInputMode="adjustResize" />
+
         <service
             android:name=".PlaybackService"
             android:exported="false"

@@ -729,6 +729,18 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Settings -> Discord: in-app browser that logs in and takes over the token itself */
+    void openDiscordLogin() {
+        try {
+            Intent intent = new Intent(this, DiscordLoginActivity.class);
+            startActivity(intent);
+            ownActivityOnTop = true;
+        } catch (Exception e) {
+            // activity missing in a broken build: fall back to the system browser
+            openExternal("https://discord.com/login");
+        }
+    }
+
     void openExternal(String url) {
         try {
             ownActivityOnTop = true;

@@ -357,7 +357,7 @@
     "repeat": "Wiederholung",
     "previous": "Vorher",
     "open_player": "Player öffnen",
-    "next":"Weiter",
+    "next": "Weiter",
     "lyrics_upgraded": "Songtext verbessert!",
     "playing_from": "Wiedergabe von",
     "autoplay_radio": "Autoplay-Radio",
@@ -768,9 +768,8 @@
       "never_run": "Die Prüfungen wurden noch nicht ausgeführt.",
       "last_run": "{ok}/{total} Prüfungen ok · {time}",
       "open_folder": "Speicherort öffnen"
-    }
-  ,
-    "discord":     {
+    },
+    "discord": {
       "description": "Zeige auf Discord, was du hörst – mit Cover, Künstler-Badge und Fortschrittsbalken.",
       "section_display": "Anzeigeoptionen",
       "section_buttons": "Profil-Buttons",
@@ -814,25 +813,24 @@
         "disabled": "Deaktiviert"
       },
       "android": {
-        "title": "Discord verbinden",
-        "description": "Auf Android gibt es kein Discord-IPC: CloudMusic meldet sich direkt an Discords Gateway an, damit dein Profil trotzdem „Hört …“ anzeigt. Dafür wird ein Discord-Token gebraucht.",
-        "open_login": "Discord im Browser öffnen",
-        "howto": "Melde dich dort an und hole das Token im Browser: F12 → Application → Local Storage → https://discord.com → Feld „token“ (Strg+C).",
-        "token_label": "Discord-Token",
-        "token_placeholder": "Token hier einfügen…",
-        "save": "Speichern & verbinden",
+        "title": "Mit Discord verbinden",
+        "description": "Android hat keinen Discord-IPC: CloudMusic meldet sich direkt an Discords Gateway an, damit dein Profil „Hört gerade …“ zeigt. Der Login läuft in der App, das Token wird automatisch übernommen.",
+        "connect": "Mit Discord verbinden",
+        "reconnect": "Neu anmelden",
         "clear": "Token löschen",
-        "saved": "Token gespeichert – nur auf diesem Gerät, verschlüsselt.",
+        "cleared": "Token gelöscht.",
         "connected_as": "Verbunden als {user}",
         "connecting": "Verbinde mit Discord…",
-        "no_token": "Kein Token gespeichert",
+        "no_token": "Nicht verbunden",
+        "login_hint": "Es öffnet sich ein Fenster mit dem Discord-Login. Nach der Anmeldung schließt es sich von selbst – fertig, wie am PC.",
         "warning": "Inoffizieller Weg: Discord kann das als Selfbot werten und dein Konto sperren. Nutzung auf eigenes Risiko – das Token bleibt ausschließlich auf diesem Gerät.",
-        "stored_locally": "Das Token liegt AES-verschlüsselt im Android-Keystore und verläßt das Gerät nie (nur zu Discords Gateway).",
+        "stored_locally": "Das Token liegt AES-verschlüsselt im Android-Keystore, wird nie geloggt und verlässt das Gerät nur Richtung Discord.",
         "error_invalid_token": "Token ungültig oder abgelaufen",
         "error_connect_failed": "Verbindung zu Discord fehlgeschlagen",
         "error_network": "Keine Verbindung zu Discord"
       }
-    }},
+    }
+  },
   "toast": {
     "playlist_created": "Playlist erstellt",
     "playlist_imported": "{name} importiert ({count} Titel)",

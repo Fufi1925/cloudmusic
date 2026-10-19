@@ -57,7 +57,7 @@ android/
 | Speichern-Dialog für den Dump | Android-"Speichern unter"-Dialog (Storage Access Framework) |
 | `net:diagnose` | DNS, TCP, TLS und Kontroll-Endpunkte nativ (Traceroute gibt es auf Android nicht) |
 | Fenster-Icon nach Akzentfarbe | Icon in der App-Übersicht (Recents) |
-| Discord Rich Presence über den lokalen Discord-IPC-Socket | **eigener Gateway-Client** (`wss://gateway.discord.gg`): Token wird in der App eingefügt, AES-256/GCM-verschlüsselt im Android-Keystore gespeichert und nur an Discord gesendet (`DiscordRpc.java`, `DiscordTokenStore.java`) |
+| Discord Rich Presence über den lokalen Discord-IPC-Socket | **eigener Gateway-Client** (`wss://gateway.discord.gg`) + **In-App-Login-Fenster**: Token wird nach dem Discord-Login automatisch übernommen, AES-256/GCM-verschlüsselt im Android-Keystore gespeichert und nur an Discord gesendet (`DiscordRpc.java`, `DiscordTokenStore.java`, `DiscordLoginActivity.java`) |
 
 Nicht übertragbar (die UI-Schalter bleiben, haben aber keine Wirkung):
 - **Auto-Updater / OTA-Bundles** – liefern Desktop-Installer bzw. Electron-Bundles; in diesem Build komplett
@@ -71,14 +71,22 @@ Die Einstellungen → **Discord** funktionieren auf dem Handy anders als am Desk
 Discord-IPC-Socket, also meldet sich CloudMusic direkt an Discords Gateway an und setzt dort eine
 Activity vom Typ *Hört gerade …* mit Cover, Künstler-Badge und Fortschrittsbalken.
 
-1. In *Einstellungen → Discord* auf **Discord im Browser öffnen** tippen, dort anmelden.
-2. Token holen: im Browser `F12` → *Application* → *Local Storage* → `https://discord.com` → Feld `token`.
-3. Token in der App einfügen → **Speichern & verbinden**.
+1. In *Einstellungen → Discord* auf **Mit Discord verbinden** tippen.
+2. Es öffnet sich ein Fenster **in der App** mit dem Discord-Login (`discord.com/login`).
+3. Nach der Anmeldung übernimmt CloudMusic das Token automatisch und das Fenster schließt sich –
+   danach läuft alles wie am PC (Einstellungen, Status, „Hört gerade …").
+
+Das Token wird dabei einmalig aus dem `localStorage` der Login-Seite gelesen und dort gleich wieder
+entfernt; die App selbst speichert nur das Chiffrat.
 
 Das Token wird **ausschließlich lokal** gespeichert: AES-256/GCM-verschlüsselt, der Schlüssel liegt im
 Android-Keystore (`cloudmusic_discord_token_v1`) und verlässt das Gerät nie. Das Klartext-Token existiert
 nur im Arbeitsspeicher und wird nur an `gateway.discord.gg` gesendet. **Token löschen** entfernt Schlüsselblob
 und Verbindung; die Einstellungen zeigen jederzeit den Status (verbunden als …).
+
+Technisch: `DiscordLoginActivity` (eigener In-App-Browser, `DiscordLoginActivity.java`) pollt während des
+Logins `localStorage.token`, übergibt den Wert direkt an `DiscordRpc.setToken()` (→ Keystore) und beendet
+sich. Wird der Login abgebrochen, ändert sich nichts.
 
 > Hinweis: Das ist der inoffizielle Weg (Selfbot). Discord kann so etwas als Regelverstoß werten –
 > Nutzung auf eigenes Risiko.

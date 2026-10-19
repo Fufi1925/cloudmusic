@@ -8,24 +8,24 @@ const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
 function hasAndroidRpc(): boolean {
   return (
     typeof window !== "undefined" &&
-    typeof window.cloudMusicElectron?.discordSetToken === "function"
+    typeof window.cloudMusicElectron?.discordOpenLogin === "function"
   );
 }
 
 /**
- * Android-only "custom RPC" block: phones have no Discord IPC socket, so the
- * native side signs into Discord's gateway with the user's token. The token is
- * typed/pasted here, handed to the keystore-backed store and never sent back to
- * the UI again.
+ * Android-only Discord block.
+ *
+ * "Mit Discord verbinden" opens an in-app browser (DiscordLoginActivity) with
+ * discord.com/login. After signing in the activity takes the token straight out
+ * of the page, hands it to the keystore-backed store and closes itself – no copy
+ * and paste, nothing leaves the device.
  */
 export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
   const [available, setAvailable] = useState(false);
   const [status, setStatus] = useState<DiscordRpcStatus>({ connected: false });
-  const [tokenInput, setTokenInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [revealToken, setRevealToken] = useState(false);
 
   useEffect(() => {
     setAvailable(hasAndroidRpc());
@@ -38,15 +38,22 @@ export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string })
       const next = await api.getDiscordStatus();
       if (next) setStatus(next);
     } catch {
-      // bridge busy, try again on the next tick
+      // bridge busy, the next tick retries
     }
   }, []);
 
   useEffect(() => {
     if (!available) return;
     void refresh();
-    const interval = setInterval(() => void refresh(), 3000);
-    return () => clearInterval(interval);
+    // the login runs in its own activity: refresh fast while it is on screen
+    // and once more when the app comes back to the foreground
+    const interval = setInterval(() => void refresh(), 2000);
+    const onFocus = () => void refresh();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [available, refresh]);
 
   const isMatch = useMemo(() => {
@@ -55,7 +62,7 @@ export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string })
     const keys = [
       "settings.discord.android.title",
       "settings.discord.android.description",
-      "settings.discord.android.token_label",
+      "settings.discord.android.connect",
       "settings.discord.android.warning",
     ];
     return keys.some((key) =>
@@ -68,39 +75,18 @@ export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string })
   const errorText = (code: string | undefined) => {
     switch (code) {
       case "invalid_token":
+      case "invalid_format":
         return t("settings.discord.android.error_invalid_token");
       case "connect_failed":
         return t("settings.discord.android.error_network");
-      case "invalid_format":
-        return t("settings.discord.android.error_invalid_token");
       default:
         return code;
     }
   };
 
-  const save = async () => {
-    const api = window.cloudMusicElectron;
-    const token = tokenInput.trim();
-    if (!api?.discordSetToken || token.length < 20) {
-      setFeedback(t("settings.discord.android.error_invalid_token"));
-      return;
-    }
-    setBusy(true);
+  const connect = () => {
     setFeedback(null);
-    try {
-      const next = await api.discordSetToken(token);
-      setStatus(next);
-      setTokenInput("");
-      setFeedback(
-        next?.error
-          ? errorText(next.error) || t("settings.discord.android.error_invalid_token")
-          : t("settings.discord.android.saved"),
-      );
-    } catch {
-      setFeedback(t("settings.discord.android.error_connect_failed"));
-    } finally {
-      setBusy(false);
-    }
+    void window.cloudMusicElectron?.discordOpenLogin?.();
   };
 
   const clear = async () => {
@@ -110,14 +96,10 @@ export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string })
     try {
       const next = await api.discordClearToken();
       setStatus(next);
-      setFeedback(t("settings.discord.android.no_token"));
+      setFeedback(t("settings.discord.android.cleared"));
     } finally {
       setBusy(false);
     }
-  };
-
-  const openLogin = () => {
-    void window.cloudMusicElectron?.discordOpenLogin?.();
   };
 
   const statusText = status.error
@@ -164,59 +146,17 @@ export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string })
       </div>
 
       <div className="flex flex-col gap-[8px]">
-        <div className="flex items-center gap-[8px]">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={openLogin}
-            className="!h-[32px] !px-[12px] !text-[12.5px]"
-          >
-            {t("settings.discord.android.open_login")}
-          </Button>
-          <span className="text-[11.5px] leading-snug text-text-tertiary" style={font}>
-            {statusText}
-          </span>
-        </div>
-
-        <p className="m-0 text-[11.5px] leading-relaxed text-text-tertiary" style={font}>
-          {t("settings.discord.android.howto")}
-        </p>
-
-        <label className="flex flex-col gap-[4px]">
-          <span className="text-[12px] font-[500] text-text-secondary" style={font}>
-            {t("settings.discord.android.token_label")}
-          </span>
-          <div className="flex items-center gap-[6px]">
-            <input
-              type={revealToken ? "text" : "password"}
-              value={tokenInput}
-              onChange={(event) => setTokenInput(event.target.value)}
-              placeholder={t("settings.discord.android.token_placeholder")}
-              spellCheck={false}
-              autoCapitalize="none"
-              autoCorrect="off"
-              className="h-[36px] min-w-0 flex-1 rounded-md border border-border-primary/60 bg-bg-surface px-[10px] font-mono text-[12px] text-text-primary outline-none placeholder:text-text-tertiary focus:border-border-secondary"
-            />
-            <button
-              type="button"
-              onClick={() => setRevealToken((value) => !value)}
-              className="h-[36px] shrink-0 rounded-md border-0 bg-border-alpha-14 px-[10px] text-[12px] text-text-secondary"
-              style={font}
-            >
-              {revealToken ? "•••" : "👁"}
-            </button>
-          </div>
-        </label>
-
-        <div className="flex items-center gap-[8px]">
+        <div className="flex flex-wrap items-center gap-[8px]">
           <Button
             variant="primary"
             size="sm"
-            onClick={() => void save()}
-            disabled={busy || tokenInput.trim().length < 20}
-            className="!h-[32px] !px-[14px] !text-[12.5px]"
+            onClick={connect}
+            disabled={busy}
+            className="!h-[34px] !px-[14px] !text-[12.5px]"
           >
-            {t("settings.discord.android.save")}
+            {status.connected
+              ? t("settings.discord.android.reconnect")
+              : t("settings.discord.android.connect")}
           </Button>
           {status.hasToken && (
             <Button
@@ -224,22 +164,22 @@ export function DiscordAndroidSection({ searchQuery }: { searchQuery?: string })
               size="sm"
               onClick={() => void clear()}
               disabled={busy}
-              className="!h-[32px] !px-[12px] !text-[12.5px]"
+              className="!h-[34px] !px-[12px] !text-[12.5px]"
             >
               {t("settings.discord.android.clear")}
             </Button>
           )}
+          <span className="text-[11.5px] leading-snug text-text-tertiary" style={font}>
+            {statusText}
+          </span>
         </div>
 
+        <p className="m-0 text-[11.5px] leading-relaxed text-text-tertiary" style={font}>
+          {t("settings.discord.android.login_hint")}
+        </p>
+
         {feedback && (
-          <p
-            className={`m-0 text-[11.5px] leading-relaxed ${
-              feedback === t("settings.discord.android.saved")
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-text-tertiary"
-            }`}
-            style={font}
-          >
+          <p className="m-0 text-[11.5px] leading-relaxed text-text-tertiary" style={font}>
             {feedback}
           </p>
         )}

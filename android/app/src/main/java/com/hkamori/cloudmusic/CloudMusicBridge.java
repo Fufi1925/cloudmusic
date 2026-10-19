@@ -184,7 +184,7 @@ public final class CloudMusicBridge {
                 resolve(callId, CloudMusicApp.get().discordRpc().setEnabled(args.optBoolean(0, true)));
                 break;
             case "discord:open-login":
-                ui.post(() -> activity.openExternal("https://discord.com/login"));
+                ui.post(() -> activity.openDiscordLogin());
                 resolve(callId, null);
                 break;
 

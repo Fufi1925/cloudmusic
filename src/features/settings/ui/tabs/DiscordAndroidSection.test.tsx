@@ -6,9 +6,6 @@ import { DiscordAndroidSection } from "./DiscordAndroidSection";
 
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 
-// clearly fake, never token-shaped: GitHub push protection rejects discord-like secrets
-const TOKEN = ["fake", "token", "only", "for", "unit", "tests"].join("-");
-
 type Api = Record<string, unknown>;
 
 function setApi(api: Api | undefined) {
@@ -42,12 +39,20 @@ function click(el: Element | null) {
   });
 }
 
-function type(input: HTMLInputElement, value: string) {
-  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
-  act(() => {
-    setter.call(input, value);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  });
+function button(host: HTMLElement, label: string) {
+  return Array.from(host.querySelectorAll("button")).find((b) =>
+    b.textContent?.includes(label),
+  );
+}
+
+function androidApi(overrides: Api = {}) {
+  return {
+    getDiscordStatus: vi.fn(async () => ({ connected: false, hasToken: false, platform: "android" })),
+    discordSetToken: vi.fn(),
+    discordClearToken: vi.fn(async () => ({ connected: false, hasToken: false })),
+    discordOpenLogin: vi.fn(async () => null),
+    ...overrides,
+  };
 }
 
 describe("DiscordAndroidSection", () => {
@@ -82,81 +87,60 @@ describe("DiscordAndroidSection", () => {
     expect(host.textContent).toBe("");
   });
 
-  it("shows the connect flow once the android bridge is present", async () => {
-    setApi({
-      getDiscordStatus: vi.fn(async () => ({ connected: false, hasToken: false, platform: "android" })),
-      discordSetToken: vi.fn(),
-      discordClearToken: vi.fn(),
-      discordOpenLogin: vi.fn(async () => null),
-    });
+  it("shows the connect button and the disconnected state", async () => {
+    setApi(androidApi());
     const { host } = mount();
     await flush();
 
-    expect(host.textContent).toContain("Discord verbinden");
-    expect(host.textContent).toContain("Kein Token gespeichert");
-    expect(host.querySelector("input")).toBeTruthy();
+    expect(host.textContent).toContain("Mit Discord verbinden");
+    expect(host.textContent).toContain("Nicht verbunden");
+    // no manual token field any more: the login window does it
+    expect(host.querySelector("input")).toBeNull();
   });
 
-  it("stores the pasted token through the bridge", async () => {
-    const setToken = vi.fn(async () => ({
-      connected: false,
-      hasToken: true,
-      platform: "android",
-    }));
-    setApi({
-      getDiscordStatus: vi.fn(async () => ({ connected: false, hasToken: false, platform: "android" })),
-      discordSetToken: setToken,
-      discordClearToken: vi.fn(async () => ({ connected: false, hasToken: false })),
-      discordOpenLogin: vi.fn(async () => null),
-    });
+  it("opens the in-app discord login", async () => {
+    const api = androidApi();
+    setApi(api);
     const { host } = mount();
     await flush();
 
-    const input = host.querySelector("input") as HTMLInputElement;
-    type(input, TOKEN);
-
-    const buttons = Array.from(host.querySelectorAll("button"));
-    const save = buttons.find((b) => b.textContent?.includes("Speichern"));
-    click(save ?? null);
+    click(button(host, "Mit Discord verbinden") ?? null);
     await flush();
 
-    expect(setToken).toHaveBeenCalledWith(TOKEN);
-    expect(host.textContent).toContain("Token gespeichert");
+    expect(api.discordOpenLogin).toHaveBeenCalled();
   });
 
-  it("opens the discord login page in the browser", async () => {
-    const openLogin = vi.fn(async () => null);
-    setApi({
-      getDiscordStatus: vi.fn(async () => ({ connected: false, hasToken: false, platform: "android" })),
-      discordSetToken: vi.fn(),
-      discordClearToken: vi.fn(),
-      discordOpenLogin: openLogin,
-    });
+  it("shows the connected account once the login produced a token", async () => {
+    const getStatus = vi
+      .fn()
+      .mockResolvedValueOnce({ connected: false, hasToken: false, platform: "android" })
+      .mockResolvedValue({ connected: true, hasToken: true, username: "fufi", platform: "android" });
+    setApi(androidApi({ getDiscordStatus: getStatus }));
     const { host } = mount();
     await flush();
 
-    const buttons = Array.from(host.querySelectorAll("button"));
-    click(buttons.find((b) => b.textContent?.includes("im Browser")) ?? null);
+    window.dispatchEvent(new Event("focus"));
     await flush();
 
-    expect(openLogin).toHaveBeenCalled();
+    expect(host.textContent).toContain("Verbunden als fufi");
+    expect(host.textContent).toContain("Neu anmelden");
   });
 
   it("deletes a stored token", async () => {
     const clearToken = vi.fn(async () => ({ connected: false, hasToken: false }));
-    setApi({
-      getDiscordStatus: vi.fn(async () => ({ connected: false, hasToken: true, platform: "android" })),
-      discordSetToken: vi.fn(),
-      discordClearToken: clearToken,
-      discordOpenLogin: vi.fn(async () => null),
-    });
+    setApi(
+      androidApi({
+        getDiscordStatus: vi.fn(async () => ({ connected: true, hasToken: true, username: "fufi", platform: "android" })),
+        discordClearToken: clearToken,
+      }),
+    );
     const { host } = mount();
     await flush();
 
-    const buttons = Array.from(host.querySelectorAll("button"));
-    click(buttons.find((b) => b.textContent?.includes("löschen")) ?? null);
+    click(button(host, "Token löschen") ?? null);
     await flush();
 
     expect(clearToken).toHaveBeenCalled();
+    expect(host.textContent).toContain("Token gelöscht");
   });
 });
