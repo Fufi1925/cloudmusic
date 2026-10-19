@@ -1,7 +1,12 @@
 // Android implementation of the exact `CloudMusicElectronApi` contract from
 // electron/preload.ts. Channel names are kept 1:1 with the electron ipc
 // channels so the native dispatcher (CloudMusicBridge.java) reads like main.ts.
-import type { DeeplinkTarget, CloudMusicElectronApi, WindowState } from "../../electron/preload";
+import type {
+  DeeplinkTarget,
+  CloudMusicElectronApi,
+  DiscordRpcStatus,
+  WindowState,
+} from "../../electron/preload";
 import type { MainNetResult } from "../../electron/netdiag";
 import { invoke, on, send } from "./ipc";
 import * as signer from "./signer";
@@ -284,11 +289,15 @@ export function createCloudMusicApi(info: AndroidInfo): CloudMusicElectronApi {
     onOverlayVisibility: (cb) => subscribe("overlay:visibility", cb),
     setOverlayAuthenticated: (authenticated) => send("overlay:set-authenticated", Boolean(authenticated)),
 
-    // discord rich presence talks to the local discord desktop ipc socket,
-    // which does not exist on android
-    discordUpdateState: () => undefined,
-    discordUpdateSettings: () => undefined,
-    getDiscordStatus: async () => ({ connected: false }),
+    // custom discord rich presence: no local ipc socket exists on android, so
+    // the native gateway client takes over (token stored locally, see DiscordRpc.java)
+    discordUpdateState: (state) => send("discord:update-state", state ?? {}),
+    discordUpdateSettings: (settings) => send("discord:update-settings", settings ?? {}),
+    getDiscordStatus: () => invoke<DiscordRpcStatus>("discord:get-status"),
+    discordSetToken: (token) => invoke<DiscordRpcStatus>("discord:set-token", token),
+    discordClearToken: () => invoke<DiscordRpcStatus>("discord:clear-token"),
+    discordSetEnabled: (enabled) => invoke<DiscordRpcStatus>("discord:set-enabled", Boolean(enabled)),
+    discordOpenLogin: () => invoke("discord:open-login"),
 
     mintPoToken: (identifier: string) => invoke<string>("potoken:mint", identifier),
   };

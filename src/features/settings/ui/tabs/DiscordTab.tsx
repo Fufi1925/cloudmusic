@@ -6,6 +6,7 @@ import {
 } from "@/features/discord";
 import { ToggleSwitch, Select } from "@/shared/ui";
 import { SettingRow, SettingSection } from "../controls";
+import { DiscordAndroidSection } from "./DiscordAndroidSection";
 
 export function DiscordTab({ searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
@@ -83,6 +84,9 @@ export function DiscordTab({ searchQuery }: { searchQuery?: string }) {
             : t("settings.discord.status.disabled") || "Disabled"}
         </span>
       </div>
+
+      {/* Android only: custom RPC via Discord gateway (local token) */}
+      <DiscordAndroidSection searchQuery={searchQuery} />
 
       {/* Main enable switch */}
       <SettingSection>

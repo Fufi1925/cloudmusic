@@ -79,6 +79,21 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## Discord Rich Presence
+
+Desktop builds talk to the local Discord client through its IPC socket (no login needed). Android has no
+such socket, so the phone app uses a built-in gateway client instead: it signs in to
+`wss://gateway.discord.gg` with a user token and publishes the same "Listening to …" activity
+(cover, artist badge, live progress).
+
+The token is entered once in *Settings → Discord*, encrypted with AES-256/GCM and stored behind a key
+that lives in the Android keystore (`cloudmusic_discord_token_v1`). It never leaves the device, is never
+logged and is only sent to Discord's own gateway. "Delete token" removes it again.
+
+> Unofficial method (selfbot) – Discord may treat it as a rule violation. Use at your own risk.
+
+---
+
 ## Architecture
 
 ```

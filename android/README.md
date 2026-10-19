@@ -57,17 +57,35 @@ android/
 | Speichern-Dialog für den Dump | Android-"Speichern unter"-Dialog (Storage Access Framework) |
 | `net:diagnose` | DNS, TCP, TLS und Kontroll-Endpunkte nativ (Traceroute gibt es auf Android nicht) |
 | Fenster-Icon nach Akzentfarbe | Icon in der App-Übersicht (Recents) |
+| Discord Rich Presence über den lokalen Discord-IPC-Socket | **eigener Gateway-Client** (`wss://gateway.discord.gg`): Token wird in der App eingefügt, AES-256/GCM-verschlüsselt im Android-Keystore gespeichert und nur an Discord gesendet (`DiscordRpc.java`, `DiscordTokenStore.java`) |
 
 Nicht übertragbar (die UI-Schalter bleiben, haben aber keine Wirkung):
-- **Discord Rich Presence** – braucht den lokalen Discord-Desktop-IPC-Socket.
 - **Auto-Updater / OTA-Bundles** – liefern Desktop-Installer bzw. Electron-Bundles; in diesem Build komplett
   abgeschaltet (`UPDATES_ENABLED = false`), damit kein Original-Update die umbenannte App überschreibt.
   Der Knopf meldet "aktuell".
 - **Globale Tastenkürzel** – gibt es systemweit nicht (In-App-Kürzel funktionieren mit Tastatur).
 
+## Discord Rich Presence
+
+Die Einstellungen → **Discord** funktionieren auf dem Handy anders als am Desktop: Android hat keinen
+Discord-IPC-Socket, also meldet sich CloudMusic direkt an Discords Gateway an und setzt dort eine
+Activity vom Typ *Hört gerade …* mit Cover, Künstler-Badge und Fortschrittsbalken.
+
+1. In *Einstellungen → Discord* auf **Discord im Browser öffnen** tippen, dort anmelden.
+2. Token holen: im Browser `F12` → *Application* → *Local Storage* → `https://discord.com` → Feld `token`.
+3. Token in der App einfügen → **Speichern & verbinden**.
+
+Das Token wird **ausschließlich lokal** gespeichert: AES-256/GCM-verschlüsselt, der Schlüssel liegt im
+Android-Keystore (`cloudmusic_discord_token_v1`) und verlässt das Gerät nie. Das Klartext-Token existiert
+nur im Arbeitsspeicher und wird nur an `gateway.discord.gg` gesendet. **Token löschen** entfernt Schlüsselblob
+und Verbindung; die Einstellungen zeigen jederzeit den Status (verbunden als …).
+
+> Hinweis: Das ist der inoffizielle Weg (Selfbot). Discord kann so etwas als Regelverstoß werten –
+> Nutzung auf eigenes Risiko.
+
 ## Bedienung
 
-- Handys: Querformat (das Desktop-Layout braucht ein breites Fenster). Tablets: jede Ausrichtung.
+- Handys: Hochformat (gesperrt), Layout automatisch kompakt (< 768 px). Tablets: jede Ausrichtung.
 - **Mit zwei Fingern zoomen** ändert die Oberflächengröße (wird gespeichert).
 - Die Zurück-Taste schließt zuerst Dialoge/Suche/Vollbild-Player (wie Escape), dann zurück, dann Hintergrund.
 - Musik läuft im Hintergrund weiter; Steuerung über Benachrichtigung und Sperrbildschirm.

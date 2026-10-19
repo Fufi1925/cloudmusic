@@ -601,7 +601,26 @@
         "waiting": "Waiting for Discord",
         "disabled": "Disabled"
       }
-    },
+    ,
+      "android":       {
+        "title": "Connect Discord",
+        "description": "Android has no Discord IPC socket: CloudMusic signs in to Discord's gateway directly so your profile still shows \"Listening to …\". This needs a Discord token.",
+        "open_login": "Open Discord in browser",
+        "howto": "Sign in there, then grab the token in the browser: F12 → Application → Local Storage → https://discord.com → key \"token\" (Ctrl+C).",
+        "token_label": "Discord token",
+        "token_placeholder": "Paste your token…",
+        "save": "Save & connect",
+        "clear": "Delete token",
+        "saved": "Token saved – encrypted and only on this device.",
+        "connected_as": "Connected as {user}",
+        "connecting": "Connecting to Discord…",
+        "no_token": "No token saved",
+        "warning": "Unofficial method: Discord may treat this as a selfbot and ban the account. Use at your own risk – the token never leaves this device.",
+        "stored_locally": "The token is AES-encrypted in the Android keystore and never leaves the device (only to Discord's gateway).",
+        "error_invalid_token": "Token invalid or expired",
+        "error_connect_failed": "Could not connect to Discord",
+        "error_network": "No connection to Discord"
+      }},
     "customization": {
       "description": "Window background wallpaper, transparency and block blur effects.",
       "apply_to_overlay": "Apply to overlay mini player",

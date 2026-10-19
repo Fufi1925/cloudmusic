@@ -170,6 +170,24 @@ public final class CloudMusicBridge {
                 break;
             }
 
+            // ---- custom discord rich presence (android gateway client)
+            case "discord:get-status":
+                resolve(callId, CloudMusicApp.get().discordRpc().status());
+                break;
+            case "discord:set-token":
+                resolve(callId, CloudMusicApp.get().discordRpc().setToken(str(args, 0)));
+                break;
+            case "discord:clear-token":
+                resolve(callId, CloudMusicApp.get().discordRpc().clearToken());
+                break;
+            case "discord:set-enabled":
+                resolve(callId, CloudMusicApp.get().discordRpc().setEnabled(args.optBoolean(0, true)));
+                break;
+            case "discord:open-login":
+                ui.post(() -> activity.openExternal("https://discord.com/login"));
+                resolve(callId, null);
+                break;
+
             // ---- BotGuard PO tokens (potoken.ts "potoken:mint")
             case "potoken:mint": {
                 String identifier = str(args, 0);
@@ -268,14 +286,22 @@ public final class CloudMusicBridge {
                 if (url != null) ui.post(() -> activity.openExternal(url));
                 break;
             }
+            case "discord:update-state": {
+                JSONObject payload = args.optJSONObject(0);
+                if (payload != null) CloudMusicApp.get().discordRpc().updateState(payload);
+                break;
+            }
+            case "discord:update-settings": {
+                JSONObject patch = args.optJSONObject(0);
+                if (patch != null) CloudMusicApp.get().discordRpc().updateSettings(patch);
+                break;
+            }
             case "overlay:pause-shortcuts":
             case "window:drag-start":
             case "window:drag-move":
             case "window:drag-end":
-            case "discord:update-state":
-            case "discord:update-settings":
             default:
-                // no global shortcuts, movable windows or discord ipc on android
+                // no global shortcuts or movable windows on android
                 break;
         }
     }

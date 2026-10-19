@@ -18,6 +18,7 @@ public final class CloudMusicApp extends Application {
 
     private static CloudMusicApp instance;
     private NetProxy netProxy;
+    private DiscordRpc discordRpc;
     private ExecutorService io;
 
     public static CloudMusicApp get() {
@@ -45,6 +46,15 @@ public final class CloudMusicApp extends Application {
 
     public ExecutorService io() {
         return io;
+    }
+
+    /** custom discord rich presence (android gateway client, token kept locally) */
+    public synchronized DiscordRpc discordRpc() {
+        if (discordRpc == null) {
+            discordRpc = new DiscordRpc(this);
+            discordRpc.start();
+        }
+        return discordRpc;
     }
 
     private void createNotificationChannel() {

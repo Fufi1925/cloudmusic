@@ -769,7 +769,70 @@
       "last_run": "{ok}/{total} Prüfungen ok · {time}",
       "open_folder": "Speicherort öffnen"
     }
-  },
+  ,
+    "discord":     {
+      "description": "Zeige auf Discord, was du hörst – mit Cover, Künstler-Badge und Fortschrittsbalken.",
+      "section_display": "Anzeigeoptionen",
+      "section_buttons": "Profil-Buttons",
+      "enable": {
+        "title": "Discord Rich Presence",
+        "description": "Zeigt deinen aktuellen Titel in deinem Discord-Profil."
+      },
+      "status_display": {
+        "title": "Status-Format",
+        "description": "Was in Discords „Hört gerade …“-Zeile steht."
+      },
+      "show_timeline": {
+        "title": "Fortschrittsbalken",
+        "description": "Zeigt die aktuelle Abspielposition."
+      },
+      "show_artwork": {
+        "title": "Titelbild",
+        "description": "Zeigt das Cover des Titels."
+      },
+      "show_artist_image": {
+        "title": "Künstler-Badge",
+        "description": "Kleines Künstlerbild unten rechts."
+      },
+      "show_paused": {
+        "title": "Pausiert anzeigen",
+        "description": "Status bleibt sichtbar, wenn pausiert ist."
+      },
+      "show_button": {
+        "title": "„Auf CloudMusic hören“-Button",
+        "description": "Button im Discord-Profil."
+      },
+      "show_download_button": {
+        "title": "Download-Button",
+        "description": "Zweiter Button zur Projektseite."
+      },
+      "status": {
+        "connected": "Verbunden mit Discord ({user})",
+        "disconnected": "Discord nicht verbunden",
+        "ready": "Bereit",
+        "waiting": "Warte auf Discord",
+        "disabled": "Deaktiviert"
+      },
+      "android": {
+        "title": "Discord verbinden",
+        "description": "Auf Android gibt es kein Discord-IPC: CloudMusic meldet sich direkt an Discords Gateway an, damit dein Profil trotzdem „Hört …“ anzeigt. Dafür wird ein Discord-Token gebraucht.",
+        "open_login": "Discord im Browser öffnen",
+        "howto": "Melde dich dort an und hole das Token im Browser: F12 → Application → Local Storage → https://discord.com → Feld „token“ (Strg+C).",
+        "token_label": "Discord-Token",
+        "token_placeholder": "Token hier einfügen…",
+        "save": "Speichern & verbinden",
+        "clear": "Token löschen",
+        "saved": "Token gespeichert – nur auf diesem Gerät, verschlüsselt.",
+        "connected_as": "Verbunden als {user}",
+        "connecting": "Verbinde mit Discord…",
+        "no_token": "Kein Token gespeichert",
+        "warning": "Inoffizieller Weg: Discord kann das als Selfbot werten und dein Konto sperren. Nutzung auf eigenes Risiko – das Token bleibt ausschließlich auf diesem Gerät.",
+        "stored_locally": "Das Token liegt AES-verschlüsselt im Android-Keystore und verläßt das Gerät nie (nur zu Discords Gateway).",
+        "error_invalid_token": "Token ungültig oder abgelaufen",
+        "error_connect_failed": "Verbindung zu Discord fehlgeschlagen",
+        "error_network": "Keine Verbindung zu Discord"
+      }
+    }},
   "toast": {
     "playlist_created": "Playlist erstellt",
     "playlist_imported": "{name} importiert ({count} Titel)",

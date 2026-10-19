@@ -31,6 +31,16 @@ export interface UpdateDownloadProgress {
   bytesPerSecond: number;
 }
 
+export interface DiscordRpcStatus {
+  connected: boolean;
+  username?: string;
+  /** android custom RPC: a token is stored on this device */
+  hasToken?: boolean;
+  enabled?: boolean;
+  error?: string;
+  platform?: string;
+}
+
 export interface WindowState {
   isMaximized: boolean;
   isFullScreen: boolean;
@@ -131,7 +141,16 @@ export interface CloudMusicElectronApi {
   setOverlayAuthenticated?: (authenticated: boolean) => void;
   discordUpdateState: (state: any) => void;
   discordUpdateSettings: (settings: any) => void;
-  getDiscordStatus: () => Promise<{ connected: boolean; username?: string }>;
+  getDiscordStatus: () => Promise<DiscordRpcStatus>;
+  /**
+   * Android only ("custom RPC"): the phone has no Discord IPC socket, so the
+   * native side signs into Discord's gateway with a user token that is stored
+   * encrypted on the device. Desktop builds leave these undefined.
+   */
+  discordSetToken?: (token: string) => Promise<DiscordRpcStatus>;
+  discordClearToken?: () => Promise<DiscordRpcStatus>;
+  discordSetEnabled?: (enabled: boolean) => Promise<DiscordRpcStatus>;
+  discordOpenLogin?: () => Promise<unknown>;
   mintPoToken: (identifier: string) => Promise<string>;
 }
 
