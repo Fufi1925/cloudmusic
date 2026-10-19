@@ -54,16 +54,16 @@ describe("DiscordRpcManager", () => {
     vi.useFakeTimers();
     mocks.setActivity.mockClear();
     mocks.clients.length = 0;
-    process.env.LINER_DISCORD_CLIENT_ID = "123456789012345678";
+    process.env.CLOUDMUSIC_DISCORD_CLIENT_ID = "123456789012345678";
   });
 
   afterEach(() => {
-    delete process.env.LINER_DISCORD_CLIENT_ID;
+    delete process.env.CLOUDMUSIC_DISCORD_CLIENT_ID;
     vi.useRealTimers();
   });
 
-  it("connects with Liner's built-in application id by default", async () => {
-    delete process.env.LINER_DISCORD_CLIENT_ID;
+  it("connects with CloudMusic's built-in application id by default", async () => {
+    delete process.env.CLOUDMUSIC_DISCORD_CLIENT_ID;
     const manager = new DiscordRpcManager();
     await vi.advanceTimersByTimeAsync(1_000);
     expect(mocks.clients).toEqual(["1561339119617974362"]);
@@ -71,7 +71,7 @@ describe("DiscordRpcManager", () => {
   });
 
   it("ignores an application id sent in a settings patch", async () => {
-    delete process.env.LINER_DISCORD_CLIENT_ID;
+    delete process.env.CLOUDMUSIC_DISCORD_CLIENT_ID;
     const manager = new DiscordRpcManager();
     const legacyPatch: Record<string, unknown> = { applicationId: "987654321098765432" };
     manager.updateSettings(legacyPatch);

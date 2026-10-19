@@ -16,12 +16,12 @@ function isUserPlaylistId(id: string): boolean {
   );
 }
 
-// opens shared entities arriving via liner:// deeplinks (main pre-validates)
+// opens shared entities arriving via cloudmusic:// deeplinks (main pre-validates)
 export default function DeeplinkHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const off = window.linerElectron?.onDeeplink((target: DeeplinkTarget) => {
+    const off = window.cloudMusicElectron?.onDeeplink((target: DeeplinkTarget) => {
       void (async () => {
         try {
           switch (target.type) {

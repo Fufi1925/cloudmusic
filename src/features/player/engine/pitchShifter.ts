@@ -236,10 +236,10 @@ export class PitchShifterController {
         return;
       }
 
-      if (!win.__liner_audio_context) {
-        win.__liner_audio_context = new AudioCtx();
+      if (!win.__cloudmusic_audio_context) {
+        win.__cloudmusic_audio_context = new AudioCtx();
       }
-      const ctx = win.__liner_audio_context as AudioContext;
+      const ctx = win.__cloudmusic_audio_context as AudioContext;
       this.context = ctx;
 
       if (ctx.state === "suspended") {
@@ -249,21 +249,21 @@ export class PitchShifterController {
       }
 
       const audioObj = audio as any;
-      let sourceNode = audioObj.__liner_source_node as MediaElementAudioSourceNode | undefined;
+      let sourceNode = audioObj.__cloudmusic_source_node as MediaElementAudioSourceNode | undefined;
 
       if (!sourceNode) {
-        if (win.__liner_media_source_node && win.__liner_media_source_node.mediaElement === audio) {
-          sourceNode = win.__liner_media_source_node;
-          audioObj.__liner_source_node = sourceNode;
+        if (win.__cloudmusic_media_source_node && win.__cloudmusic_media_source_node.mediaElement === audio) {
+          sourceNode = win.__cloudmusic_media_source_node;
+          audioObj.__cloudmusic_source_node = sourceNode;
         } else {
           try {
             sourceNode = ctx.createMediaElementSource(audio);
-            audioObj.__liner_source_node = sourceNode;
-            win.__liner_media_source_node = sourceNode;
+            audioObj.__cloudmusic_source_node = sourceNode;
+            win.__cloudmusic_media_source_node = sourceNode;
           } catch (sourceErr: any) {
-            if (win.__liner_media_source_node) {
-              sourceNode = win.__liner_media_source_node;
-              audioObj.__liner_source_node = sourceNode;
+            if (win.__cloudmusic_media_source_node) {
+              sourceNode = win.__cloudmusic_media_source_node;
+              audioObj.__cloudmusic_source_node = sourceNode;
             } else {
               throw sourceErr;
             }
@@ -290,7 +290,7 @@ export class PitchShifterController {
         );
       };
 
-      let graph = (audioObj.__liner_pitch_graph || win.__liner_pitch_graph) as AudioEffectsGraph | undefined;
+      let graph = (audioObj.__cloudmusic_pitch_graph || win.__cloudmusic_pitch_graph) as AudioEffectsGraph | undefined;
 
       if (!isCompleteGraph(graph)) {
         // Disconnect any legacy/stale nodes from the old graph
@@ -311,8 +311,8 @@ export class PitchShifterController {
             (graph as any).reverbWetGain?.disconnect();
           } catch {}
         }
-        delete audioObj.__liner_pitch_graph;
-        delete win.__liner_pitch_graph;
+        delete audioObj.__cloudmusic_pitch_graph;
+        delete win.__cloudmusic_pitch_graph;
 
         try {
           sourceNode.disconnect();
@@ -384,8 +384,8 @@ export class PitchShifterController {
           reverbWetGain,
         };
 
-        audioObj.__liner_pitch_graph = graph;
-        win.__liner_pitch_graph = graph;
+        audioObj.__cloudmusic_pitch_graph = graph;
+        win.__cloudmusic_pitch_graph = graph;
       }
 
       this.context = graph.ctx;
@@ -417,7 +417,7 @@ export class PitchShifterController {
     if (!this.isConnected || !this.context || !this.graph) {
       if (typeof window !== "undefined") {
         const win = window as any;
-        const audio = win.__liner_audio || (typeof document !== "undefined" && document.getElementById("liner-audio"));
+        const audio = win.__cloudmusic_audio || (typeof document !== "undefined" && document.getElementById("cloudmusic-audio"));
         if (audio) {
           this.attach(audio);
         }

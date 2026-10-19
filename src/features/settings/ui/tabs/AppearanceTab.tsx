@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import {
-  usePlayerStore,
-  type AccentVariant,
-} from "@/features/player";
 import { useTranslation, LOCALE_OPTIONS } from "@/languages";
 import { Select } from "@/shared/ui";
 import {
@@ -11,53 +7,8 @@ import {
   selectIsGlassThemeActive,
 } from "../../store/customizationStore";
 import { SettingBlock, SettingRow, SettingSection } from "../controls";
-import defaultLogo from "@/assets/branding/logo-default.svg";
-import spotifyLogo from "@/assets/branding/logo-spotify.svg";
-import discordLogo from "@/assets/branding/logo-discord.svg";
-import telegramLogo from "@/assets/branding/logo-telegram.svg";
-import auroraLogo from "@/assets/branding/logo-aurora.svg";
-import sunsetLogo from "@/assets/branding/logo-sunset.svg";
-import oceanLogo from "@/assets/branding/logo-ocean.svg";
-import forestLogo from "@/assets/branding/logo-forest.svg";
-import berryLogo from "@/assets/branding/logo-berry.svg";
-import carbonLogo from "@/assets/branding/logo-carbon.svg";
-import pixelLogo from "@/assets/branding/logo-pixel.svg";
-import scanlinesLogo from "@/assets/branding/logo-scanlines.svg";
-import vhsLogo from "@/assets/branding/logo-vhs.svg";
 
 const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
-
-const logos: Record<AccentVariant, string> = {
-  default: defaultLogo,
-  spotify: spotifyLogo,
-  discord: discordLogo,
-  telegram: telegramLogo,
-  aurora: auroraLogo,
-  sunset: sunsetLogo,
-  ocean: oceanLogo,
-  forest: forestLogo,
-  berry: berryLogo,
-  carbon: carbonLogo,
-  pixel: pixelLogo,
-  scanlines: scanlinesLogo,
-  vhs: vhsLogo,
-};
-
-const brandingVariants: readonly AccentVariant[] = [
-  "default",
-  "spotify",
-  "discord",
-  "telegram",
-  "aurora",
-  "sunset",
-  "ocean",
-  "forest",
-  "berry",
-  "carbon",
-  "pixel",
-  "scanlines",
-  "vhs",
-];
 
 // tiny dashboard mock so theme choice reads visually instead of as text
 function ThemeMock({ mode }: { mode: "light" | "dark" }) {
@@ -176,8 +127,6 @@ export function AppearanceTab({ searchQuery }: { searchQuery?: string }) {
   const { t, locale, setLocale } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const accentVariant = usePlayerStore((state) => state.accentVariant);
-  const setAccentVariant = usePlayerStore((state) => state.setAccentVariant);
   const isGlassActive = useCustomizationStore(selectIsGlassThemeActive);
 
   useEffect(() => {
@@ -259,61 +208,6 @@ export function AppearanceTab({ searchQuery }: { searchQuery?: string }) {
         ) : null}
       </SettingBlock>
 
-      <SettingBlock
-        title={t("settings.branding.title")}
-        description={t("settings.branding.description")}
-        titleKey="settings.branding.title"
-        descKey="settings.branding.description"
-        searchQuery={searchQuery}
-      >
-        {mounted ? (
-          <div className="flex flex-wrap gap-[2px]">
-            {brandingVariants.map((variantId) => {
-              const isActive = accentVariant === variantId;
-              const label = t(`settings.branding.${variantId}`);
-              return (
-                <button
-                  key={variantId}
-                  type="button"
-                  onClick={() => setAccentVariant(variantId)}
-                  title={label}
-                  aria-label={label}
-                  aria-pressed={isActive}
-                  className={`flex items-center gap-[8px] pl-[8px] pr-[12px] py-[6px] rounded-md border-none transition-colors cursor-pointer ${
-                    isActive
-                      ? "bg-bg-elevated text-text-primary font-[500]"
-                      : "bg-transparent text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
-                  }`}
-                >
-                  <div className="w-[22px] h-[22px] flex items-center justify-center shrink-0">
-                    <img
-                      src={logos[variantId]}
-                      alt=""
-                      width={20}
-                      height={20}
-                      className={
-                        variantId === "default" ||
-                        variantId === "carbon" ||
-                        variantId === "pixel" ||
-                        variantId === "scanlines"
-                          ? "theme-logo invert dark:invert-0"
-                          : ""
-                      }
-                      draggable={false}
-                    />
-                  </div>
-                  <span
-                    className="text-[12px] leading-none whitespace-nowrap"
-                    style={{ fontFamily: "var(--font-inter), sans-serif" }}
-                  >
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-      </SettingBlock>
     </SettingSection>
   );
 }

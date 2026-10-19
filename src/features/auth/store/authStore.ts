@@ -125,8 +125,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       usePlayerStore.getState().setFullscreen(false);
     } catch {}
     try {
-      window.linerElectron?.closeOverlay?.();
-      window.linerElectron?.sendOverlayAction?.({ type: "closeOverlay" });
+      window.cloudMusicElectron?.closeOverlay?.();
+      window.cloudMusicElectron?.sendOverlayAction?.({ type: "closeOverlay" });
     } catch {}
     if (typeof window !== "undefined" && window.location.hash.includes("/player")) {
       window.location.hash = "#/";

@@ -53,7 +53,7 @@ export default function App() {
 
   if (isOverlay) {
     if (!getAuthSession()) {
-      window.linerElectron?.closeOverlay?.();
+      window.cloudMusicElectron?.closeOverlay?.();
       return null;
     }
 

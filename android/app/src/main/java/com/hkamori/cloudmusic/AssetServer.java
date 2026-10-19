@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.content.res.AssetManager;
 import android.webkit.WebResourceResponse;

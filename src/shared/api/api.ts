@@ -443,7 +443,7 @@ export function resolveApiErrorMessage(
   return t(fallbackKey);
 }
 
-// ---- Types from @liner/contracts --------------------------------------------
+// ---- Types from @cloudmusic/contracts --------------------------------------------
 
 export type {
   SearchType,

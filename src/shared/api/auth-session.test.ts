@@ -52,7 +52,7 @@ describe("auth-session token system", () => {
       accessToken: "a1",
       refreshToken: "r1",
       accessTokenExpiresAt: "2026-09-02T19:00:00.000Z",
-      user: { id: "u1", email: "test@liner.app" },
+      user: { id: "u1", email: "test@cloudmusic.app" },
     };
     expect(getSessionExpiryMs(session1)).toBe(
       new Date("2026-09-02T19:00:00.000Z").getTime(),
@@ -63,7 +63,7 @@ describe("auth-session token system", () => {
       refreshToken: "r2",
       accessTokenExpiresAt: "",
       expiresAt: 1788370000,
-      user: { id: "u2", email: "test2@liner.app" },
+      user: { id: "u2", email: "test2@cloudmusic.app" },
     };
     expect(getSessionExpiryMs(session2)).toBe(1788370000 * 1000);
   });
@@ -293,7 +293,7 @@ describe("auth-session token system", () => {
       const rotated = { ...base(), accessToken: "other_window_token", refreshToken: "rt_9" };
       globalThis.fetch = vi.fn().mockImplementation(async () => {
         // another window finished a refresh meanwhile
-        storageMap.set("liner_auth_session", JSON.stringify(rotated));
+        storageMap.set("cloudmusic_auth_session", JSON.stringify(rotated));
         return reject(401, "TOKEN_REUSED");
       }) as any;
       const res = await refreshAuthSession();

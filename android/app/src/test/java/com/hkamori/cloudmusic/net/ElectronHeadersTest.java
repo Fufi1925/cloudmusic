@@ -1,4 +1,4 @@
-package com.hkamori.liner.net;
+package com.hkamori.cloudmusic.net;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -44,14 +44,14 @@ public class ElectronHeadersTest {
                 .header("Origin", "file://")
                 .header("Referer", "https://appassets.androidplatform.net/")
                 .header("User-Agent", "desktop")
-                .header("x-liner-user-agent", "com.google.android.apps.youtube.vr.oculus/1.65.10")
+                .header("x-cloudmusic-user-agent", "com.google.android.apps.youtube.vr.oculus/1.65.10")
                 .header("x-goog-visitor-id", "abc")
                 .build();
         Request out = ElectronHeaders.rewrite(in);
         assertEquals("https://music.youtube.com", out.header("Origin"));
         assertEquals("https://music.youtube.com/", out.header("Referer"));
         assertEquals("com.google.android.apps.youtube.vr.oculus/1.65.10", out.header("User-Agent"));
-        assertNull(out.header("x-liner-user-agent"));
+        assertNull(out.header("x-cloudmusic-user-agent"));
         assertEquals("abc", out.header("x-goog-visitor-id"));
         assertEquals(1, out.headers("Origin").size());
     }
@@ -69,10 +69,10 @@ public class ElectronHeadersTest {
         Request in = new Request.Builder()
                 .url("https://api.tryliner.fun/v1/tracks")
                 .header("Origin", "file://")
-                .header("x-liner-user-agent", "kept")
+                .header("x-cloudmusic-user-agent", "kept")
                 .build();
         Request out = ElectronHeaders.rewrite(in);
         assertEquals("file://", out.header("Origin"));
-        assertEquals("kept", out.header("x-liner-user-agent"));
+        assertEquals("kept", out.header("x-cloudmusic-user-agent"));
     }
 }

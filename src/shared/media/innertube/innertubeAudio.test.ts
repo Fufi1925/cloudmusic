@@ -89,7 +89,7 @@ describe("resolveDirectAudioStream", () => {
     const headers = (init?.headers ?? {}) as Record<string, string>;
     expect(headers["x-youtube-client-name"]).toBe("101");
     expect(headers["x-goog-visitor-id"]).toBe("CgtVISITOR123");
-    expect(headers["x-liner-user-agent"]).toContain("visionos");
+    expect(headers["x-cloudmusic-user-agent"]).toContain("visionos");
     const body = JSON.parse(String(init?.body));
     expect(body.videoId).toBe("dQw4w9WgXcQ");
     expect(body.context.client).toMatchObject({ clientName: "VISIONOS", clientVersion: "1.04", visitorData: "CgtVISITOR123" });

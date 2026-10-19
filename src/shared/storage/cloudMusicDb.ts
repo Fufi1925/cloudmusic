@@ -48,12 +48,12 @@ export interface CachedArtistRecord {
   lastCheckedAt: number;
 }
 
-const DB_NAME = "liner_db_v1";
+const DB_NAME = "cloudmusic_db_v1";
 const DB_VERSION = 4;
 
 const MEM_AUDIO_LIMIT = 3;
 
-class LinerDb {
+class CloudMusicDb {
   private dbPromise: Promise<IDBDatabase> | null = null;
   private isSupported = typeof indexedDB !== "undefined";
 
@@ -662,4 +662,4 @@ class LinerDb {
   }
 }
 
-export const linerDb = new LinerDb();
+export const cloudMusicDb = new CloudMusicDb();

@@ -195,14 +195,14 @@ export default function LoginPage() {
           <div className="flex shrink-0 items-center gap-[10px]">
             <AppImage
               src={logo}
-              alt="Liner"
-              width={25}
-              height={30}
-              className="theme-logo h-[22px] w-auto"
+              alt="CloudMusic"
+              width={22}
+              height={22}
+              className="h-[22px] w-[22px] rounded-[6px]"
               priority
             />
             <span className="text-[16px] font-[600] tracking-[-0.025em] text-text-primary">
-              Liner
+              CloudMusic
             </span>
             <Select
               options={LOCALE_OPTIONS}

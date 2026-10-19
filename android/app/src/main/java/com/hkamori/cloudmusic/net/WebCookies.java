@@ -1,4 +1,4 @@
-package com.hkamori.liner.net;
+package com.hkamori.cloudmusic.net;
 
 import android.webkit.CookieManager;
 

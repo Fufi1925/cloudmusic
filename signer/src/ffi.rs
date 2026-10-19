@@ -6,9 +6,9 @@ use std::os::raw::c_char;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Signs a cover URL token payload for `covers.tryliner.fun` (using COVER_TOKEN_SECRET).
-/// Returns a newly allocated null-terminated C string. Caller must free with `liner_signer_free_string`.
+/// Returns a newly allocated null-terminated C string. Caller must free with `cloudmusic_signer_free_string`.
 #[no_mangle]
-pub unsafe extern "C" fn liner_signer_sign_cover_url(payload: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn cloudmusic_signer_sign_cover_url(payload: *const c_char) -> *mut c_char {
     if payload.is_null() {
         return std::ptr::null_mut();
     }
@@ -26,9 +26,9 @@ pub unsafe extern "C" fn liner_signer_sign_cover_url(payload: *const c_char) -> 
 
 /// Signs a canonical API request string (`METHOD\nPATH\nTIMESTAMP\nNONCE\nBODY_SHA256`) using REQUEST_SIGNING_SECRET.
 /// Returns the signature string. Populates `out_timestamp` and `out_nonce`.
-/// Caller must free both strings using `liner_signer_free_string`.
+/// Caller must free both strings using `cloudmusic_signer_free_string`.
 #[no_mangle]
-pub unsafe extern "C" fn liner_signer_sign_request(
+pub unsafe extern "C" fn cloudmusic_signer_sign_request(
     method: *const c_char,
     path: *const c_char,
     body: *const c_char,
@@ -84,9 +84,9 @@ pub unsafe extern "C" fn liner_signer_sign_request(
 
 /// Signs a canonical Monitor Telemetry request string (`METHOD\nPATH\nTIMESTAMP\nNONCE\nBODY_SHA256`) using MONITOR_SIGNING_SECRET.
 /// Returns the signature string. Populates `out_timestamp` and `out_nonce`.
-/// Caller must free both strings using `liner_signer_free_string`.
+/// Caller must free both strings using `cloudmusic_signer_free_string`.
 #[no_mangle]
-pub unsafe extern "C" fn liner_signer_sign_monitor_request(
+pub unsafe extern "C" fn cloudmusic_signer_sign_monitor_request(
     method: *const c_char,
     path: *const c_char,
     body: *const c_char,
@@ -142,7 +142,7 @@ pub unsafe extern "C" fn liner_signer_sign_monitor_request(
 
 /// Signs arbitrary raw bytes using REQUEST_SIGNING_SECRET and returns base64url HMAC signature.
 #[no_mangle]
-pub unsafe extern "C" fn liner_signer_sign_raw_payload(
+pub unsafe extern "C" fn cloudmusic_signer_sign_raw_payload(
     payload: *const u8,
     payload_len: usize,
 ) -> *mut c_char {
@@ -158,9 +158,9 @@ pub unsafe extern "C" fn liner_signer_sign_raw_payload(
     }
 }
 
-/// Frees a string allocated by any `liner_signer_*` FFI function.
+/// Frees a string allocated by any `cloudmusic_signer_*` FFI function.
 #[no_mangle]
-pub unsafe extern "C" fn liner_signer_free_string(s: *mut c_char) {
+pub unsafe extern "C" fn cloudmusic_signer_free_string(s: *mut c_char) {
     if !s.is_null() {
         drop(CString::from_raw(s));
     }

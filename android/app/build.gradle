@@ -17,11 +17,11 @@ def keystoreFile = rootProject.file("keystore.properties")
 if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
 
 android {
-    namespace 'com.hkamori.liner'
+    namespace 'com.hkamori.cloudmusic'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'com.hkamori.liner'
+        applicationId 'com.hkamori.cloudmusic'
         minSdk 26
         targetSdk 35
         versionCode appVersionCode

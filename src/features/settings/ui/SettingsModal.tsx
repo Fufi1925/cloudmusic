@@ -102,7 +102,7 @@ const SETTING_ITEMS: { tabId: TabId; titleKey: string; descKey?: string }[] = [
   { tabId: "Storage", titleKey: "settings.storage.open_folder", descKey: "settings.storage.open_folder_description" },
 
   // About
-  { tabId: "About", titleKey: "settings.about.liner", descKey: "common.app.version" },
+  { tabId: "About", titleKey: "settings.about.cloudmusic", descKey: "common.app.version" },
   { tabId: "About", titleKey: "settings.notifications.test_button" },
 ];
 
@@ -227,7 +227,7 @@ export default function SettingsModal() {
     user?.displayName ||
     user?.username ||
     user?.email?.split("@")[0] ||
-    "Liner";
+    "CloudMusic";
   const handle = user?.username ? `@${user.username}` : (user?.email ?? t("settings.manage_account"));
 
   return (
@@ -320,21 +320,12 @@ export default function SettingsModal() {
             </p>
             <button
               type="button"
-              onClick={() => openExternal("https://github.com/tryliner/desktop/blob/main/README.md")}
+              onClick={() => openExternal("https://github.com/Fufi1925/Music./blob/main/README.md")}
               className="w-full flex items-center gap-[10px] px-[10px] py-[8px] rounded-[8px] border-0 bg-transparent text-text-secondary hover:bg-border-alpha-14 hover:text-text-primary cursor-pointer text-left transition-colors"
               style={{ ...font, fontSize: "13.5px" }}
             >
               <Book2 size={18} weight="Bold" className="text-text-tertiary shrink-0" />
               <span className="leading-none">{t("settings.docs")}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => openExternal("https://t.me/liner_app?direct")}
-              className="w-full flex items-center gap-[10px] px-[10px] py-[8px] rounded-[8px] border-0 bg-transparent text-text-secondary hover:bg-border-alpha-14 hover:text-text-primary cursor-pointer text-left transition-colors"
-              style={{ ...font, fontSize: "13.5px" }}
-            >
-              <QuestionCircle size={18} weight="Bold" className="text-text-tertiary shrink-0" />
-              <span className="leading-none">{t("settings.support")}</span>
             </button>
           </div>
         </nav>

@@ -48,7 +48,7 @@ export const DEFAULT_GLASS_CONFIG: BlockCustomization = {
   dim: 15,
 };
 
-const DB_NAME = "liner_customization_db";
+const DB_NAME = "cloudmusic_customization_db";
 const STORE_NAME = "wallpapers";
 const BG_KEY = "active_wallpaper";
 
@@ -123,7 +123,7 @@ export const clampBlockConfig = (cfg: Partial<BlockCustomization>): BlockCustomi
 
 export const wallpaperBroadcast =
   typeof window !== "undefined" && typeof BroadcastChannel !== "undefined"
-    ? new BroadcastChannel("liner_wallpaper_sync")
+    ? new BroadcastChannel("cloudmusic_wallpaper_sync")
     : null;
 
 if (wallpaperBroadcast) {
@@ -240,7 +240,7 @@ export const useCustomizationStore = create<CustomizationState>()(
       },
     }),
     {
-      name: "liner_customization_v1",
+      name: "cloudmusic_customization_v1",
       storage: createJSONStorage(() => debouncedStorage),
       partialize: (state) => ({
         backgroundBlur: state.backgroundBlur,

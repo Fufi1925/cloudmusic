@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -38,7 +38,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import com.hkamori.liner.net.NetProxy;
+import com.hkamori.cloudmusic.net.NetProxy;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -67,7 +67,7 @@ final class NetDiag {
                 if (value instanceof String && HOST.matcher((String) value).matches()) hosts.add((String) value);
             }
         }
-        ExecutorService pool = LinerApp.get().io();
+        ExecutorService pool = CloudMusicApp.get().io();
         List<Future<JSONObject>> dns = new ArrayList<>();
         List<Future<JSONObject>> tcp = new ArrayList<>();
         List<Future<JSONObject>> tls = new ArrayList<>();
@@ -206,7 +206,7 @@ final class NetDiag {
     private static JSONObject control(OkHttpClient client, String name, String url, boolean cloudflare) throws JSONException {
         long start = System.currentTimeMillis();
         JSONObject json = new JSONObject().put("name", name);
-        Request request = new Request.Builder().url(url).header("User-Agent", "liner-connectivity/1.0").build();
+        Request request = new Request.Builder().url(url).header("User-Agent", "cloudmusic-connectivity/1.0").build();
         try (Response response = client.newCall(request).execute()) {
             json.put("ok", response.code() < 400).put("status", response.code());
             if (cloudflare) {

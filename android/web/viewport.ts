@@ -84,7 +84,7 @@ export function applyViewport(metrics: ViewportMetrics): ComputedViewport | null
     "content",
     `width=${next.width}, initial-scale=${next.scale}, minimum-scale=${next.scale}, maximum-scale=${next.scale}, user-scalable=no, viewport-fit=cover`,
   );
-  document.documentElement.style.setProperty("--liner-android-scale", String(next.scale));
+  document.documentElement.style.setProperty("--cloudmusic-android-scale", String(next.scale));
   return next;
 }
 

@@ -66,7 +66,7 @@ export function handleBackPressed(): boolean {
 
 export function installAndroidStyles(isOverlay: boolean): void {
   const style = document.createElement("style");
-  style.id = "liner-android-style";
+  style.id = "cloudmusic-android-style";
   style.textContent = [
     "html,body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}",
     "html,body{overscroll-behavior:none;}",

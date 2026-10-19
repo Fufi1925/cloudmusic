@@ -39,7 +39,7 @@ renderer.log
 *.tsbuildinfo
 
 # cache
-.liner_local_cache
+.cloudmusic_local_cache
 signer/
 
 # agent rules

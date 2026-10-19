@@ -1,9 +1,10 @@
-# Liner für Android
+# CloudMusic für Android
 
-Android-Portierung der Liner-Desktop-App (Electron) aus diesem Repository.
+Android-Portierung der CloudMusic-Desktop-App (Electron) aus diesem Repository
+(CloudMusic = privater, umbenannter Fork von *Liner*, siehe `../NOTICE.md`).
 Der Renderer-Code unter `src/` wird **unverändert** verwendet; ersetzt wird nur
 die Electron-Schicht (`electron/main.ts`, `electron/preload.ts` und Co.) durch
-eine native Android-Schicht mit **derselben** `window.linerElectron`-Schnittstelle.
+eine native Android-Schicht mit **derselben** `window.cloudMusicElectron`-Schnittstelle.
 
 > Lizenz: Das Projekt ist "source-available" und nicht kommerziell. Ein lokaler
 > Build ist für den **privaten, persönlichen Gebrauch** erlaubt. APKs dürfen
@@ -14,17 +15,17 @@ eine native Android-Schicht mit **derselben** `window.linerElectron`-Schnittstel
 ```
 android/
 ├── web/                    JS-Seite der Brücke (ersetzt electron/preload.ts)
-│   ├── index.ts            -> liner-android.js, läuft vor dem Renderer-Bundle
-│   ├── api.ts              window.linerElectron (gleicher Vertrag wie preload.ts)
+│   ├── index.ts            -> cloudmusic-android.js, läuft vor dem Renderer-Bundle
+│   ├── api.ts              window.cloudMusicElectron (gleicher Vertrag wie preload.ts)
 │   ├── ipc.ts              ipcRenderer-Ersatz (invoke/send/on)
 │   ├── netPatch.ts         fetch()-Tunnel durch die native Schicht
 │   ├── signer.ts           eingebetteter WASM-Request-Signer (Port von electron/crypto.ts)
 │   ├── viewport.ts         Skalierung des Desktop-Layouts auf das Display
 │   ├── platform.ts         Zurück-Taste, Zwischenablage, window.open
 │   └── potokenWorker.ts    -> potoken-worker.js (Port von electron/potoken-preload.ts)
-├── app/src/main/java/com/hkamori/liner/
+├── app/src/main/java/com/hkamori/cloudmusic/
 │   ├── MainActivity.java   Fenster (createWindow), Systemleisten, Zurück-Taste, Dialoge
-│   ├── LinerBridge.java    alle ipcMain-Handler (gleiche Kanalnamen wie main.ts)
+│   ├── CloudMusicBridge.java    alle ipcMain-Handler (gleiche Kanalnamen wie main.ts)
 │   ├── net/NetProxy.java   Ersatz für webSecurity:false + session.webRequest
 │   ├── net/ElectronHeaders.java  1:1 die Origin/Referer/User-Agent-Regeln aus main.ts
 │   ├── PoTokenService.java BotGuard in versteckter youtube.com-WebView (potoken.ts)
@@ -42,16 +43,16 @@ android/
 | Electron (Desktop) | Android |
 | --- | --- |
 | `BrowserWindow` + `loadFile(dist/index.html)` | WebView, Renderer aus den APK-Assets über `https://appassets.androidplatform.net` |
-| `preload.ts` / `contextBridge` | `liner-android.js` + Java-Interface `LinerAndroid` (gleiche Kanäle) |
-| `webSecurity: false` (kein CORS) | jeder Cross-Origin-`fetch()` läuft durch einen same-origin-Tunnel (`/__liner_net__/…`) und wird nativ mit OkHttp ausgeführt; Bilder/Audio/Fonts werden nativ geproxyt und bekommen dieselben `Access-Control-Allow-*`-Header wie bei Electron |
-| `onBeforeSendHeaders` (YouTube, googlevideo, Apple Music) | `ElectronHeaders.java`, identische Regeln inkl. `x-liner-user-agent`, pro Redirect-Hop |
+| `preload.ts` / `contextBridge` | `cloudmusic-android.js` + Java-Interface `CloudMusicAndroid` (gleiche Kanäle) |
+| `webSecurity: false` (kein CORS) | jeder Cross-Origin-`fetch()` läuft durch einen same-origin-Tunnel (`/__cloudmusic_net__/…`) und wird nativ mit OkHttp ausgeführt; Bilder/Audio/Fonts werden nativ geproxyt und bekommen dieselben `Access-Control-Allow-*`-Header wie bei Electron |
+| `onBeforeSendHeaders` (YouTube, googlevideo, Apple Music) | `ElectronHeaders.java`, identische Regeln inkl. `x-cloudmusic-user-agent`, pro Redirect-Hop |
 | `--disable-http2` | OkHttp nur mit HTTP/1.1 |
 | WASM-Signer im Main-Prozess | gleicher WASM-Signer in der WebView (asynchron instanziiert) |
 | PO-Token: verstecktes Fenster auf youtube.com/robots.txt | versteckte WebView auf youtube.com/robots.txt, gleicher BotGuard-Code |
 | macOS Touch Bar | Android-Mediensteuerung: Benachrichtigung, Sperrbildschirm, Bluetooth-/Kopfhörertasten, "Gefällt mir" |
 | `backgroundThrottling: false`, `powerSaveBlocker` | Vordergrunddienst (mediaPlayback), Wake-/WLAN-Lock, Bildschirm bleibt beim Abspielen an (wie am Desktop) |
 | Overlay-Fenster (always on top) | schwebendes Fenster über anderen Apps (Berechtigung "Über anderen Apps einblenden"), erscheint wie am Desktop beim Minimieren |
-| `liner://`-Deeplinks | Intent-Filter für `liner://` |
+| `cloudmusic://`-Deeplinks | Intent-Filter für `cloudmusic://` |
 | Minimieren / Maximieren / Schließen | App in den Hintergrund / Vollbild (Systemleisten aus) / App beenden |
 | Speichern-Dialog für den Dump | Android-"Speichern unter"-Dialog (Storage Access Framework) |
 | `net:diagnose` | DNS, TCP, TLS und Kontroll-Endpunkte nativ (Traceroute gibt es auf Android nicht) |
@@ -59,7 +60,9 @@ android/
 
 Nicht übertragbar (die UI-Schalter bleiben, haben aber keine Wirkung):
 - **Discord Rich Presence** – braucht den lokalen Discord-Desktop-IPC-Socket.
-- **Auto-Updater / OTA-Bundles** – liefern Desktop-Installer bzw. Electron-Bundles; meldet "aktuell".
+- **Auto-Updater / OTA-Bundles** – liefern Desktop-Installer bzw. Electron-Bundles; in diesem Build komplett
+  abgeschaltet (`UPDATES_ENABLED = false`), damit kein Original-Update die umbenannte App überschreibt.
+  Der Knopf meldet "aktuell".
 - **Globale Tastenkürzel** – gibt es systemweit nicht (In-App-Kürzel funktionieren mit Tastatur).
 
 ## Bedienung
@@ -80,6 +83,10 @@ android/build.sh assembleDebug # Debug-APK, WebView über chrome://inspect debug
 ```
 
 Ausgabe: `android/app/build/outputs/apk/{release,debug}/`.
+
+App-ID/Namespace: `com.hkamori.cloudmusic`, App-Name **CloudMusic**, Deeplink-Schema `cloudmusic://`.
+Die Icons (adaptiv, monochrom für Themed Icons ab Android 13, Benachrichtigung) entstehen aus
+`branding/cloudmusic-logo.svg` über `python3 branding/generate-icons.py`.
 Die Release-Signatur liegt in `android/keystore/` + `android/keystore.properties` –
 gut aufheben: Updates lassen sich nur mit demselben Schlüssel über die installierte App installieren.
 

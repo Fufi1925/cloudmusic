@@ -56,12 +56,12 @@ export class BundleManager {
     this.defaultRendererDist = options.defaultRendererDist;
     this.updaterUrl =
       options.updaterUrl ||
-      process.env.LINER_UPDATER_URL ||
+      process.env.CLOUDMUSIC_UPDATER_URL ||
       "https://updates.tryliner.fun";
 
     this.publicKeyHex =
       options.publicKeyHex ||
-      process.env.LINER_UPDATER_PUBLIC_KEY ||
+      process.env.CLOUDMUSIC_UPDATER_PUBLIC_KEY ||
       "302a300506032b6570032100508b7c5d10171f046c1bfd28e01d651b99c6b29cd78f8dcda00c47893c51b8de";
 
     // userData/bundles

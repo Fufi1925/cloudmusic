@@ -11,5 +11,5 @@
     <string name="open_export">Export öffnen</string>
     <string name="ui_scale_toast">Oberflächengröße: %1$d %%</string>
     <string name="ui_scale_tip">Tipp: Mit zwei Fingern zoomen, um die Oberfläche größer oder kleiner zu machen</string>
-    <string name="overlay_permission_hint">Erlaube \"Über anderen Apps einblenden\" für das Liner-Overlay</string>
+    <string name="overlay_permission_hint">Erlaube \"Über anderen Apps einblenden\" für das CloudMusic-Overlay</string>
 </resources>

@@ -1,4 +1,4 @@
-//! Liner Signer — Protected HMAC request and cover signing library for Liner.
+//! CloudMusic Signer — Protected HMAC request and cover signing library for CloudMusic.
 
 pub mod crypto;
 pub mod ffi;

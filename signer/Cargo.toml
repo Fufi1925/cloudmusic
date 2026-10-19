@@ -1,13 +1,13 @@
 [package]
-name = "liner-signer"
+name = "cloudmusic-signer"
 version = "0.1.0"
-description = "Secure HMAC request and cover signing module for Liner Desktop"
-authors = ["Liner Team"]
+description = "Secure HMAC request and cover signing module for CloudMusic Desktop"
+authors = ["CloudMusic Team"]
 edition = "2021"
 rust-version = "1.77.2"
 
 [lib]
-name = "liner_signer"
+name = "cloudmusic_signer"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]

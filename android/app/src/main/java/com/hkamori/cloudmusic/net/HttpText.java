@@ -1,4 +1,4 @@
-package com.hkamori.liner.net;
+package com.hkamori.cloudmusic.net;
 
 import java.util.HashMap;
 import java.util.Locale;

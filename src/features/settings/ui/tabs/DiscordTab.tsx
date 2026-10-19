@@ -43,8 +43,8 @@ export function DiscordTab({ searchQuery }: { searchQuery?: string }) {
     setMounted(true);
 
     const checkStatus = () => {
-      if (window.linerElectron?.getDiscordStatus) {
-        window.linerElectron.getDiscordStatus().then((status) => {
+      if (window.cloudMusicElectron?.getDiscordStatus) {
+        window.cloudMusicElectron.getDiscordStatus().then((status) => {
           if (status) setDiscordStatus(status);
         });
       }
@@ -143,7 +143,7 @@ export function DiscordTab({ searchQuery }: { searchQuery?: string }) {
                   },
                   {
                     value: "app",
-                    label: t("settings.discord.status_display.app") || "Liner (App name)",
+                    label: t("settings.discord.status_display.app") || "CloudMusic (App name)",
                   },
                 ]}
               />
@@ -232,12 +232,12 @@ export function DiscordTab({ searchQuery }: { searchQuery?: string }) {
 
       {/* Profile Buttons */}
       <SettingSection label={t("settings.discord.section_buttons") || "Profile Buttons"}>
-        {/* Listen on Liner button */}
+        {/* Listen on CloudMusic button */}
         <SettingRow
-          title={t("settings.discord.show_button.title") || "'Listen on Liner' Button"}
+          title={t("settings.discord.show_button.title") || "'Listen on CloudMusic' Button"}
           description={
             t("settings.discord.show_button.description") ||
-            "Add an interactive button linking to the song on Liner."
+            "Add an interactive button linking to the song on CloudMusic."
           }
           titleKey="settings.discord.show_button.title"
           descKey="settings.discord.show_button.description"
@@ -251,9 +251,9 @@ export function DiscordTab({ searchQuery }: { searchQuery?: string }) {
           }
         />
 
-        {/* Download Liner button */}
+        {/* Download CloudMusic button */}
         <SettingRow
-          title={t("settings.discord.show_download_button.title") || "'Download Liner' Button"}
+          title={t("settings.discord.show_download_button.title") || "'Download CloudMusic' Button"}
           description={
             t("settings.discord.show_download_button.description") ||
             "Add an interactive button linking to tryliner.fun to download the app."

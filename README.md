@@ -1,8 +1,14 @@
 <div align="center">
 
-# Liner
+# CloudMusic
 
-**Modern desktop music streaming player with syllable-synced lyrics and reactive dynamic visuals.**
+**Desktop music streaming player with syllable-synced lyrics and reactive dynamic visuals — plus a native Android build.**
+
+> [!IMPORTANT]
+> **Private build.** CloudMusic is a personal, renamed fork of *Liner* (upstream: [tryliner/desktop](https://github.com/tryliner/desktop)).
+> It runs against the official Liner backend, which this fork talks to unchanged. The repository is private on purpose:
+> the [license](./LICENSE) only allows private, non-commercial use and forbids distributing copies or binaries.
+> See [NOTICE.md](./NOTICE.md).
 
 [![Electron](https://img.shields.io/badge/Electron-44.0-47848F?style=flat-square&logo=electron&logoColor=black&labelColor=white)](https://electronjs.org)
 [![React 19](https://img.shields.io/badge/React_19-19.2-61DAFB?style=flat-square&logo=react&logoColor=black&labelColor=white)](https://react.dev)
@@ -20,7 +26,7 @@
 
 <br/>
 
-<img src="./.github/assets/lyrics_preview.png" alt="Liner Fullscreen Lyrics" width="100%" />
+<img src="./.github/assets/lyrics_preview.png" alt="CloudMusic Fullscreen Lyrics" width="100%" />
 
 </div>
 
@@ -32,12 +38,12 @@
   <table>
     <tr>
       <td align="center" width="50%">
-        <img src="./.github/assets/home.png" alt="Liner Home Page" />
+        <img src="./.github/assets/home.png" alt="CloudMusic Home Page" />
         <br/>
         <sub><b>Home</b></sub>
       </td>
       <td align="center" width="50%">
-        <img src="./.github/assets/demo.gif" alt="Liner Fullscreen Mode Demo" />
+        <img src="./.github/assets/demo.gif" alt="CloudMusic Fullscreen Mode Demo" />
         <br/>
         <sub><b>Fullscreen mode</b></sub>
       </td>
@@ -48,14 +54,16 @@
 ---
 
 > [!NOTE]
-> Liner client connects to the official Liner API backend for music catalog, streaming playback, and synchronized lyrics.
+> CloudMusic talks to the same official Liner API backend (`api.tryliner.fun`, `covers.tryliner.fun`, `link.tryliner.fun`)
+> for music catalog, streaming playback, and synchronized lyrics. The upstream update channels are switched off in this
+> build (`UPDATES_ENABLED = false` in `electron/main.ts`), so the original installer/OTA bundles can never overwrite it.
 
 ---
 
 ## Architecture
 
 ```
-liner/desktop/
+Music./
 ├── electron/
 │   ├── main.ts              # Electron main process & IPC handlers
 │   ├── preload.ts           # Context bridge & secure renderer bindings
@@ -69,6 +77,9 @@ liner/desktop/
 │   ├── shared/              # API client, state stores (Zustand), and data contracts
 │   ├── App.tsx              # Application root
 │   └── main.tsx             # Vite entry point
+├── android/                 # native Android port (WebView + Java bridge), see android/README.md
+├── branding/                # CloudMusic logo (vector master + icon generator)
+├── build/                   # desktop icon assets used by electron-builder
 ├── package.json
 └── vite.config.ts
 ```
@@ -87,9 +98,9 @@ liner/desktop/
 ### Setup
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/tryliner/desktop.git
-cd desktop
+# 1. Clone repository (private)
+git clone https://github.com/Fufi1925/Music..git
+cd Music.
 
 # 2. Install dependencies (pnpm or Bun)
 pnpm install
@@ -102,7 +113,7 @@ bun install
 ### Running in Development
 
 ```bash
-# Start Liner in development mode (Electron app with Vite hot-reload)
+# Start CloudMusic in development mode (Electron app with Vite hot-reload)
 pnpm run dev
 # or
 bun run dev
@@ -133,13 +144,34 @@ bun run electron:build:linux
 bun run electron:build:win
 ```
 
-Compiled distributions will be placed in the `release/` directory.
+Compiled distributions will be placed in the `release/` directory (AppImage/deb, NSIS setup, dmg/zip).
+
+### Android APK
+
+```bash
+cd android
+./build.sh            # renderer -> webView assets, then assembleRelease + assembleDebug
+```
+
+The signed APKs land in `android/app/build/outputs/apk/`. Signing uses
+`android/keystore/keystore.properties` (not committed — back it up, updates need the same key).
+Details, the Electron-to-Android mapping and the device test steps are in [android/README.md](./android/README.md).
+
+### Icons and logo
+
+All icons come from one master: `branding/cloudmusic-logo.svg` (vectorised from
+`branding/cloudmusic-original.webp`). Rebuild every icon (desktop, Windows `.ico`, Android adaptive icon,
+monochrome icon, notification icon, renderer logo) with:
+
+```bash
+python3 branding/generate-icons.py   # needs rsvg-convert, imagemagick, potrace, numpy, pillow
+```
 
 ---
 
 ## Contributing
 
-Bug fixes, small features, and docs fixes are welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md) before you open a pull request. The [license](./LICENSE) limits what a fork is allowed to do.
+This is a private personal fork; there is no contribution process. See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 
@@ -153,10 +185,11 @@ Bug fixes, small features, and docs fixes are welcome. Read [CONTRIBUTING.md](./
 
 ## License
 
-Liner is distributed under the **Liner Source-Available & Non-Commercial Contribution License**.
+The code stays under the **Liner Source-Available & Non-Commercial Contribution License** (`LICENSE`, unchanged).
 
-- **Allowed**: Personal non-commercial usage, local builds, and upstream contributions.
-- **Prohibited**: Commercial distribution, public competing forks, or extracting core algorithms for third-party products.
+- **Allowed**: personal, private, non-commercial builds and modifications (§2) — the owner of this repository has the upstream author's permission.
+- **Prohibited**: any public distribution, hosting or binary release of the fork (§4b), and extracting the signer or core algorithms (§4c).
+- The license grants no rights to the Liner name or branding (§4d); this fork is therefore called **CloudMusic** and uses its own logo.
 
-See [LICENSE](./LICENSE) for details.
+Keep this repository private. See [LICENSE](./LICENSE) and [NOTICE.md](./NOTICE.md).
 

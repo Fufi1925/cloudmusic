@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.os.Build;
 import android.os.Handler;
@@ -7,7 +7,7 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
-import com.hkamori.liner.net.NetProxy;
+import com.hkamori.cloudmusic.net.NetProxy;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,15 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JavaScript interface "LinerAndroid": the android side of liner-android.js and the
+ * JavaScript interface "CloudMusicAndroid": the android side of cloudmusic-android.js and the
  * counterpart of every {@code ipcMain.handle / ipcMain.on} in electron/main.ts,
  * overlay.ts, touchbar.ts and potoken.ts. Channel names are identical.
  *
- * invoke() answers asynchronously through {@code window.__linerIpc.reply}, events
- * are pushed with {@code window.__linerIpc.emit}.
+ * invoke() answers asynchronously through {@code window.__cloudMusicIpc.reply}, events
+ * are pushed with {@code window.__cloudMusicIpc.emit}.
  */
-public final class LinerBridge {
-    private static final String TAG = "LinerBridge";
+public final class CloudMusicBridge {
+    private static final String TAG = "CloudMusicBridge";
     static final String ROLE_MAIN = "main";
     static final String ROLE_OVERLAY = "overlay";
 
@@ -37,7 +37,7 @@ public final class LinerBridge {
     private volatile boolean ready;
     private volatile boolean destroyed;
 
-    LinerBridge(MainActivity activity, WebView webView, String role) {
+    CloudMusicBridge(MainActivity activity, WebView webView, String role) {
         this.activity = activity;
         this.webView = webView;
         this.role = role;
@@ -56,7 +56,7 @@ public final class LinerBridge {
     }
 
     private NetProxy net() {
-        return LinerApp.get().netProxy();
+        return CloudMusicApp.get().netProxy();
     }
 
     // ------------------------------------------------------------ JS -> native
@@ -146,7 +146,7 @@ public final class LinerBridge {
 
             // ---- storage (main.ts "storage:*")
             case "storage:get-cache-stats":
-                LinerApp.get().io().execute(() -> resolve(callId, CacheStats.compute(activity, net())));
+                CloudMusicApp.get().io().execute(() -> resolve(callId, CacheStats.compute(activity, net())));
                 break;
             case "storage:clear-covers-cache":
                 // cache storage + service workers are cleared on the web side
@@ -156,7 +156,7 @@ public final class LinerBridge {
             case "storage:clear-http-cache":
                 ui.post(() -> {
                     activity.clearWebViewCache();
-                    LinerApp.get().io().execute(() -> {
+                    CloudMusicApp.get().io().execute(() -> {
                         net().clearCache();
                         resolve(callId, true);
                     });
@@ -166,7 +166,7 @@ public final class LinerBridge {
             // ---- offline dump diagnostics (main.ts "net:diagnose")
             case "net:diagnose": {
                 JSONArray hosts = args.optJSONArray(0);
-                LinerApp.get().io().execute(() -> resolve(callId, NetDiag.run(activity, net(), hosts)));
+                CloudMusicApp.get().io().execute(() -> resolve(callId, NetDiag.run(activity, net(), hosts)));
                 break;
             }
 
@@ -298,12 +298,12 @@ public final class LinerBridge {
 
     private void reply(String callId, boolean ok, String json) {
         if (callId == null) return;
-        eval("window.__linerIpc&&window.__linerIpc.reply(" + JSONObject.quote(callId) + "," + ok + ","
+        eval("window.__cloudMusicIpc&&window.__cloudMusicIpc.reply(" + JSONObject.quote(callId) + "," + ok + ","
                 + JSONObject.quote(json) + ")");
     }
 
     void emit(String channel, Object payload) {
-        eval("window.__linerIpc&&window.__linerIpc.emit(" + JSONObject.quote(channel) + ","
+        eval("window.__cloudMusicIpc&&window.__cloudMusicIpc.emit(" + JSONObject.quote(channel) + ","
                 + JSONObject.quote(toJson(payload)) + ")");
     }
 

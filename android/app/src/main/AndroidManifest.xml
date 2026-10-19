@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
-        android:name=".LinerApp"
+        android:name=".CloudMusicApp"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,7 +21,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Liner"
+        android:theme="@style/Theme.CloudMusic"
         android:usesCleartextTraffic="true">
 
         <activity
@@ -35,12 +35,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- liner:// share links (electron: setAsDefaultProtocolClient("liner")) -->
+            <!-- cloudmusic:// share links (electron: setAsDefaultProtocolClient("cloudmusic")) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="liner" />
+                <data android:scheme="cloudmusic" />
             </intent-filter>
         </activity>
 

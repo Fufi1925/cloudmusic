@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import static org.junit.Assert.assertEquals;
 

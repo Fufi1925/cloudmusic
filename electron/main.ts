@@ -75,6 +75,10 @@ let mainWindow: BrowserWindow | null = null;
 let touchBarManager: TouchBarManager | null = null;
 let overlayManager: OverlayManager | null = null;
 let bundleManager: BundleManager | null = null;
+// CloudMusic: both upstream update channels (installer releases and OTA renderer
+// bundles) ship the original client and would silently revert this build, so they
+// stay off; the IPC handlers below answer "no update available".
+const UPDATES_ENABLED = false;
 let discordRpcManager: DiscordRpcManager | null = null;
 let poTokenService: PoTokenService | null = null;
 
@@ -125,7 +129,7 @@ const shutdown = createShutdown({
   watchdogMs: 4000,
 });
 
-// liner:// deeplink support (share links bounce here from link.tryliner.fun)
+// cloudmusic:// deeplink support (cloudmusic://track?id=..., artist, album, playlist)
 
 // cold-start url arrives before the window exists, stash it until renderer is ready
 let pendingDeeplink: DeeplinkTarget | null = findDeeplinkArg(process.argv)
@@ -155,7 +159,7 @@ const MIN_WINDOW_HEIGHT = 705;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    title: "Liner",
+    title: "CloudMusic",
     icon: path.join(process.env.VITE_PUBLIC!, "icon.png"),
     width: DEFAULT_WINDOW_WIDTH,
     height: DEFAULT_WINDOW_HEIGHT,
@@ -272,6 +276,8 @@ function createWindow() {
 
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+  } else if (!UPDATES_ENABLED) {
+    mainWindow.loadFile(path.join(RENDERER_DIST, "index.html"));
   } else {
     bundleManager = new BundleManager({
       defaultRendererDist: RENDERER_DIST,
@@ -315,12 +321,12 @@ function createWindow() {
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   console.warn(
-    "\n\x1b[33m[Liner]\x1b[0m Another instance of Liner is already running in the background. Exiting development instance.\nTo run in development mode, please close the running Liner application first.\n"
+    "\n\x1b[33m[CloudMusic]\x1b[0m Another instance of CloudMusic is already running in the background. Exiting development instance.\nTo run in development mode, please close the running CloudMusic application first.\n"
   );
   app.quit();
 } else {
   app.on("second-instance", (_event, argv) => {
-    // running instance gets here when xdg-open / os launches liner:// again
+    // running instance gets here when xdg-open / os launches cloudmusic:// again
     const raw = findDeeplinkArg(argv);
     if (shutdown.isQuitting()) {
       // this process is on its way out and can no longer show a window; the new
@@ -347,12 +353,12 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(() => {
-    if (!app.isPackaged && process.env.LINER_DEV_SIGNING_SECRET) {
-      setDevSigningSecret(process.env.LINER_DEV_SIGNING_SECRET);
+    if (!app.isPackaged && process.env.CLOUDMUSIC_DEV_SIGNING_SECRET) {
+      setDevSigningSecret(process.env.CLOUDMUSIC_DEV_SIGNING_SECRET);
       console.log("\x1b[43;30m signer \x1b[0m dev signing secret active (unpackaged build only)");
     }
 
-    // register liner:// so browsers / xdg-open route share links to us
+    // register cloudmusic:// so browsers / xdg-open route share links to us
     // (on linux the packaged .desktop carries the mime handler too)
     if (process.defaultApp && process.argv.length >= 2) {
       app.setAsDefaultProtocolClient(DEEP_LINK_SCHEME, process.execPath, [path.resolve(process.argv[1]!)]);
@@ -491,7 +497,7 @@ if (!gotTheLock) {
           return desktopName.trim();
         }
       } catch {}
-      return "liner";
+      return "cloudmusic";
     };
 
     const installLinuxAppIcon = async (iconName: string, png: Buffer) => {
@@ -590,7 +596,7 @@ if (!gotTheLock) {
         let userAgentOverride: string | undefined;
         for (const [name, value] of Object.entries(details.requestHeaders)) {
           const lower = name.toLowerCase();
-          if (lower === "x-liner-user-agent") {
+          if (lower === "x-cloudmusic-user-agent") {
             userAgentOverride = value;
           } else if (lower !== "origin" && lower !== "referer") {
             requestHeaders[name] = value;
@@ -1085,7 +1091,7 @@ if (!gotTheLock) {
           try {
             req = https.get(
               url,
-              { timeout: 6000, headers: { "user-agent": "liner-connectivity/1.0" } },
+              { timeout: 6000, headers: { "user-agent": "cloudmusic-connectivity/1.0" } },
               (res) => {
                 let body = "";
                 res.on("data", (chunk) => {
@@ -1206,6 +1212,7 @@ if (!gotTheLock) {
     });
 
     ipcMain.handle("updater:check-for-updates", async () => {
+      if (!UPDATES_ENABLED) return { available: false };
       if (!app.isPackaged) {
         return { available: false, error: "Updater is disabled in dev mode" };
       }
@@ -1222,6 +1229,7 @@ if (!gotTheLock) {
     });
 
     ipcMain.handle("updater:download-update", async () => {
+      if (!UPDATES_ENABLED) return { success: false, error: "Updates are disabled in this build" };
       if (!app.isPackaged) {
         return { success: false, error: "Updater is disabled in dev mode" };
       }
@@ -1234,6 +1242,7 @@ if (!gotTheLock) {
     });
 
     ipcMain.handle("updater:quit-and-install", () => {
+      if (!UPDATES_ENABLED) return false;
       setImmediate(() => {
         autoUpdater.quitAndInstall(false, true);
       });
@@ -1242,6 +1251,7 @@ if (!gotTheLock) {
 
     // OTA bundle updater IPC handlers
     ipcMain.handle("bundle:check", async () => {
+      if (!UPDATES_ENABLED) return { available: false };
       if (!bundleManager) {
         return { available: false, error: "Bundle updater inactive (dev mode)" };
       }
@@ -1249,6 +1259,7 @@ if (!gotTheLock) {
     });
 
     ipcMain.handle("bundle:download-and-install", async (_event, manifest) => {
+      if (!UPDATES_ENABLED) return { success: false, error: "Updates are disabled in this build" };
       if (!bundleManager) {
         return { success: false, error: "Bundle updater inactive (dev mode)" };
       }
@@ -1277,7 +1288,7 @@ if (!gotTheLock) {
     });
 
     // automatic update check after window initialization (packaged app only)
-    if (app.isPackaged) {
+    if (app.isPackaged && UPDATES_ENABLED) {
       setTimeout(() => {
         autoUpdater.checkForUpdates().catch((err) => {
           console.error("\x1b[31m updater \x1b[0m background check error:", err?.message || err);

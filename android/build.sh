@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Baut die Liner-Android-APK aus diesem Repository.
+# Baut die CloudMusic-Android-APK aus diesem Repository.
 # Voraussetzungen: Node 20+, pnpm 10, JDK 17+ (21 empfohlen), Android SDK (platform 35, build-tools 35)
 #   ANDROID_HOME muss gesetzt sein (oder android/local.properties mit sdk.dir=...).
 # Aufruf:  android/build.sh                 -> signierte Release-APK (mit android/keystore.properties)

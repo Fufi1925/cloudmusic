@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- light/dark follows the system so the WebView's prefers-color-scheme matches (renderer theme "system") -->
-    <style name="Theme.Liner" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.CloudMusic" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

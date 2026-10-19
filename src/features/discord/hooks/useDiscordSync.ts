@@ -40,7 +40,7 @@ export function useDiscordSync() {
   // Sync settings on mount
   useEffect(() => {
     const s = useDiscordSettingsStore.getState();
-    window.linerElectron?.discordUpdateSettings?.({
+    window.cloudMusicElectron?.discordUpdateSettings?.({
       enabled: s.enabled,
       statusDisplayType: s.statusDisplayType,
       showArtwork: s.showArtwork,
@@ -57,7 +57,7 @@ export function useDiscordSync() {
     const handleAuthChange = () => {
       const session = getAuthSession();
       if (!session) {
-        window.linerElectron?.discordUpdateState?.({
+        window.cloudMusicElectron?.discordUpdateState?.({
           status: "idle",
           track: null,
           positionMs: 0,
@@ -106,7 +106,7 @@ export function useDiscordSync() {
 
   // Push updates to Electron
   useEffect(() => {
-    if (!window.linerElectron?.discordUpdateState) return;
+    if (!window.cloudMusicElectron?.discordUpdateState) return;
 
     const trackId = currentTrack?.id ?? null;
     const coverUrl = effectiveCover || currentTrack?.coverUrl;
@@ -174,7 +174,7 @@ export function useDiscordSync() {
       artistImageUrl: artistAvatar,
     };
 
-    window.linerElectron.discordUpdateState(payload);
+    window.cloudMusicElectron.discordUpdateState(payload);
   }, [
     player.status,
     player.positionMs,

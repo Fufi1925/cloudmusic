@@ -1,5 +1,5 @@
 // Desktop test harness for the android WebView side. Runs the real renderer +
-// liner-android.js in headless chromium with phone emulation while
+// cloudmusic-android.js in headless chromium with phone emulation while
 // native-sim.mjs plays the role of the java layer (tunnel, subresource proxy,
 // ipc). Usage: node harness.mjs <scenario> [...]
 import { createRequire } from "node:module";
@@ -55,10 +55,10 @@ async function ensurePoPage() {
       } catch (e) {
         error = String(e.message || e);
       }
-      await poPage.evaluate(([i, t, e]) => window.__linerPoWorker.interpreterResult(i, t, e), [id, text, error]);
+      await poPage.evaluate(([i, t, e]) => window.__cloudMusicPoWorker.interpreterResult(i, t, e), [id, text, error]);
     });
     await poPage.addInitScript(() => {
-      window.LinerPoBridge = {
+      window.CloudMusicPoBridge = {
         ready: () => window.__poReady(),
         result: (json) => window.__poResult(json),
         interpreter: (id, url) => window.__poInterpreter(id, url),
@@ -83,7 +83,7 @@ async function mintPoToken(identifier) {
       resolve: (t) => (clearTimeout(timer), resolve(t)),
       reject: (e) => (clearTimeout(timer), reject(e)),
     });
-    poPage.evaluate(([i, ident]) => window.__linerPoWorker.mint(i, ident), [id, identifier]);
+    poPage.evaluate(([i, ident]) => window.__cloudMusicPoWorker.mint(i, ident), [id, identifier]);
   });
 }
 
@@ -120,7 +120,7 @@ async function newAppContext({ width, height, dpr = 2.625, uiScale = 1, phone = 
           value = false;
           break;
         case "storage:get-cache-stats":
-          value = { cacheSize: 0, httpCacheSize: 0, codeCacheSize: 0, serviceWorkerSize: 0, indexedDbSize: 0, localStorageSize: 0, blobStorageSize: 0, cachePath: "/data/user/0/com.hkamori.liner/cache" };
+          value = { cacheSize: 0, httpCacheSize: 0, codeCacheSize: 0, serviceWorkerSize: 0, indexedDbSize: 0, localStorageSize: 0, blobStorageSize: 0, cachePath: "/data/user/0/com.hkamori.cloudmusic/cache" };
           break;
         case "overlay:get-initial-state":
           value = null;
@@ -134,7 +134,7 @@ async function newAppContext({ width, height, dpr = 2.625, uiScale = 1, phone = 
       value = { message: String(error.message || error) };
       events.push(`invoke ${channel} FAILED: ${value.message}`);
     }
-    await page.evaluate(([id, okFlag, json]) => window.__linerIpc && window.__linerIpc.reply(id, okFlag, json), [callId, ok, JSON.stringify(value)]).catch(() => undefined);
+    await page.evaluate(([id, okFlag, json]) => window.__cloudMusicIpc && window.__cloudMusicIpc.reply(id, okFlag, json), [callId, ok, JSON.stringify(value)]).catch(() => undefined);
   });
   await context.exposeBinding("__harnessSend", (_src, channel, argsJson) => {
     if (channel === "touchbar:update-state") {
@@ -186,8 +186,8 @@ try {
       innerHeight: window.innerHeight,
       viewportMeta: document.querySelector('meta[name="viewport"]')?.getAttribute("content"),
       scale: window.visualViewport?.scale,
-      hasBridge: typeof window.linerElectron === "object",
-      platform: window.linerElectron?.platform,
+      hasBridge: typeof window.cloudMusicElectron === "object",
+      platform: window.cloudMusicElectron?.platform,
       envWarning: document.body.innerText.includes("Electron") || document.body.innerText.includes("Desktop-App"),
     }));
     await page.screenshot({ path: `${OUT}/login-${w}x${h}.png` });
@@ -239,7 +239,7 @@ try {
         out.downloadError = String(e.message || e);
       }
       // direct playback: <audio crossorigin="anonymous"> + MediaElementSource (needs CORS-clean media)
-      const audio = document.getElementById("liner-audio");
+      const audio = document.getElementById("cloudmusic-audio");
       audio.src = stream.url;
       try {
         await new Promise((resolve, reject) => {
@@ -310,7 +310,7 @@ try {
     await context.addInitScript(() => {
       const payload = btoa(JSON.stringify({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 86400 })).replace(/=+$/, "");
       const token = `x.${payload}.y`;
-      localStorage.setItem("liner_auth_session", JSON.stringify({ accessToken: token, refreshToken: "r", expiresAt: Date.now() + 86400000, user: { id: "u1", username: "android", displayName: "Android", email: "a@b.c" } }));
+      localStorage.setItem("cloudmusic_auth_session", JSON.stringify({ accessToken: token, refreshToken: "r", expiresAt: Date.now() + 86400000, user: { id: "u1", username: "android", displayName: "Android", email: "a@b.c" } }));
     });
     const page = await context.newPage();
     const consoleLines = [];
@@ -342,9 +342,9 @@ try {
       if (sessionStorage.getItem("seeded")) return;
       sessionStorage.setItem("seeded", "1");
       const payload = btoa(JSON.stringify({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 86400 })).replace(/=+$/, "");
-      localStorage.setItem("liner_auth_session", JSON.stringify({ accessToken: `x.${payload}.y`, refreshToken: "r", expiresAt: Date.now() + 86400000, user: { id: "u1", username: "android", displayName: "Android", email: "a@b.c" } }));
+      localStorage.setItem("cloudmusic_auth_session", JSON.stringify({ accessToken: `x.${payload}.y`, refreshToken: "r", expiresAt: Date.now() + 86400000, user: { id: "u1", username: "android", displayName: "Android", email: "a@b.c" } }));
       const track = { id: "dQw4w9WgXcQ", title: "Never Gonna Give You Up", artists: "Rick Astley", coverUrl: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg", durationMs: 213000, playCount: 0 };
-      localStorage.setItem("liner_player_session_v2", JSON.stringify({ state: { queue: [track], currentIndex: 0, currentTrack: track, playbackContext: null, playbackContextCover: null, positionMs: 0, durationMs: 213000, volume: 0.6, repeat: "off", shuffle: false, defaultPlaybackContext: "resume" }, version: 0 }));
+      localStorage.setItem("cloudmusic_player_session_v2", JSON.stringify({ state: { queue: [track], currentIndex: 0, currentTrack: track, playbackContext: null, playbackContextCover: null, positionMs: 0, durationMs: 213000, volume: 0.6, repeat: "off", shuffle: false, defaultPlaybackContext: "resume" }, version: 0 }));
     });
     const page = await context.newPage();
     const consoleLines = [];
@@ -367,7 +367,7 @@ try {
     });
     await page.waitForTimeout(15000);
     const audio = await page.evaluate(() => {
-      const a = document.getElementById("liner-audio");
+      const a = document.getElementById("cloudmusic-audio");
       return a ? { paused: a.paused, currentTime: Math.round(a.currentTime * 10) / 10, duration: Math.round(a.duration || 0), src: (a.currentSrc || "").slice(0, 60), error: a.error?.code ?? null } : null;
     });
     await page.screenshot({ path: `${OUT}/player-playing-${w}x${h}-s${uiScale}.png` });
@@ -398,7 +398,7 @@ try {
       });
       await run("headersReadable", async () => {
         const r = await fetch("https://api.tryliner.fun/health");
-        return { date: Boolean(r.headers.get("date")), ct: r.headers.get("content-type"), xInstance: r.headers.get("x-liner-instance"), meta: [...r.headers.keys()].filter((k) => k.startsWith("x-lnrproxy")).length, body: await r.json() };
+        return { date: Boolean(r.headers.get("date")), ct: r.headers.get("content-type"), xInstance: r.headers.get("x-liner-instance"), meta: [...r.headers.keys()].filter((k) => k.startsWith("x-cmproxy")).length, body: await r.json() };
       });
       await run("clone", async () => {
         const r = await fetch("https://api.tryliner.fun/health");
@@ -429,9 +429,9 @@ try {
         return "not aborted?!";
       });
       await run("postEcho", async () => {
-        const r = await fetch("https://httpbin.org/anything", { method: "POST", headers: { "content-type": "application/json", "x-test": "1", "x-liner-user-agent": "kept-for-other-hosts" }, body: JSON.stringify({ a: "ü€" }) });
+        const r = await fetch("https://httpbin.org/anything", { method: "POST", headers: { "content-type": "application/json", "x-test": "1", "x-cloudmusic-user-agent": "kept-for-other-hosts" }, body: JSON.stringify({ a: "ü€" }) });
         const j = await r.json();
-        return { method: j.method, json: j.json, origin: j.headers.Origin, ua: j.headers["User-Agent"]?.slice(0, 40), xTest: j.headers["X-Test"], linerUa: j.headers["X-Liner-User-Agent"], lang: j.headers["Accept-Language"] };
+        return { method: j.method, json: j.json, origin: j.headers.Origin, ua: j.headers["User-Agent"]?.slice(0, 40), xTest: j.headers["X-Test"], cloudMusicUa: j.headers["X-Cloudmusic-User-Agent"], lang: j.headers["Accept-Language"] };
       });
       await run("formData", async () => {
         const fd = new FormData();

@@ -5,8 +5,8 @@
 // android WebView always enforces CORS and never lets page JS set those headers,
 // so every cross-origin fetch() is tunnelled through the native layer:
 //
-//   1. the request (method, headers, body) is parked natively via LinerNet.prepare()
-//   2. the page fetches the same-origin url /__liner_net__/<id>
+//   1. the request (method, headers, body) is parked natively via CloudMusicNet.prepare()
+//   2. the page fetches the same-origin url /__cloudmusic_net__/<id>
 //   3. WebViewClient.shouldInterceptRequest() performs the real request with OkHttp
 //      (same header rewriting rules as electron/main.ts) and streams the response back
 //
@@ -22,12 +22,12 @@ interface NativeNet {
 
 declare global {
   interface Window {
-    LinerNet?: NativeNet;
+    CloudMusicNet?: NativeNet;
   }
 }
 
-export const PROXY_PATH = "/__liner_net__/";
-const META = "x-lnrproxy-";
+export const PROXY_PATH = "/__cloudmusic_net__/";
+const META = "x-cmproxy-";
 const NULL_BODY_STATUS = new Set([101, 103, 204, 205, 304]);
 
 let seq = 0;
@@ -63,8 +63,8 @@ function decorate(response: Response, url: string, redirected: boolean): Respons
 }
 
 export function installFetchProxy(): void {
-  const net = window.LinerNet;
-  if (!net || (window.fetch as any).__linerProxied) return;
+  const net = window.CloudMusicNet;
+  if (!net || (window.fetch as any).__cloudMusicProxied) return;
 
   const nativeFetch = window.fetch.bind(window);
   const appOrigin = window.location.origin;
@@ -177,6 +177,6 @@ export function installFetchProxy(): void {
     return decorate(response, finalUrl, redirected);
   };
 
-  Object.defineProperty(proxiedFetch, "__linerProxied", { value: true });
+  Object.defineProperty(proxiedFetch, "__cloudMusicProxied", { value: true });
   window.fetch = proxiedFetch as typeof window.fetch;
 }

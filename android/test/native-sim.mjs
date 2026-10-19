@@ -1,13 +1,13 @@
 // Node re-implementation of the android native layer for desktop testing of the
-// WebView side (liner-android.js + the unchanged renderer) in headless chromium.
+// WebView side (cloudmusic-android.js + the unchanged renderer) in headless chromium.
 // Mirrors NetProxy.java / ElectronHeaders.java / AssetServer.java rule by rule.
 import fs from "node:fs";
 import path from "node:path";
 
 export const APP_HOST = "appassets.androidplatform.net";
 export const APP_ORIGIN = `https://${APP_HOST}`;
-export const TUNNEL_PATH = "/__liner_net__/";
-const META = "x-lnrproxy-";
+export const TUNNEL_PATH = "/__cloudmusic_net__/";
+const META = "x-cmproxy-";
 
 const HOP_BY_HOP = new Set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "proxy-connection", "te", "trailer", "transfer-encoding", "upgrade"]);
 const TUNNEL_SKIP = new Set(["host", "connection", "content-length", "accept-encoding", "transfer-encoding", "te", "trailer", "upgrade", "keep-alive", "proxy-connection", "expect", "cookie", "cookie2"]);
@@ -28,8 +28,8 @@ export function originFor(url) {
 function rewrite(url, headers) {
   if (!matchesFilter(url)) return new Map(headers);
   const out = new Map(headers);
-  const ua = out.get("x-liner-user-agent");
-  out.delete("x-liner-user-agent");
+  const ua = out.get("x-cloudmusic-user-agent");
+  out.delete("x-cloudmusic-user-agent");
   out.delete("origin");
   out.delete("referer");
   const origin = originFor(url);
@@ -103,7 +103,7 @@ export class NativeSim {
     this.apiMock = apiMock;
   }
 
-  // LinerNet.prepare (the harness page calls it through a synchronous XHR)
+  // CloudMusicNet.prepare (the harness page calls it through a synchronous XHR)
   prepare(id, descriptor, bodyBase64) {
     this.pending.set(id, { descriptor, body: bodyBase64 ? Buffer.from(bodyBase64, "base64") : null });
   }
@@ -253,7 +253,7 @@ export function bridgeInitScript(info) {
   return `
     (() => {
       const info = ${JSON.stringify(JSON.stringify(info))};
-      window.LinerNet = {
+      window.CloudMusicNet = {
         prepare(id, descriptor, body) {
           const xhr = new XMLHttpRequest();
           xhr.open("POST", "/__harness_prepare__", false);
@@ -261,7 +261,7 @@ export function bridgeInitScript(info) {
         },
         cancel(id) { window.__harnessSend && window.__harnessSend("net:cancel", JSON.stringify([id])); },
       };
-      window.LinerAndroid = {
+      window.CloudMusicAndroid = {
         getInfo() { return info; },
         invoke(callId, channel, args) { window.__harnessInvoke(callId, channel, args); },
         send(channel, args) { window.__harnessSend(channel, args); },

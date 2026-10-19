@@ -65,10 +65,10 @@ const SIDEBAR_WIDTH = 58;
 const SHELL_EDGE_GAP = 12;
 const SEARCH_QUERY_CACHE_TTL_MS = 60_000;
 const LEGACY_LAYOUT_STORAGE_KEYS = [
-  "liner_right_sidebar",
-  "liner_sidebar_position",
-  "liner_sidebar_width",
-  "liner_queue_popup_open",
+  "cloudmusic_right_sidebar",
+  "cloudmusic_sidebar_position",
+  "cloudmusic_sidebar_width",
+  "cloudmusic_queue_popup_open",
 ] as const;
 
 export default function AppFrame({ children }: AppFrameProps) {
@@ -87,7 +87,7 @@ export default function AppFrame({ children }: AppFrameProps) {
   const [queuePopupOpen, setQueuePopupOpen] = useState(false);
   const [rightDrawerTab, setRightDrawerTabState] = useState<"queue" | "lyrics">(() => {
     if (typeof window === "undefined") return "queue";
-    const saved = window.localStorage.getItem("liner_right_drawer_tab");
+    const saved = window.localStorage.getItem("cloudmusic_right_drawer_tab");
     return saved === "queue" || saved === "lyrics" ? saved : "queue";
   });
   const fullscreenPlayerOpen = usePlayerStore((state) => state.fullscreen);
@@ -244,7 +244,7 @@ export default function AppFrame({ children }: AppFrameProps) {
 
   const setRightDrawerTab = useCallback((tab: "queue" | "lyrics") => {
     setRightDrawerTabState(tab);
-    localStorage.setItem("liner_right_drawer_tab", tab);
+    localStorage.setItem("cloudmusic_right_drawer_tab", tab);
   }, []);
 
   const openRightPanel = useCallback(

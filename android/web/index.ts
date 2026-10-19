@@ -1,9 +1,9 @@
-// liner-android.js: loaded as a classic <script> before the renderer's module
+// cloudmusic-android.js: loaded as a classic <script> before the renderer's module
 // bundle, i.e. this is what electron/preload.ts is for the desktop app.
 import { parseDeeplink } from "../../electron/deeplink";
 import { dispatch, installIpcReceiver, send } from "./ipc";
 import { installFetchProxy } from "./netPatch";
-import { createLinerApi, type AndroidInfo } from "./api";
+import { createCloudMusicApi, type AndroidInfo } from "./api";
 import { applyViewport, getLastViewport, installViewport, type ViewportMetrics } from "./viewport";
 import {
   dispatchDeviceChange,
@@ -16,7 +16,7 @@ import { getWasmExports } from "./signer";
 
 declare global {
   interface Window {
-    __linerAndroid?: {
+    __cloudMusicAndroid?: {
       info: AndroidInfo;
       back: () => boolean;
     };
@@ -25,17 +25,17 @@ declare global {
 
 function readInfo(): AndroidInfo | null {
   try {
-    return JSON.parse(window.LinerAndroid!.getInfo()) as AndroidInfo;
+    return JSON.parse(window.CloudMusicAndroid!.getInfo()) as AndroidInfo;
   } catch (error) {
-    console.error("[liner-android] could not read native info", error);
+    console.error("[cloudmusic-android] could not read native info", error);
     return null;
   }
 }
 
 (function install() {
-  if (typeof window === "undefined" || window.__linerAndroid) return;
-  if (!window.LinerAndroid) {
-    console.warn("[liner-android] native bridge missing, running as plain web app");
+  if (typeof window === "undefined" || window.__cloudMusicAndroid) return;
+  if (!window.CloudMusicAndroid) {
+    console.warn("[cloudmusic-android] native bridge missing, running as plain web app");
     return;
   }
   const info = readInfo();
@@ -79,8 +79,8 @@ function readInfo(): AndroidInfo | null {
   installClipboard();
   installWindowOpen();
 
-  window.linerElectron = createLinerApi(info);
-  window.__linerAndroid = { info, back: handleBackPressed };
+  window.cloudMusicElectron = createCloudMusicApi(info);
+  window.__cloudMusicAndroid = { info, back: handleBackPressed };
 
   // compile the signer right away, the first api request needs it
   void getWasmExports().catch((error) => console.error("[signer] wasm init failed", error));

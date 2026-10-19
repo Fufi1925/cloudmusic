@@ -1,9 +1,9 @@
 // Android replacement for electron's ipcRenderer.
 //
-// invoke(channel, ...args) -> LinerAndroid.invoke(callId, channel, json) and the
-// native side answers asynchronously through window.__linerIpc.reply(...).
-// send(channel, ...args)   -> LinerAndroid.send(channel, json), fire and forget.
-// native events            -> window.__linerIpc.emit(channel, json) -> on(channel, cb)
+// invoke(channel, ...args) -> CloudMusicAndroid.invoke(callId, channel, json) and the
+// native side answers asynchronously through window.__cloudMusicIpc.reply(...).
+// send(channel, ...args)   -> CloudMusicAndroid.send(channel, json), fire and forget.
+// native events            -> window.__cloudMusicIpc.emit(channel, json) -> on(channel, cb)
 
 export interface NativeBridge {
   invoke(callId: string, channel: string, argsJson: string): void;
@@ -20,8 +20,8 @@ interface PendingCall {
 
 declare global {
   interface Window {
-    LinerAndroid?: NativeBridge;
-    __linerIpc?: {
+    CloudMusicAndroid?: NativeBridge;
+    __cloudMusicIpc?: {
       reply: (callId: string, ok: boolean, json: string | null) => void;
       emit: (channel: string, json: string | null) => void;
     };
@@ -38,7 +38,7 @@ const stickyQueue = new Map<string, any[]>();
 let seq = 0;
 
 function native(): NativeBridge | undefined {
-  return typeof window !== "undefined" ? window.LinerAndroid : undefined;
+  return typeof window !== "undefined" ? window.CloudMusicAndroid : undefined;
 }
 
 function parse(json: string | null | undefined): any {
@@ -125,7 +125,7 @@ export function dispatch(channel: string, payload: any): void {
 }
 
 export function installIpcReceiver(onEvent?: (channel: string, payload: any) => boolean): void {
-  window.__linerIpc = {
+  window.__cloudMusicIpc = {
     reply(callId, ok, json) {
       const call = pending.get(callId);
       if (!call) return;

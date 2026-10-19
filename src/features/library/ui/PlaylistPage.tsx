@@ -66,7 +66,7 @@ const TrackItem = memo(function TrackItem({
   highlight,
 }: TrackItemProps) {
   const handlePlay = useCallback(() => {
-    if (typeof window !== "undefined" && window.__linerWasDragging) return;
+    if (typeof window !== "undefined" && window.__cloudMusicWasDragging) return;
     const context = playlistId ? `playlist:${playlistId}` : playlistTitle;
     playerEngine.playTrack(
       track,

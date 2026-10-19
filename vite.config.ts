@@ -7,8 +7,8 @@ import pkg from "./package.json" with { type: "json" };
 
 export default defineConfig(({ command, mode }) => {
   if (command === "serve") {
-    const devSigningSecret = loadEnv(mode, process.cwd(), "LINER_").LINER_DEV_SIGNING_SECRET;
-    if (devSigningSecret) process.env.LINER_DEV_SIGNING_SECRET = devSigningSecret;
+    const devSigningSecret = loadEnv(mode, process.cwd(), "CLOUDMUSIC_").CLOUDMUSIC_DEV_SIGNING_SECRET;
+    if (devSigningSecret) process.env.CLOUDMUSIC_DEV_SIGNING_SECRET = devSigningSecret;
   }
 
   return {

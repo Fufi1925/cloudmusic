@@ -27,7 +27,7 @@ export interface UseListReorderReturn<T> {
 
 declare global {
   interface Window {
-    __linerWasDragging?: boolean;
+    __cloudMusicWasDragging?: boolean;
   }
 }
 
@@ -182,7 +182,7 @@ export function useListReorder<T>({
           draggedItemRef.current = item;
 
           if (typeof window !== "undefined") {
-            window.__linerWasDragging = true;
+            window.__cloudMusicWasDragging = true;
           }
 
           setIsDragging(true);
@@ -240,7 +240,7 @@ export function useListReorder<T>({
           setTimeout(() => {
             window.removeEventListener("click", suppressClick, true);
             if (typeof window !== "undefined") {
-              window.__linerWasDragging = false;
+              window.__cloudMusicWasDragging = false;
             }
           }, 400);
         }

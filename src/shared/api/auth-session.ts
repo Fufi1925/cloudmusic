@@ -5,7 +5,7 @@ export type { AuthTokens, AuthUser };
 
 import { getApiBaseUrl } from "./baseUrl";
  
-const STORAGE_KEY = "liner_auth_session";
+const STORAGE_KEY = "cloudmusic_auth_session";
 
 let session: AuthTokens | null = null;
 let refreshPromise: Promise<AuthTokens | null> | null = null;

@@ -1,6 +1,6 @@
 // Vite config for the Android build of the renderer.
 // Identical to vite.config.ts minus the electron main/preload plugin; instead
-// the android bridge (android/web -> liner-android.js) is loaded before the
+// the android bridge (android/web -> cloudmusic-android.js) is loaded before the
 // renderer bundle, exactly where electron's preload script would run.
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
@@ -12,18 +12,18 @@ export const ANDROID_WWW = path.resolve(import.meta.dirname, "android/app/src/ma
 
 function androidHtml(): Plugin {
   return {
-    name: "liner-android-html",
+    name: "cloudmusic-android-html",
     transformIndexHtml: {
       order: "pre",
       handler(html) {
-        // the viewport meta is owned by liner-android.js (it scales the desktop layout)
+        // the viewport meta is owned by cloudmusic-android.js (it scales the desktop layout)
         const withoutViewport = html.replace(/<meta\s+name="viewport"[^>]*>\s*/i, "");
         return {
           html: withoutViewport,
           tags: [
             {
               tag: "script",
-              attrs: { src: "./liner-android.js" },
+              attrs: { src: "./cloudmusic-android.js" },
               injectTo: "head-prepend",
             },
           ],

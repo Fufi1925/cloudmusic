@@ -1,8 +1,8 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.content.Context;
 
-import com.hkamori.liner.net.NetProxy;
+import com.hkamori.cloudmusic.net.NetProxy;
 
 import org.json.JSONException;
 import org.json.JSONObject;

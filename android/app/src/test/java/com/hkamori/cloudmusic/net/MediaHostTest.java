@@ -1,4 +1,4 @@
-package com.hkamori.liner.net;
+package com.hkamori.cloudmusic.net;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

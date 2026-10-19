@@ -37,7 +37,7 @@ export interface WindowState {
   isVisible?: boolean;
 }
 
-export interface LinerElectronApi {
+export interface CloudMusicElectronApi {
   platform: string;
   isHyprland: boolean;
   minimize: () => Promise<void>;
@@ -141,7 +141,7 @@ const isHyprland = Boolean(
   process.env.XDG_SESSION_DESKTOP?.toLowerCase().includes("hyprland"),
 );
 
-const api: LinerElectronApi = {
+const api: CloudMusicElectronApi = {
   platform: process.platform,
   isHyprland,
   minimize: () => ipcRenderer.invoke("window:minimize"),
@@ -353,5 +353,5 @@ const api: LinerElectronApi = {
 if (location.hostname === "www.youtube.com") {
   startPoTokenWorker();
 } else {
-  contextBridge.exposeInMainWorld("linerElectron", api);
+  contextBridge.exposeInMainWorld("cloudMusicElectron", api);
 }

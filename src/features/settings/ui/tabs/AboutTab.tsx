@@ -1,48 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
-import { FaTelegramPlane, FaGithub, FaGlobe } from "react-icons/fa";
+import { FaGithub, FaGlobe } from "react-icons/fa";
 import { Refresh1Line, CheckLine } from "@mingcute/react";
-import { QuestionCircle } from "@solar-icons/react";
 import Button from "@/shared/ui/Button";
 import { useToast } from "@/shared/ui";
 import { useTranslation, getTranslationsForAllLocales } from "@/languages";
 import { APP_VERSION } from "@/shared/config/version";
 import logo from "@/assets/logo.svg";
-import spotifyLogo from "@/assets/branding/logo-spotify.svg";
-import discordLogo from "@/assets/branding/logo-discord.svg";
-import telegramLogo from "@/assets/branding/logo-telegram.svg";
-import auroraLogo from "@/assets/branding/logo-aurora.svg";
-import sunsetLogo from "@/assets/branding/logo-sunset.svg";
-import oceanLogo from "@/assets/branding/logo-ocean.svg";
-import forestLogo from "@/assets/branding/logo-forest.svg";
-import berryLogo from "@/assets/branding/logo-berry.svg";
-import carbonLogo from "@/assets/branding/logo-carbon.svg";
-import pixelLogo from "@/assets/branding/logo-pixel.svg";
-import scanlinesLogo from "@/assets/branding/logo-scanlines.svg";
-import vhsLogo from "@/assets/branding/logo-vhs.svg";
-import { usePlayerStore, type AccentVariant } from "@/features/player";
 import { useUpdaterStore } from "@/features/updater";
-
-const brandingLogos: Record<Exclude<AccentVariant, "default">, string> = {
-  spotify: spotifyLogo,
-  discord: discordLogo,
-  telegram: telegramLogo,
-  aurora: auroraLogo,
-  sunset: sunsetLogo,
-  ocean: oceanLogo,
-  forest: forestLogo,
-  berry: berryLogo,
-  carbon: carbonLogo,
-  pixel: pixelLogo,
-  scanlines: scanlinesLogo,
-  vhs: vhsLogo,
-};
 
 const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
 
 export function AboutTab({ searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const accentVariant = usePlayerStore((state) => state.accentVariant);
 
   const [appVersion, setAppVersion] = useState(APP_VERSION);
   const [bundleInfo, setBundleInfo] = useState<{
@@ -55,15 +25,15 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
 
   useEffect(() => {
     // dynamically query electron runtime version & bundle status
-    if (window.linerElectron) {
-      window.linerElectron
+    if (window.cloudMusicElectron) {
+      window.cloudMusicElectron
         .getAppVersion?.()
         .then((ver) => {
           if (ver) setAppVersion(ver);
         })
         .catch(() => {});
 
-      window.linerElectron
+      window.cloudMusicElectron
         .bundleGetStatus?.()
         .then((status) => {
           if (status) {
@@ -109,7 +79,7 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
     if (!searchQuery?.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
     const searchableKeys = [
-      "settings.about.liner",
+      "settings.about.cloudmusic",
       "settings.about.tagline",
       "settings.about.updates_title",
       "settings.about.build_info",
@@ -128,23 +98,11 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
         {/* Logo */}
         <div className="bg-bg-elevated flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-2xl border border-border-primary/50 shadow-inner mb-[14px]">
           <img
-            src={
-              accentVariant === "default"
-                ? logo
-                : brandingLogos[accentVariant]
-            }
-            alt="Liner Logo"
-            width={44}
-            height={44}
-            className={
-              "h-[44px] w-[44px] " +
-              (accentVariant === "default" ||
-              accentVariant === "carbon" ||
-              accentVariant === "pixel" ||
-              accentVariant === "scanlines"
-                ? "theme-logo invert dark:invert-0"
-                : "")
-            }
+            src={logo}
+            alt="CloudMusic Logo"
+            width={52}
+            height={52}
+            className="h-[52px] w-[52px] rounded-xl"
             draggable={false}
           />
         </div>
@@ -155,7 +113,7 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
             className="text-text-primary text-[20px] font-[600] tracking-[-0.01em] leading-none m-0"
             style={font}
           >
-            {t("settings.about.liner")}
+            {t("settings.about.cloudmusic")}
           </h2>
           <div
             className="inline-flex items-center gap-[5px] h-[22px] rounded-full bg-border-alpha-14 px-[9px] border border-border-primary/40 text-[11.5px] font-[500] text-text-secondary leading-none select-none"
@@ -201,25 +159,7 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => openUrl("https://t.me/liner_app")}
-            className="!h-[28px] !px-[10px] !text-[12px] gap-[6px]"
-          >
-            <FaTelegramPlane size={13} className="text-[#2AABEE]" />
-            {t("settings.about.telegram")}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => openUrl("https://t.me/liner_app?direct")}
-            className="!h-[28px] !px-[10px] !text-[12px] gap-[6px]"
-          >
-            <QuestionCircle size={14} weight="Bold" className="text-text-tertiary" />
-            {t("settings.about.support")}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => openUrl("https://github.com/tryliner/desktop")}
+            onClick={() => openUrl("https://github.com/Fufi1925/Music.")}
             className="!h-[28px] !px-[10px] !text-[12px] gap-[6px]"
           >
             <FaGithub size={13} />
@@ -228,7 +168,7 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => openUrl("https://tryliner.fun")}
+            onClick={() => openUrl("https://github.com/Fufi1925/Music./releases")}
             className="!h-[28px] !px-[10px] !text-[12px] gap-[6px]"
           >
             <FaGlobe size={12} className="text-text-tertiary" />

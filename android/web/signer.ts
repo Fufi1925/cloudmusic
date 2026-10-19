@@ -5,7 +5,7 @@
 //  - chromium refuses synchronous `new WebAssembly.Module()` for modules > 4 KB
 //    on the main thread, so the module is instantiated asynchronously once.
 //  - randomBytes -> crypto.getRandomValues, Buffer -> TextEncoder/TextDecoder.
-//  - the dev-only LINER_DEV_SIGNING_SECRET path does not exist on android
+//  - the dev-only CLOUDMUSIC_DEV_SIGNING_SECRET path does not exist on android
 //    (it is unpackaged-electron only in the original too).
 import { SIGNER_WASM_BASE64 } from "../../electron/signer";
 
@@ -23,12 +23,12 @@ export interface SignedRequestHeaders {
 }
 
 interface WasmSignerExports {
-  liner_alloc: (len: number) => number;
-  liner_dealloc: (ptr: number, len: number) => void;
-  liner_get_result_ptr: () => number;
-  liner_get_result_len: () => number;
-  liner_sign_cover_url: (ptr: number, len: number) => number;
-  liner_sign_request: (
+  cloudmusic_alloc: (len: number) => number;
+  cloudmusic_dealloc: (ptr: number, len: number) => void;
+  cloudmusic_get_result_ptr: () => number;
+  cloudmusic_get_result_len: () => number;
+  cloudmusic_sign_cover_url: (ptr: number, len: number) => number;
+  cloudmusic_sign_request: (
     methodPtr: number,
     methodLen: number,
     pathPtr: number,
@@ -39,7 +39,7 @@ interface WasmSignerExports {
     noncePtr: number,
     nonceLen: number,
   ) => number;
-  liner_sign_monitor_request: (
+  cloudmusic_sign_monitor_request: (
     methodPtr: number,
     methodLen: number,
     pathPtr: number,
@@ -50,7 +50,7 @@ interface WasmSignerExports {
     noncePtr: number,
     nonceLen: number,
   ) => number;
-  liner_sign_raw_payload: (ptr: number, len: number) => number;
+  cloudmusic_sign_raw_payload: (ptr: number, len: number) => number;
   memory: WebAssembly.Memory;
 }
 
@@ -103,13 +103,13 @@ export function getWasmExports(): Promise<WasmSignerExports> {
 }
 
 function passBytesToWasm(exports: WasmSignerExports, bytes: Uint8Array) {
-  const ptr = exports.liner_alloc(bytes.length);
+  const ptr = exports.cloudmusic_alloc(bytes.length);
   // view is created after alloc: alloc may grow (and detach) the memory buffer
   new Uint8Array(exports.memory.buffer, ptr, bytes.length).set(bytes);
   return {
     ptr,
     len: bytes.length,
-    free: () => exports.liner_dealloc(ptr, bytes.length),
+    free: () => exports.cloudmusic_dealloc(ptr, bytes.length),
   };
 }
 
@@ -118,8 +118,8 @@ function passStringToWasm(exports: WasmSignerExports, str: string) {
 }
 
 function readResultFromWasm(exports: WasmSignerExports): string {
-  const ptr = exports.liner_get_result_ptr();
-  const len = exports.liner_get_result_len();
+  const ptr = exports.cloudmusic_get_result_ptr();
+  const len = exports.cloudmusic_get_result_len();
   if (!ptr || len === 0) return "";
   return decoder.decode(new Uint8Array(exports.memory.buffer, ptr, len).slice());
 }
@@ -134,7 +134,7 @@ export async function signCoverUrl(payload: string): Promise<string> {
   const wasm = await getWasmExports();
   const payloadBuf = passStringToWasm(wasm, payload);
   try {
-    const code = wasm.liner_sign_cover_url(payloadBuf.ptr, payloadBuf.len);
+    const code = wasm.cloudmusic_sign_cover_url(payloadBuf.ptr, payloadBuf.len);
     if (code !== 0) throw new Error(`wasm sign_cover_url failed with code ${code}`);
     return readResultFromWasm(wasm);
   } finally {
@@ -142,7 +142,7 @@ export async function signCoverUrl(payload: string): Promise<string> {
   }
 }
 
-type RequestSigner = "liner_sign_request" | "liner_sign_monitor_request";
+type RequestSigner = "cloudmusic_sign_request" | "cloudmusic_sign_monitor_request";
 
 async function signCanonical(fn: RequestSigner, input: SignRequestInput): Promise<SignedRequestHeaders> {
   const wasm = await getWasmExports();
@@ -167,7 +167,7 @@ async function signCanonical(fn: RequestSigner, input: SignRequestInput): Promis
       nonceBuf.len,
     );
     if (code !== 0) {
-      const name = fn === "liner_sign_request" ? "sign_request" : "sign_monitor_request";
+      const name = fn === "cloudmusic_sign_request" ? "sign_request" : "sign_monitor_request";
       throw new Error(`wasm ${name} failed with code ${code}`);
     }
     return { signature: readResultFromWasm(wasm), timestamp, nonce };
@@ -181,12 +181,12 @@ async function signCanonical(fn: RequestSigner, input: SignRequestInput): Promis
 
 // signs api request with canonical string and hmac-sha256 using server-adjusted timestamp
 export function signRequest(input: SignRequestInput): Promise<SignedRequestHeaders> {
-  return signCanonical("liner_sign_request", input);
+  return signCanonical("cloudmusic_sign_request", input);
 }
 
 // signs monitor telemetry request using server-adjusted timestamp
 export function signMonitorRequest(input: SignRequestInput): Promise<SignedRequestHeaders> {
-  return signCanonical("liner_sign_monitor_request", input);
+  return signCanonical("cloudmusic_sign_monitor_request", input);
 }
 
 // signs raw byte buffer
@@ -195,7 +195,7 @@ export async function signRawPayload(payload: number[] | Uint8Array): Promise<st
   const bytes = payload instanceof Uint8Array ? payload : Uint8Array.from(payload);
   const buf = passBytesToWasm(wasm, bytes);
   try {
-    const code = wasm.liner_sign_raw_payload(buf.ptr, buf.len);
+    const code = wasm.cloudmusic_sign_raw_payload(buf.ptr, buf.len);
     if (code !== 0) throw new Error(`wasm sign_raw_payload failed with code ${code}`);
     return readResultFromWasm(wasm);
   } finally {

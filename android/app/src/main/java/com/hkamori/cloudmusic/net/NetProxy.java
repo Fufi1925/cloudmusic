@@ -1,4 +1,4 @@
-package com.hkamori.liner.net;
+package com.hkamori.cloudmusic.net;
 
 import android.content.Context;
 import android.os.LocaleList;
@@ -45,8 +45,8 @@ import okhttp3.ResponseBody;
  * plus the {@code webRequest} hooks in electron/main.ts.
  *
  * <ul>
- *   <li><b>Tunnel</b> ({@code /__liner_net__/<id>}): every cross-origin fetch() of the
- *       renderer, parked by liner-android.js through {@link Js#prepare}. Method, headers
+ *   <li><b>Tunnel</b> ({@code /__cloudmusic_net__/<id>}): every cross-origin fetch() of the
+ *       renderer, parked by cloudmusic-android.js through {@link Js#prepare}. Method, headers
  *       and body are replayed with OkHttp and the response is streamed back same-origin.</li>
  *   <li><b>Subresources</b>: GET/HEAD for images, audio, fonts, css are proxied directly
  *       and get the permissive CORS headers electron's {@code onHeadersReceived} adds,
@@ -54,9 +54,9 @@ import okhttp3.ResponseBody;
  * </ul>
  */
 public final class NetProxy {
-    private static final String TAG = "LinerNet";
-    public static final String TUNNEL_PATH = "/__liner_net__/";
-    static final String META = "x-lnrproxy-";
+    private static final String TAG = "CloudMusicNet";
+    public static final String TUNNEL_PATH = "/__cloudmusic_net__/";
+    static final String META = "x-cmproxy-";
     private static final long PENDING_TTL_MS = 120_000L;
 
     private static final Set<String> HOP_BY_HOP = new HashSet<>(Arrays.asList(
@@ -102,7 +102,7 @@ public final class NetProxy {
         this.acceptLanguage = buildAcceptLanguage();
         // chromium keeps an http cache for the electron renderer; covers and static
         // json are cached the same way here
-        this.cache = new Cache(new File(context.getCacheDir(), "liner-http"), 160L * 1024 * 1024);
+        this.cache = new Cache(new File(context.getCacheDir(), "cloudmusic-http"), 160L * 1024 * 1024);
         this.client = new OkHttpClient.Builder()
                 // electron starts with --disable-http2 ("resilient http/1.1")
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
@@ -177,7 +177,7 @@ public final class NetProxy {
         }
     }
 
-    /** JavaScript interface "LinerNet" (called on the WebView's JavaBridge thread). */
+    /** JavaScript interface "CloudMusicNet" (called on the WebView's JavaBridge thread). */
     public final class Js {
         @JavascriptInterface
         public void prepare(String id, String descriptorJson, String bodyBase64) {

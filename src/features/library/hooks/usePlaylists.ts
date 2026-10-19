@@ -28,7 +28,7 @@ export interface LibraryPlaylistDetail {
 
 type PlaylistList = { playlists: LibraryPlaylistSummary[]; total: number };
 
-const COVER_CACHE_KEY = "liner:playlist-covers-v2";
+const COVER_CACHE_KEY = "cloudmusic:playlist-covers-v2";
 type CoverCacheEntry = { coverUrls: string[]; trackCount: number; updatedAt: string };
 type CoverCache = Record<string, CoverCacheEntry>;
 

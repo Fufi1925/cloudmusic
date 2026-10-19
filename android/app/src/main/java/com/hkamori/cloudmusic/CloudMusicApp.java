@@ -1,11 +1,11 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
-import com.hkamori.liner.net.NetProxy;
+import com.hkamori.cloudmusic.net.NetProxy;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,14 +13,14 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** Process-wide singletons: the native network stack and a worker pool for blocking work. */
-public final class LinerApp extends Application {
+public final class CloudMusicApp extends Application {
     public static final String PLAYBACK_CHANNEL_ID = "playback";
 
-    private static LinerApp instance;
+    private static CloudMusicApp instance;
     private NetProxy netProxy;
     private ExecutorService io;
 
-    public static LinerApp get() {
+    public static CloudMusicApp get() {
         return instance;
     }
 
@@ -30,7 +30,7 @@ public final class LinerApp extends Application {
         instance = this;
         AtomicInteger counter = new AtomicInteger();
         ThreadFactory factory = runnable -> {
-            Thread thread = new Thread(runnable, "liner-io-" + counter.incrementAndGet());
+            Thread thread = new Thread(runnable, "cloudmusic-io-" + counter.incrementAndGet());
             thread.setDaemon(true);
             return thread;
         };

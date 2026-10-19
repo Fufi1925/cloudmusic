@@ -37,10 +37,10 @@ export interface DiscordRpcStatePayload {
   artistImageUrl?: string;
 }
 
-export const LINER_DISCORD_APPLICATION_ID = "1561339119617974362";
+export const CLOUDMUSIC_DISCORD_APPLICATION_ID = "1561339119617974362";
 
 function builtInApplicationId(): string {
-  return process.env.LINER_DISCORD_CLIENT_ID?.trim() || LINER_DISCORD_APPLICATION_ID;
+  return process.env.CLOUDMUSIC_DISCORD_CLIENT_ID?.trim() || CLOUDMUSIC_DISCORD_APPLICATION_ID;
 }
 
 const DEFAULT_SETTINGS: DiscordRpcSettings = {
@@ -51,7 +51,8 @@ const DEFAULT_SETTINGS: DiscordRpcSettings = {
   showTime: true,
   showPaused: true,
   showButton: true,
-  showDownloadButton: true,
+  // off by default: the project repository is private
+  showDownloadButton: false,
 };
 
 const RECONNECT_INTERVAL_MS = 15_000;
@@ -297,7 +298,7 @@ export class DiscordRpcManager {
 
       const dur = Math.max(0, payload.durationMs || track.durationMs || 0);
 
-      let activityName = "Liner";
+      let activityName = "CloudMusic";
       let detailsText = title;
       let stateText = isPaused ? `${artist} (Paused)` : artist;
       let rpcStatusDisplayType = StatusDisplayType.STATE; // 1 -> "Listening to [Artist]"
@@ -310,8 +311,8 @@ export class DiscordRpcManager {
           stateText = artist;
           break;
         case "app":
-          activityName = "Liner";
-          rpcStatusDisplayType = StatusDisplayType.NAME; // 0 -> "Listening to Liner"
+          activityName = "CloudMusic";
+          rpcStatusDisplayType = StatusDisplayType.NAME; // 0 -> "Listening to CloudMusic"
           detailsText = title;
           stateText = isPaused ? `${artist} (Paused)` : artist;
           break;
@@ -337,7 +338,7 @@ export class DiscordRpcManager {
       }
 
       const activity: SetActivity & { status_display_type?: number } = {
-        name: sanitizeText(activityName) || "Liner",
+        name: sanitizeText(activityName) || "CloudMusic",
         type: 2, // 2 = ActivityType.Listening -> renders "Listening to" + live progress bar
         details: sanitizeText(detailsText),
         state: sanitizeText(stateText),
@@ -358,7 +359,7 @@ export class DiscordRpcManager {
       const coverImage = toDiscordImageUrl(track.coverUrl);
       if (this.settings.showArtwork && coverImage) {
         activity.largeImageKey = coverImage;
-        activity.largeImageText = sanitizeText(track.album || track.title) || "Liner";
+        activity.largeImageText = sanitizeText(track.album || track.title) || "CloudMusic";
       }
 
       // Small artwork (Artist photo badge)
@@ -368,20 +369,20 @@ export class DiscordRpcManager {
         activity.smallImageText = sanitizeText(track.artist) || "Artist";
       }
 
-      // Action buttons linking to song or tryliner.fun (Discord allows up to 2 buttons)
+      // Action buttons linking to the song and the project page (Discord allows up to 2 buttons)
       const buttons: Array<{ label: string; url: string }> = [];
 
       if (this.settings.showButton && track.id) {
         buttons.push({
-          label: "Listen on Liner",
+          label: "Listen on CloudMusic",
           url: `https://link.tryliner.fun/track?id=${encodeURIComponent(track.id)}`,
         });
       }
 
       if (this.settings.showDownloadButton) {
         buttons.push({
-          label: "Download Liner",
-          url: "https://tryliner.fun",
+          label: "Download CloudMusic",
+          url: "https://github.com/Fufi1925/Music./releases",
         });
       }
 

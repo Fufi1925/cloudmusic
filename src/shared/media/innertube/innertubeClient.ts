@@ -19,7 +19,7 @@ export const WEB_REMIX_PROFILE: InnertubeProfile = {
   origin: "https://music.youtube.com",
 };
 
-export const USER_AGENT_HEADER_OVERRIDE = "x-liner-user-agent";
+export const USER_AGENT_HEADER_OVERRIDE = "x-cloudmusic-user-agent";
 
 export class InnertubeError extends Error {
   constructor(

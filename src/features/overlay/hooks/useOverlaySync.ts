@@ -29,16 +29,16 @@ export function useOverlaySync() {
 
   // Sync auth status to Electron overlay manager
   useEffect(() => {
-    window.linerElectron?.setOverlayAuthenticated?.(isAuthenticated);
+    window.cloudMusicElectron?.setOverlayAuthenticated?.(isAuthenticated);
     if (!isAuthenticated) {
-      window.linerElectron?.closeOverlay?.();
+      window.cloudMusicElectron?.closeOverlay?.();
     }
   }, [isAuthenticated]);
 
   // Sync settings on mount
   useEffect(() => {
     const s = useOverlaySettingsStore.getState();
-    window.linerElectron?.updateOverlaySettings?.({
+    window.cloudMusicElectron?.updateOverlaySettings?.({
       enabled: s.enabled,
       position: s.position,
       shortcut: s.shortcut,
@@ -52,10 +52,10 @@ export function useOverlaySync() {
     const handleAuthChange = () => {
       const session = getAuthSession();
       const authed = Boolean(session);
-      window.linerElectron?.setOverlayAuthenticated?.(authed);
+      window.cloudMusicElectron?.setOverlayAuthenticated?.(authed);
       if (!authed) {
-        window.linerElectron?.closeOverlay?.();
-        window.linerElectron?.sendOverlayAction?.({ type: "closeOverlay" });
+        window.cloudMusicElectron?.closeOverlay?.();
+        window.cloudMusicElectron?.sendOverlayAction?.({ type: "closeOverlay" });
       }
     };
     window.addEventListener("auth:changed", handleAuthChange);
@@ -66,9 +66,9 @@ export function useOverlaySync() {
 
   // Listen for actions from overlay
   useEffect(() => {
-    if (!window.linerElectron?.onOverlayAction) return;
+    if (!window.cloudMusicElectron?.onOverlayAction) return;
 
-    const cleanup = window.linerElectron.onOverlayAction((action: OverlayAction) => {
+    const cleanup = window.cloudMusicElectron.onOverlayAction((action: OverlayAction) => {
       switch (action.type) {
         case "togglePlay":
           void playerEngine.togglePlayPause();
@@ -153,7 +153,7 @@ export function useOverlaySync() {
 
   // Push updates to overlay
   useEffect(() => {
-    if (!window.linerElectron?.overlayUpdateState) return;
+    if (!window.cloudMusicElectron?.overlayUpdateState) return;
     if (!isAuthenticated) return;
 
     const artistName =
@@ -189,7 +189,7 @@ export function useOverlaySync() {
       isLiked,
     };
 
-    window.linerElectron.overlayUpdateState(payload);
+    window.cloudMusicElectron.overlayUpdateState(payload);
   }, [
     isAuthenticated,
     player.status,

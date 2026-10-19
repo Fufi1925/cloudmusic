@@ -22,18 +22,18 @@ export default function WindowControls({
   const [isWindowMaximized, setIsWindowMaximized] = useState(false);
 
   useEffect(() => {
-    if (!window.linerElectron) return;
+    if (!window.cloudMusicElectron) return;
 
     // hydrate initial os window state
-    window.linerElectron.isFullScreen?.().then((fs) => {
+    window.cloudMusicElectron.isFullScreen?.().then((fs) => {
       if (typeof fs === "boolean") setIsWindowFullScreen(fs);
     });
-    window.linerElectron.isMaximized?.().then((max) => {
+    window.cloudMusicElectron.isMaximized?.().then((max) => {
       if (typeof max === "boolean") setIsWindowMaximized(max);
     });
 
     // live sync across os fullscreen transitions & maximize toggles
-    const unsubscribe = window.linerElectron.onWindowStateChange?.((state) => {
+    const unsubscribe = window.cloudMusicElectron.onWindowStateChange?.((state) => {
       setIsWindowFullScreen(state.isFullScreen);
       setIsWindowMaximized(state.isMaximized);
     });
@@ -43,7 +43,7 @@ export default function WindowControls({
     };
   }, []);
 
-  const isHyprland = window.linerElectron?.isHyprland ?? false;
+  const isHyprland = window.cloudMusicElectron?.isHyprland ?? false;
 
   const handleMinimize = () => {
     // macos fullscreen spaces and hyprland tiling wm prohibit/ignore minimizing
@@ -52,7 +52,7 @@ export default function WindowControls({
   };
 
   const handleMaximize = () => {
-    window.linerElectron?.toggleMaximize();
+    window.cloudMusicElectron?.toggleMaximize();
   };
 
   const handleClose = () => {

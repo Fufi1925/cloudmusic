@@ -1,14 +1,15 @@
 {
-  "name": "@liner/client",
+  "name": "@cloudmusic/client",
   "version": "0.1.40",
   "type": "module",
   "private": true,
-  "description": "Liner Music Player",
+  "description": "CloudMusic music player",
+  "homepage": "https://github.com/Fufi1925/Music.",
   "author": {
-    "name": "hkamori",
-    "email": "dev@tryliner.fun"
+    "name": "Fufi1925",
+    "email": "180835986+Fufi1925@users.noreply.github.com"
   },
-  "desktopName": "liner",
+  "desktopName": "cloudmusic",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -24,15 +25,16 @@
     "electron:build:mac": "tsc -b && vite build && electron-builder --mac"
   },
   "build": {
-    "appId": "com.hkamori.liner",
-    "productName": "Liner",
-    "executableName": "liner",
+    "appId": "com.hkamori.cloudmusic",
+    "productName": "CloudMusic",
+    "executableName": "cloudmusic",
     "artifactName": "${productName}-${version}-${arch}.${ext}",
     "publish": [
       {
         "provider": "github",
-        "owner": "tryliner",
-        "repo": "desktop"
+        "owner": "Fufi1925",
+        "repo": "Music.",
+        "private": true
       }
     ],
     "directories": {
@@ -40,9 +42,9 @@
     },
     "protocols": [
       {
-        "name": "Liner",
+        "name": "CloudMusic",
         "schemes": [
-          "liner"
+          "cloudmusic"
         ]
       }
     ],
@@ -51,9 +53,9 @@
       "dist-electron/**/*"
     ],
     "linux": {
-      "executableName": "liner",
+      "executableName": "cloudmusic",
       "syncDesktopName": true,
-      "maintainer": "hkamori <dev@tryliner.fun>",
+      "maintainer": "Fufi1925 <180835986+Fufi1925@users.noreply.github.com>",
       "icon": "build/icons",
       "target": [
         "AppImage",
@@ -62,21 +64,21 @@
       "category": "Audio"
     },
     "deb": {
-      "packageName": "liner",
-      "artifactName": "liner_${version}_${arch}.${ext}"
+      "packageName": "cloudmusic",
+      "artifactName": "cloudmusic_${version}_${arch}.${ext}"
     },
     "appImage": {
-      "artifactName": "Liner-${version}.${ext}"
+      "artifactName": "CloudMusic-${version}.${ext}"
     },
     "win": {
-      "executableName": "liner",
+      "executableName": "cloudmusic",
       "icon": "build/icon.ico",
       "target": [
         "nsis"
       ]
     },
     "nsis": {
-      "artifactName": "Liner-Setup-${version}.${ext}",
+      "artifactName": "CloudMusic-Setup-${version}.${ext}",
       "allowToChangeInstallationDirectory": true,
       "oneClick": false
     },

@@ -1,7 +1,7 @@
-// liner:// deeplink parsing, shared by main process (no electron imports here
+// cloudmusic:// deeplink parsing, shared by main process (no electron imports here
 // so vitest can cover it). same strict allowlist as the link server: fixed
 // entity types, opaque catalog tokens only.
-export const DEEP_LINK_SCHEME = "liner";
+export const DEEP_LINK_SCHEME = "cloudmusic";
 
 const DEEP_LINK_IDS: Record<string, RegExp> = {
   // youtube channel ids, always UC + 22 base64url chars

@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -51,7 +51,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
-import com.hkamori.liner.net.NetProxy;
+import com.hkamori.cloudmusic.net.NetProxy;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,20 +61,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 /**
- * The single liner window. Mirrors electron/main.ts createWindow(): one WebView
+ * The single cloudmusic window. Mirrors electron/main.ts createWindow(): one WebView
  * running the unchanged renderer, a native bridge in place of preload.ts, the
  * request hooks in place of session.webRequest, plus the android specifics
  * (system bars, back button, media notification, landscape on phones).
  */
 public class MainActivity extends Activity {
-    private static final String TAG = "Liner";
+    private static final String TAG = "CloudMusic";
     static final String APP_HOST = "appassets.androidplatform.net";
     static final String APP_ORIGIN = "https://" + APP_HOST;
     static final String APP_URL = APP_ORIGIN + "/index.html";
 
     private static final int REQ_FILE_CHOOSER = 41;
     private static final int REQ_SAVE_DUMP = 42;
-    private static final String PREFS = "liner_android";
+    private static final String PREFS = "cloudmusic_android";
     private static final float MIN_UI_SCALE = 0.6f;
     private static final float MAX_UI_SCALE = 1.6f;
 
@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
     private FrameLayout root;
     private FrameLayout webContainer;
     private WebView webView;
-    private LinerBridge mainBridge;
+    private CloudMusicBridge mainBridge;
     private AssetServer assetServer;
     private PoTokenService poTokenService;
     private OverlayController overlayController;
@@ -256,7 +256,7 @@ public class MainActivity extends Activity {
             return;
         }
         webView.evaluateJavascript(
-                "(function(){try{return !!(window.__linerAndroid&&window.__linerAndroid.back());}catch(e){return false;}})()",
+                "(function(){try{return !!(window.__cloudMusicAndroid&&window.__cloudMusicAndroid.back());}catch(e){return false;}})()",
                 value -> {
                     if ("true".equals(value)) return;
                     if (webView != null && webView.canGoBack()) webView.goBack();
@@ -299,15 +299,15 @@ public class MainActivity extends Activity {
             // electron: backgroundThrottling false - keep the renderer important while music plays
             view.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false);
         }
-        view.addJavascriptInterface(LinerApp.get().netProxy().jsInterface(), "LinerNet");
+        view.addJavascriptInterface(CloudMusicApp.get().netProxy().jsInterface(), "CloudMusicNet");
         return view;
     }
 
     @SuppressLint("JavascriptInterface")
     private void createMainWebView() {
         webView = buildWebView(false);
-        mainBridge = new LinerBridge(this, webView, LinerBridge.ROLE_MAIN);
-        webView.addJavascriptInterface(mainBridge, "LinerAndroid");
+        mainBridge = new CloudMusicBridge(this, webView, CloudMusicBridge.ROLE_MAIN);
+        webView.addJavascriptInterface(mainBridge, "CloudMusicAndroid");
         webView.setWebViewClient(new AppWebViewClient(true));
         webView.setWebChromeClient(new AppChromeClient());
         webContainer.addView(webView, new FrameLayout.LayoutParams(
@@ -363,7 +363,7 @@ public class MainActivity extends Activity {
         Uri uri = request.getUrl();
         String scheme = uri.getScheme();
         if (!"https".equalsIgnoreCase(scheme) && !"http".equalsIgnoreCase(scheme)) return null;
-        NetProxy net = LinerApp.get().netProxy();
+        NetProxy net = CloudMusicApp.get().netProxy();
         if (APP_HOST.equalsIgnoreCase(uri.getHost())) {
             String path = uri.getPath();
             if (path != null && path.startsWith(NetProxy.TUNNEL_PATH)) {
@@ -434,13 +434,13 @@ public class MainActivity extends Activity {
             String text = message.message() + " (" + message.sourceId() + ":" + message.lineNumber() + ")";
             switch (message.messageLevel()) {
                 case ERROR:
-                    Log.e("LinerWeb", text);
+                    Log.e("CloudMusicWeb", text);
                     break;
                 case WARNING:
-                    Log.w("LinerWeb", text);
+                    Log.w("CloudMusicWeb", text);
                     break;
                 default:
-                    Log.d("LinerWeb", text);
+                    Log.d("CloudMusicWeb", text);
             }
             return true;
         }
@@ -471,7 +471,7 @@ public class MainActivity extends Activity {
 
     // ------------------------------------------------- bridge entry points
 
-    void onBridgeReady(LinerBridge bridge) {
+    void onBridgeReady(CloudMusicBridge bridge) {
         if (bridge != mainBridge) {
             overlayController.onOverlayReady(bridge);
             return;
@@ -510,7 +510,7 @@ public class MainActivity extends Activity {
         return json;
     }
 
-    /** liner-android.js reports the largest pinch factor the layout still fits with. */
+    /** cloudmusic-android.js reports the largest pinch factor the layout still fits with. */
     void onViewportApplied(float max) {
         if (Float.isNaN(max) || max <= 0f) return;
         maxUiScale = clamp(max, 1f, MAX_UI_SCALE);
@@ -624,7 +624,7 @@ public class MainActivity extends Activity {
         try {
             startActivity(intent);
         } catch (Exception e) {
-            Log.w(TAG, "could not bring liner to front", e);
+            Log.w(TAG, "could not bring cloudmusic to front", e);
         }
     }
 
@@ -647,7 +647,7 @@ public class MainActivity extends Activity {
             callback.accept(result(false, null, false, "a save dialog is already open"));
             return;
         }
-        String filename = input == null ? "liner-dump.json" : input.optString("filename", "liner-dump.json");
+        String filename = input == null ? "cloudmusic-dump.json" : input.optString("filename", "cloudmusic-dump.json");
         pendingSaveContent = input == null ? "" : input.optString("content", "");
         pendingSaveCallback = callback;
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
@@ -673,7 +673,7 @@ public class MainActivity extends Activity {
             callback.accept(result(false, null, true, null));
             return;
         }
-        LinerApp.get().io().execute(() -> {
+        CloudMusicApp.get().io().execute(() -> {
             JSONObject outcome;
             try (OutputStream out = getContentResolver().openOutputStream(target, "wt")) {
                 if (out == null) throw new IllegalStateException("cannot open destination");
@@ -740,18 +740,18 @@ public class MainActivity extends Activity {
 
     void copyToClipboard(String text) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText("Liner", text));
+        if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText("CloudMusic", text));
     }
 
     void clearWebViewCache() {
         if (webView != null) webView.clearCache(true);
     }
 
-    // liner://artist?id=... deeplinks (electron: second-instance / open-url)
+    // cloudmusic://artist?id=... deeplinks (electron: second-instance / open-url)
     private void handleIntent(Intent intent) {
         Uri data = intent == null ? null : intent.getData();
         if (data == null || mainBridge == null) return;
-        if ("liner".equalsIgnoreCase(data.getScheme())) mainBridge.deliverDeeplink(data.toString());
+        if ("cloudmusic".equalsIgnoreCase(data.getScheme())) mainBridge.deliverDeeplink(data.toString());
     }
 
     // ------------------------------------------------------ pinch -> ui scale

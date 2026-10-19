@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -40,7 +40,7 @@ import okhttp3.Response;
  * "potoken:interpreter" ipc handler.
  */
 final class PoTokenService {
-    private static final String TAG = "LinerPoToken";
+    private static final String TAG = "CloudMusicPoToken";
     private static final String BOTGUARD_PAGE = "https://www.youtube.com/robots.txt";
     private static final long START_TIMEOUT_MS = 20_000L;
     private static final long MINT_TIMEOUT_MS = 20_000L;
@@ -103,7 +103,7 @@ final class PoTokenService {
                 };
                 pending.put(id, entry);
                 ui.postDelayed(entry.timeout, MINT_TIMEOUT_MS);
-                webView.evaluateJavascript("window.__linerPoWorker&&window.__linerPoWorker.mint(" + id + ","
+                webView.evaluateJavascript("window.__cloudMusicPoWorker&&window.__cloudMusicPoWorker.mint(" + id + ","
                         + JSONObject.quote(identifier) + ")", null);
             }
 
@@ -135,7 +135,7 @@ final class PoTokenService {
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(false);
         s.setUserAgentString(UserAgent.get(activity));
-        view.addJavascriptInterface(new PoBridge(view), "LinerPoBridge");
+        view.addJavascriptInterface(new PoBridge(view), "CloudMusicPoBridge");
         view.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView v, String url, Bitmap favicon) {
@@ -229,7 +229,7 @@ final class PoTokenService {
     }
 
     private void downloadInterpreter(WebView source, int requestId, String url) {
-        LinerApp.get().io().execute(() -> {
+        CloudMusicApp.get().io().execute(() -> {
             String text = null;
             String error = null;
             try {
@@ -238,7 +238,7 @@ final class PoTokenService {
                     throw new IllegalArgumentException("interpreter host not allowed");
                 }
                 Request request = new Request.Builder().url(target).build();
-                try (Response response = LinerApp.get().netProxy().client().newCall(request).execute()) {
+                try (Response response = CloudMusicApp.get().netProxy().client().newCall(request).execute()) {
                     if (!response.isSuccessful() || response.body() == null) {
                         throw new IllegalStateException("interpreter download failed with " + response.code());
                     }
@@ -247,7 +247,7 @@ final class PoTokenService {
             } catch (Exception e) {
                 error = e.getMessage() != null ? e.getMessage() : e.toString();
             }
-            String script = "window.__linerPoWorker&&window.__linerPoWorker.interpreterResult(" + requestId + ","
+            String script = "window.__cloudMusicPoWorker&&window.__cloudMusicPoWorker.interpreterResult(" + requestId + ","
                     + (text == null ? "null" : JSONObject.quote(text)) + ","
                     + (error == null ? "null" : JSONObject.quote(error)) + ")";
             ui.post(() -> {
@@ -283,7 +283,7 @@ final class PoTokenService {
         for (ReadyWaiter waiter : copy) waiter.onFailed("PO token window closed");
     }
 
-    /** JavaScript interface "LinerPoBridge" inside the hidden youtube.com WebView. */
+    /** JavaScript interface "CloudMusicPoBridge" inside the hidden youtube.com WebView. */
     public final class PoBridge {
         private final WebView source;
 

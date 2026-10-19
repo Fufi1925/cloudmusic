@@ -3,40 +3,11 @@ import AppImage from "@/features/covers/ui/AppImage";
 import { Link, useLocation } from "react-router-dom";
 import { sidebarNavItems } from "../data/navigation";
 import logo from "@/assets/logo.svg";
-import spotifyLogo from "@/assets/branding/logo-spotify.svg";
-import discordLogo from "@/assets/branding/logo-discord.svg";
-import telegramLogo from "@/assets/branding/logo-telegram.svg";
-import auroraLogo from "@/assets/branding/logo-aurora.svg";
-import sunsetLogo from "@/assets/branding/logo-sunset.svg";
-import oceanLogo from "@/assets/branding/logo-ocean.svg";
-import forestLogo from "@/assets/branding/logo-forest.svg";
-import berryLogo from "@/assets/branding/logo-berry.svg";
-import carbonLogo from "@/assets/branding/logo-carbon.svg";
-import pixelLogo from "@/assets/branding/logo-pixel.svg";
-import scanlinesLogo from "@/assets/branding/logo-scanlines.svg";
-import vhsLogo from "@/assets/branding/logo-vhs.svg";
 import { useTranslation } from "@/languages";
 import { useTheme } from "next-themes";
-import { usePlayerStore, type AccentVariant } from "@/features/player";
 import { useModalStore } from "@/features/library";
 import { useCustomizationStore, getBlockStyle } from "@/features/settings";
 import { Tooltip } from "@/shared/ui";
-
-
-const brandingLogos: Record<Exclude<AccentVariant, "default">, string> = {
-  spotify: spotifyLogo,
-  discord: discordLogo,
-  telegram: telegramLogo,
-  aurora: auroraLogo,
-  sunset: sunsetLogo,
-  ocean: oceanLogo,
-  forest: forestLogo,
-  berry: berryLogo,
-  carbon: carbonLogo,
-  pixel: pixelLogo,
-  scanlines: scanlinesLogo,
-  vhs: vhsLogo,
-};
 
 interface SidebarProps {
   searchOpen: boolean;
@@ -46,7 +17,6 @@ interface SidebarProps {
 function Sidebar({ searchOpen, onSearchToggle }: SidebarProps) {
   const { pathname } = useLocation();
   const { t } = useTranslation();
-  const accentVariant = usePlayerStore((state) => state.accentVariant);
   const settingsOpen = useModalStore((state) => state.settingsOpen);
   const toggleSettings = useModalStore((state) => state.toggleSettings);
 
@@ -175,23 +145,11 @@ function Sidebar({ searchOpen, onSearchToggle }: SidebarProps) {
         <div className="flex justify-center items-center pt-[16px] pb-[16px] shrink-0">
 
           <AppImage
-            src={
-              accentVariant === "default"
-                ? logo
-                : brandingLogos[accentVariant]
-            }
-            alt="Logo"
+            src={logo}
+            alt="CloudMusic"
             width={34}
             height={34}
-            className={
-              "w-[34px] h-[34px] " +
-              (accentVariant === "default" ||
-              accentVariant === "carbon" ||
-              accentVariant === "pixel" ||
-              accentVariant === "scanlines"
-                ? "theme-logo invert dark:invert-0"
-                : "")
-            }
+            className="w-[34px] h-[34px] rounded-[8px]"
             draggable={false}
           />
         </div>

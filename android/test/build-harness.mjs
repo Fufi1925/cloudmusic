@@ -13,7 +13,7 @@ await build({
   define: { __APP_VERSION__: JSON.stringify("0.0.0-harness") },
   resolve: { alias: { "@": path.join(root, "src") } },
   build: { outDir: out, emptyOutDir: false, minify: false, target: "es2022",
-    lib: { entry: path.join(root, "android/test/harness-entry.ts"), formats: ["iife"], name: "LinerHarness", fileName: () => "harness-test.js" } },
+    lib: { entry: path.join(root, "android/test/harness-entry.ts"), formats: ["iife"], name: "CloudMusicHarness", fileName: () => "harness-test.js" } },
 });
-fs.writeFileSync(path.join(out, "test.html"), `<!DOCTYPE html><html><head><meta charset="utf-8"><script src="./liner-android.js"></script><script src="./harness-test.js"></script></head><body><audio id="liner-audio" crossorigin="anonymous"></audio></body></html>`);
+fs.writeFileSync(path.join(out, "test.html"), `<!DOCTYPE html><html><head><meta charset="utf-8"><script src="./cloudmusic-android.js"></script><script src="./harness-test.js"></script></head><body><audio id="cloudmusic-audio" crossorigin="anonymous"></audio></body></html>`);
 console.log("harness assets in", out);

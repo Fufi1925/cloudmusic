@@ -2,7 +2,7 @@ import { usePlayerStore } from "../store/playerStore";
 import { ApiError } from "@/shared/api";
 import { log } from "@/shared/utils/logger";
 import { telemetry } from "@/shared/telemetry";
-import { linerDb, audioCache } from "@/shared/storage";
+import { cloudMusicDb, audioCache } from "@/shared/storage";
 import { isStandaloneAudioFile } from "@/shared/storage/audioFormat";
 import type { Track } from "@/shared/types";
 import { pitchShifter } from "./pitchShifter";
@@ -32,10 +32,10 @@ export class PlayerRuntime {
 
   constructor() {
     const win = typeof window !== "undefined" ? (window as any) : null;
-    let audio = (win?.__liner_audio || (typeof document !== "undefined" && document.getElementById("liner-audio"))) as HTMLAudioElement | null;
+    let audio = (win?.__cloudmusic_audio || (typeof document !== "undefined" && document.getElementById("cloudmusic-audio"))) as HTMLAudioElement | null;
     if (!audio) {
       audio = new Audio();
-      audio.id = "liner-audio";
+      audio.id = "cloudmusic-audio";
       audio.crossOrigin = "anonymous";
       audio.preload = "auto";
       if (typeof document !== "undefined") {
@@ -43,7 +43,7 @@ export class PlayerRuntime {
       }
     }
     if (win) {
-      win.__liner_audio = audio;
+      win.__cloudmusic_audio = audio;
     }
     this.audio = audio;
     this.setupAudioListeners(this.audio);
@@ -143,7 +143,7 @@ export class PlayerRuntime {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: track.title,
         artist: track.artists,
-        album: (track as { albumTitle?: string }).albumTitle || "Liner",
+        album: (track as { albumTitle?: string }).albumTitle || "CloudMusic",
         artwork: track.coverUrl
           ? [
               { src: track.coverUrl, sizes: "96x96", type: "image/jpeg" },
@@ -257,7 +257,7 @@ export class PlayerRuntime {
       if (this.activeBlobUrl) {
         URL.revokeObjectURL(this.activeBlobUrl);
         this.activeBlobUrl = null;
-        void linerDb.deleteAudio(this.currentTrackId);
+        void cloudMusicDb.deleteAudio(this.currentTrackId);
         audioCache.deleteAudio(this.currentTrackId);
       }
 
@@ -413,7 +413,7 @@ export class PlayerRuntime {
     if (this.currentTrackId === track.id) return;
     if (this.preloadingTrackId === track.id) return;
 
-    const cached = await linerDb.getAudio(track.id);
+    const cached = await cloudMusicDb.getAudio(track.id);
     if (cached) return;
 
     this.preloadAbortController?.abort();
@@ -428,8 +428,8 @@ export class PlayerRuntime {
 
         const blob = await this.downloadAudioBlob(stream, controller.signal);
         if (!blob || controller.signal.aborted) return;
-        await linerDb.putAudio(track.id, blob, blob.type);
-        await linerDb.putTrack(track);
+        await cloudMusicDb.putAudio(track.id, blob, blob.type);
+        await cloudMusicDb.putTrack(track);
         log(
           "green",
           "preload",
@@ -517,7 +517,7 @@ export class PlayerRuntime {
     this.safeResetAudioElement();
 
     try {
-      const cachedAudio = bypassCache ? null : await linerDb.getAudio(track.id);
+      const cachedAudio = bypassCache ? null : await cloudMusicDb.getAudio(track.id);
       if (epoch !== this.loadEpoch || controller.signal.aborted) {
         return;
       }
@@ -528,13 +528,13 @@ export class PlayerRuntime {
         (!cachedAudio!.blob.type || cachedAudio!.blob.type.startsWith("audio/"));
 
       if (cachedAudio && !isValidCachedBlob) {
-        void linerDb.deleteAudio(track.id);
+        void cloudMusicDb.deleteAudio(track.id);
         audioCache.deleteAudio(track.id);
       }
 
       if (cachedAudio && isValidCachedBlob) {
         this.currentSessionExpiresAt = null;
-        void linerDb.putTrack(track);
+        void cloudMusicDb.putTrack(track);
         const blobUrl = URL.createObjectURL(cachedAudio.blob);
         this.activeBlobUrl = blobUrl;
         this.audio.src = blobUrl;
@@ -848,8 +848,8 @@ export class PlayerRuntime {
       try {
         const blob = await this.downloadAudioBlob(stream, signal);
         if (!blob || signal.aborted) return;
-        await linerDb.putAudio(track.id, blob, blob.type);
-        await linerDb.putTrack(track);
+        await cloudMusicDb.putAudio(track.id, blob, blob.type);
+        await cloudMusicDb.putTrack(track);
         log("green", "playback", `background cached: ${track.title} (${Math.round(blob.size / 1024)} KB)`);
       } catch {}
     })();

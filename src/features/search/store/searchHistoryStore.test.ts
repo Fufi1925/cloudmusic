@@ -133,6 +133,6 @@ describe("searchHistoryStore", () => {
     await clearSearchAndQueryCache();
 
     expect(useSearchHistoryStore.getState().items).toEqual([]);
-    expect(debouncedStorage.getItem("liner_search_history")).toBeNull();
+    expect(debouncedStorage.getItem("cloudmusic_search_history")).toBeNull();
   });
 });

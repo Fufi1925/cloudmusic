@@ -510,7 +510,7 @@ export class OverlayManager {
     const bounds = this.getWindowBounds();
 
     this.overlayWindow = new BrowserWindow({
-      title: "Liner Overlay",
+      title: "CloudMusic Overlay",
       width: bounds.width,
       height: bounds.height,
       x: bounds.x,

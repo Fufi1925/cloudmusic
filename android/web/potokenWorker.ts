@@ -3,7 +3,7 @@
 // Injected by PoTokenService.java into a hidden WebView that has
 // https://www.youtube.com/robots.txt loaded (same page electron uses), so
 // BotGuard runs in a genuine youtube.com origin. ipcRenderer is replaced by the
-// LinerPoBridge java interface; everything else is the original logic.
+// CloudMusicPoBridge java interface; everything else is the original logic.
 import { BotGuardClient } from "bgutils-js/botguard";
 import { buildURL, GOOG_API_KEY } from "bgutils-js/utils";
 import { WebPoMinter } from "bgutils-js/webpo";
@@ -16,8 +16,8 @@ interface PoBridge {
 
 declare global {
   interface Window {
-    LinerPoBridge?: PoBridge;
-    __linerPoWorker?: {
+    CloudMusicPoBridge?: PoBridge;
+    __cloudMusicPoWorker?: {
       mint: (id: number, identifier: string) => void;
       interpreterResult: (requestId: number, text: string | null, error: string | null) => void;
     };
@@ -53,7 +53,7 @@ function downloadInterpreter(url: string): Promise<string> {
     const requestId = ++interpreterSeq;
     interpreterRequests.set(requestId, { resolve, reject });
     try {
-      window.LinerPoBridge!.interpreter(requestId, url);
+      window.CloudMusicPoBridge!.interpreter(requestId, url);
     } catch (error) {
       interpreterRequests.delete(requestId);
       reject(error instanceof Error ? error : new Error(String(error)));
@@ -118,15 +118,15 @@ async function getMinter(): Promise<MinterEntry> {
 
 function report(payload: { id: number; token?: string; error?: string }): void {
   try {
-    window.LinerPoBridge?.result(JSON.stringify(payload));
+    window.CloudMusicPoBridge?.result(JSON.stringify(payload));
   } catch {
     // service torn down
   }
 }
 
 (function startPoTokenWorker() {
-  if (window.__linerPoWorker || !window.LinerPoBridge) return;
-  window.__linerPoWorker = {
+  if (window.__cloudMusicPoWorker || !window.CloudMusicPoBridge) return;
+  window.__cloudMusicPoWorker = {
     mint(id, identifier) {
       void (async () => {
         try {
@@ -147,5 +147,5 @@ function report(payload: { id: number; token?: string; error?: string }): void {
       else request.reject(new Error(error || "interpreter download failed"));
     },
   };
-  window.LinerPoBridge.ready();
+  window.CloudMusicPoBridge.ready();
 })();

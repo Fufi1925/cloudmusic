@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -28,7 +28,7 @@ import org.json.JSONObject;
  * overlay on in Settings -> Overlay.
  */
 final class OverlayController {
-    private static final String TAG = "LinerOverlay";
+    private static final String TAG = "CloudMusicOverlay";
     private static final int WIDTH_DP = 320;
     private static final int HEIGHT_DP = 56;
     private static final int PADDING_DP = 20;
@@ -39,7 +39,7 @@ final class OverlayController {
     private final SharedPreferences prefs;
 
     private WebView webView;
-    private LinerBridge bridge;
+    private CloudMusicBridge bridge;
     private FrameLayout container;
     private boolean attached;
     private Runnable pendingHide;
@@ -57,7 +57,7 @@ final class OverlayController {
     OverlayController(MainActivity activity) {
         this.activity = activity;
         this.windowManager = (WindowManager) activity.getSystemService(android.content.Context.WINDOW_SERVICE);
-        this.prefs = activity.getSharedPreferences("liner_overlay", android.content.Context.MODE_PRIVATE);
+        this.prefs = activity.getSharedPreferences("cloudmusic_overlay", android.content.Context.MODE_PRIVATE);
         // electron: overlay-settings.json defaults
         enabled = prefs.getBoolean("enabled", true);
         position = prefs.getString("position", "top-center");
@@ -189,7 +189,7 @@ final class OverlayController {
         ui.postDelayed(pendingHide, 90);
     }
 
-    void onOverlayReady(LinerBridge readyBridge) {
+    void onOverlayReady(CloudMusicBridge readyBridge) {
         if (readyBridge != bridge || !attached) return;
         if (latestState != null) bridge.emit("overlay:state", latestState);
         bridge.emit("overlay:visibility", true);
@@ -253,8 +253,8 @@ final class OverlayController {
     private void ensureWebView() {
         if (webView != null) return;
         webView = activity.buildWebView(true);
-        bridge = new LinerBridge(activity, webView, LinerBridge.ROLE_OVERLAY);
-        webView.addJavascriptInterface(bridge, "LinerAndroid");
+        bridge = new CloudMusicBridge(activity, webView, CloudMusicBridge.ROLE_OVERLAY);
+        webView.addJavascriptInterface(bridge, "CloudMusicAndroid");
         webView.setWebViewClient(activity.appClient(false));
         webView.setWebChromeClient(activity.chromeClient());
         container = new FrameLayout(activity);
@@ -324,7 +324,7 @@ final class OverlayController {
         }
         lp.gravity = Gravity.TOP | horizontal;
         lp.y = statusBarHeight() + Math.round(8 * density);
-        lp.setTitle("Liner Overlay");
+        lp.setTitle("CloudMusic Overlay");
         return lp;
     }
 

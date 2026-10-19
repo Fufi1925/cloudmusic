@@ -1,4 +1,4 @@
-//! Obfuscated cryptographic core for Liner HMAC signing.
+//! Obfuscated cryptographic core for CloudMusic HMAC signing.
 //!
 //! Provides HMAC-SHA256 computation over distinct obfuscated keys for
 //! Cover URL signing, API request signing, and Monitor telemetry signing.

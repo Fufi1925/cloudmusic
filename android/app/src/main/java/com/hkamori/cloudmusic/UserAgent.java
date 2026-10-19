@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.content.Context;
 import android.webkit.WebSettings;
@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The electron app talks to youtube, the liner api and the import sources with a
+ * The electron app talks to youtube, the cloudmusic api and the import sources with a
  * desktop chromium user agent, and BotGuard attestation runs in that same
  * environment. The android build presents the identical desktop chromium UA
  * (with the real engine version of the installed WebView) for every request,

@@ -1,7 +1,7 @@
-// Android implementation of the exact `LinerElectronApi` contract from
+// Android implementation of the exact `CloudMusicElectronApi` contract from
 // electron/preload.ts. Channel names are kept 1:1 with the electron ipc
-// channels so the native dispatcher (LinerBridge.java) reads like main.ts.
-import type { DeeplinkTarget, LinerElectronApi, WindowState } from "../../electron/preload";
+// channels so the native dispatcher (CloudMusicBridge.java) reads like main.ts.
+import type { DeeplinkTarget, CloudMusicElectronApi, WindowState } from "../../electron/preload";
 import type { MainNetResult } from "../../electron/netdiag";
 import { invoke, on, send } from "./ipc";
 import * as signer from "./signer";
@@ -46,7 +46,7 @@ let lastMediaRate = 1;
 let lastMediaPlaying = false;
 
 function currentPlaybackRate(): number {
-  const audio = document.getElementById("liner-audio") as HTMLAudioElement | null;
+  const audio = document.getElementById("cloudmusic-audio") as HTMLAudioElement | null;
   const rate = audio?.playbackRate;
   return typeof rate === "number" && Number.isFinite(rate) && rate > 0 ? rate : 1;
 }
@@ -146,10 +146,10 @@ async function clearAllIndexedDb(): Promise<void> {
   }
 }
 
-export function createLinerApi(info: AndroidInfo): LinerElectronApi {
+export function createCloudMusicApi(info: AndroidInfo): CloudMusicElectronApi {
   const appVersion = info.appVersion;
 
-  const api: LinerElectronApi = {
+  const api: CloudMusicElectronApi = {
     platform: info.platform || "android",
     isHyprland: false,
 

@@ -1,4 +1,4 @@
-package com.hkamori.liner.net;
+package com.hkamori.cloudmusic.net;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -18,12 +18,12 @@ import okhttp3.Response;
  * </pre>
  *
  * Origin / Referer are replaced with the matching first-party origin and the
- * renderer's {@code x-liner-user-agent} header becomes the real User-Agent.
+ * renderer's {@code x-cloudmusic-user-agent} header becomes the real User-Agent.
  * Installed as an OkHttp network interceptor so it runs for every redirect hop,
  * exactly like the electron hook does.
  */
 public final class ElectronHeaders implements Interceptor {
-    public static final String USER_AGENT_OVERRIDE = "x-liner-user-agent";
+    public static final String USER_AGENT_OVERRIDE = "x-cloudmusic-user-agent";
 
     public static boolean matchesFilter(HttpUrl url) {
         String host = url.host().toLowerCase(Locale.ROOT);

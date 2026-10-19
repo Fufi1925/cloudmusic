@@ -131,7 +131,7 @@ function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
     if (!el) return;
     el.theme = braccatoThemeCss;
     el.lyrics = latestLyricsRef.current;
-    el.source = "#liner-audio";
+    el.source = "#cloudmusic-audio";
 
     const handleBraccatoLineClick = (e: Event) => {
       const isAudioLoading = playerEngine.getSnapshot().status === "loading";
@@ -184,7 +184,7 @@ function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
     let lastReportedIndex = -1;
 
     const checkActiveLine = () => {
-      const audioEl = document.getElementById("liner-audio") as HTMLAudioElement | null;
+      const audioEl = document.getElementById("cloudmusic-audio") as HTMLAudioElement | null;
       if (audioEl && !Number.isNaN(audioEl.currentTime)) {
         const currentMs = audioEl.currentTime * 1000;
         const lines = useLyricsStore.getState().syncedLines;
@@ -273,7 +273,7 @@ function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
     <div className="relative flex flex-col flex-1 w-full h-full min-h-0">
       {createElement(BRACCATO_TAG, {
         ref: setElement,
-        source: "#liner-audio",
+        source: "#cloudmusic-audio",
         className: "block flex-1 w-full h-full px-6",
         style: {
           overflowY: "auto",

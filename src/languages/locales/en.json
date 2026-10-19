@@ -43,7 +43,7 @@
   },
   "common": {
     "app": {
-      "name": "Liner",
+      "name": "CloudMusic",
       "description": "More of what you like",
       "version": "Version 0.1.0"
     },
@@ -241,7 +241,7 @@
     "sign_in_to_account": "Sign in to your account",
     "auth_title_login": "Your music, your way",
     "auth_subtitle_login": "Sign in and pick up right where you left off.",
-    "auth_title_register": "Join Liner",
+    "auth_title_register": "Join CloudMusic",
     "auth_subtitle_register": "Create an account and start building your personal library.",
     "profile_setup_title": "Set up your profile",
     "profile_setup_subtitle": "Choose your unique handle and display name.",
@@ -312,7 +312,7 @@
       "email_invalid": "Enter a valid email address.",
       "password_min_8": "Password must contain at least 8 characters.",
       "server_unavailable": "Unable to reach the server. Please check your connection.",
-      "server_error": "Liner's servers are having trouble right now. Please try again in a few minutes.",
+      "server_error": "CloudMusic's servers are having trouble right now. Please try again in a few minutes.",
       "invalid_credentials": "Email or password is incorrect.",
       "email_already_used": "This email is already in use.",
       "username_invalid": "Username must be 3-30 lowercase letters, numbers, or underscores.",
@@ -464,9 +464,9 @@
     "shortcuts": {
       "description": "Customize global system-wide and player keyboard shortcuts.",
       "global_section": "Global Shortcuts (System-wide)",
-      "global_desc": "Work from any application across your computer, even when Liner is minimized or not focused.",
+      "global_desc": "Work from any application across your computer, even when CloudMusic is minimized or not focused.",
       "main_app_section": "Main Application",
-      "main_app_desc": "Active when the main Liner window is open and focused.",
+      "main_app_desc": "Active when the main CloudMusic window is open and focused.",
       "miniplayer_section": "Miniplayer Mode",
       "miniplayer_desc": "Active when the desktop overlay miniplayer is focused.",
       "toggle_overlay": "Toggle miniplayer overlay",
@@ -542,7 +542,7 @@
       },
       "auto_show_on_minimize": {
         "title": "Auto-show on minimize",
-        "description": "Automatically show the overlay when Liner is minimized."
+        "description": "Automatically show the overlay when CloudMusic is minimized."
       },
       "always_on_top": {
         "title": "Always on top",
@@ -564,7 +564,7 @@
         "song": "Song Title",
         "artist_song": "Artist - Song",
         "song_artist": "Song - Artist",
-        "app": "Liner (App name)"
+        "app": "CloudMusic (App name)"
       },
       "show_timeline": {
         "title": "Playback Timeline",
@@ -583,12 +583,12 @@
         "description": "Keep status visible on Discord with a paused indicator when music is paused."
       },
       "show_button": {
-        "title": "'Listen on Liner' Button",
-        "description": "Add an interactive button linking to the song on Liner."
+        "title": "'Listen on CloudMusic' Button",
+        "description": "Add an interactive button linking to the song on CloudMusic."
       },
       "show_download_button": {
-        "title": "'Download Liner' Button",
-        "description": "Add an interactive button linking to tryliner.fun to download the app."
+        "title": "'Download CloudMusic' Button",
+        "description": "Add an interactive button linking to GitHub to download the app."
       },
       "status": {
         "connected": "Connected to Discord ({user})",
@@ -708,8 +708,8 @@
       "title": "Cache & Storage",
       "description": "Storage breakdown, local cache analytics and media files.",
       "usage_title": "Storage Usage",
-      "device_usage": "Liner is currently using {size} of local storage.",
-      "device_usage_raw": "Liner is currently using {size} of local storage.",
+      "device_usage": "CloudMusic is currently using {size} of local storage.",
+      "device_usage_raw": "CloudMusic is currently using {size} of local storage.",
       "audio_cache_limit": "Cache size limit",
       "audio_cache_limit_desc": "Older files and media are automatically removed when full",
       "cache_limit": "Cache size limit",
@@ -725,7 +725,7 @@
       "empty_storage": "Cache is squeaky clean!",
       "cloud_disclaimer": "All media, covers and tracks stay in the cloud and will be re-downloaded seamlessly when played.",
       "clearing_title": "Clearing cache...",
-      "clearing_subtitle": "Please keep this window open while Liner is cleaning your cache.",
+      "clearing_subtitle": "Please keep this window open while CloudMusic is cleaning your cache.",
       "cleared_title": "Storage Cleared",
       "cleared_subtitle": "Your cache has been swept clean. New media will stream and cache automatically.",
       "done_button": "Done",
@@ -781,7 +781,7 @@
       "title": "Profile",
       "signed_in_as": "Signed in as",
       "not_signed_in": "Not currently signed in to a recognized session.",
-      "sign_in": "Sign in to Liner",
+      "sign_in": "Sign in to CloudMusic",
       "sign_out": "Sign out",
       "sign_out_confirm": "Are you sure you want to sign out?",
       "edit_profile": "Edit profile",
@@ -792,7 +792,7 @@
       "stat_active": "Active",
       "no_bio": "No bio yet",
       "details_section": "Profile Details",
-      "details_subtitle": "Customize your public appearance across Liner",
+      "details_subtitle": "Customize your public appearance across CloudMusic",
       "username_label": "Username",
       "username_hint": "3-30 lowercase characters (a-z, 0-9, _). Must be unique.",
       "username_invalid": "Username must be 3-30 lowercase letters, numbers, or underscores.",
@@ -809,7 +809,7 @@
       "saved_success": "Profile updated successfully",
       "save_failed": "Failed to update profile",
       "privacy_section": "Privacy & Social",
-      "privacy_subtitle": "Control your visibility and social presence across Liner",
+      "privacy_subtitle": "Control your visibility and social presence across CloudMusic",
       "public_profile": {
         "title": "Public profile",
         "description": "Allow others to search for your profile and view your public information."
@@ -834,7 +834,7 @@
       "badge_private": "Private"
     },
     "about": {
-      "liner": "Liner",
+      "cloudmusic": "CloudMusic",
       "telegram": "Channel",
       "support": "Support",
       "github": "GitHub",
@@ -867,7 +867,7 @@
       "report_issue_desc": "Submit bug reports, feature suggestions, or feedback on GitHub.",
       "special_thanks": "Special Thanks",
       "special_thanks_desc": "@braccato/core, @kawarp/react, Solar Icons and MingCute Icons.",
-      "license_notice": "Distributed under Liner Source-Available & Non-Commercial License."
+      "license_notice": "Distributed under the Source-Available & Non-Commercial License."
     },
     "connection": {
       "title": "Connection",
@@ -950,7 +950,7 @@
   },
   "error_screen": {
     "title": "Something went wrong",
-    "subtitle": "An unexpected error occurred in Liner. You can reload the app or try again.",
+    "subtitle": "An unexpected error occurred in CloudMusic. You can reload the app or try again.",
     "reload": "Reload app",
     "try_again": "Try again",
     "go_home": "Go to home",
@@ -977,13 +977,13 @@
   },
   "connectivity": {
     "wall_title": "Connection failed",
-    "wall_subtitle": "Liner can't reach its servers. Your music and library are safe.",
-    "wall_title_server": "Liner's servers are having trouble",
+    "wall_subtitle": "CloudMusic can't reach its servers. Your music and library are safe.",
+    "wall_title_server": "CloudMusic's servers are having trouble",
     "wall_subtitle_server": "Your connection is fine, the server answered with an error. Your music and library are safe, try again in a few minutes.",
     "steps_title": "Quick fixes worth trying",
     "step_net": "Check that Wi-Fi or cable is connected and pages open in a browser.",
     "step_vpn": "Pause VPN, proxy or DNS filters for a minute — they often block the app.",
-    "step_firewall": "Allow Liner through the firewall and antivirus network shields.",
+    "step_firewall": "Allow CloudMusic through the firewall and antivirus network shields.",
     "step_router": "Restart the router, then press Retry below.",
     "retry": "Retry",
     "retrying": "Checking…",
@@ -1013,13 +1013,13 @@
   },
   "updater": {
     "modal_title": "New Update Available",
-    "modal_desc": "A new version of Liner (v{version}) is ready to download.",
+    "modal_desc": "A new version of CloudMusic (v{version}) is ready to download.",
     "view_changelog": "Changelog",
     "skip_button": "Skip",
     "update_button": "Update",
     "downloading_title": "Downloading update…",
     "downloaded_title": "Update downloaded",
-    "downloaded_desc": "Restart Liner to install version {version}.",
+    "downloaded_desc": "Restart CloudMusic to install version {version}.",
     "install_button": "Install",
     "error_title": "Update failed"
   },

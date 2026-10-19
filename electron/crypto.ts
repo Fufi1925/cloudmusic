@@ -47,12 +47,12 @@ export function getAdjustedTimestamp(): number {
 }
 
 interface WasmSignerExports {
-  liner_alloc: (len: number) => number;
-  liner_dealloc: (ptr: number, len: number) => void;
-  liner_get_result_ptr: () => number;
-  liner_get_result_len: () => number;
-  liner_sign_cover_url: (ptr: number, len: number) => number;
-  liner_sign_request: (
+  cloudmusic_alloc: (len: number) => number;
+  cloudmusic_dealloc: (ptr: number, len: number) => void;
+  cloudmusic_get_result_ptr: () => number;
+  cloudmusic_get_result_len: () => number;
+  cloudmusic_sign_cover_url: (ptr: number, len: number) => number;
+  cloudmusic_sign_request: (
     method_ptr: number,
     method_len: number,
     path_ptr: number,
@@ -63,7 +63,7 @@ interface WasmSignerExports {
     nonce_ptr: number,
     nonce_len: number,
   ) => number;
-  liner_sign_monitor_request: (
+  cloudmusic_sign_monitor_request: (
     method_ptr: number,
     method_len: number,
     path_ptr: number,
@@ -74,7 +74,7 @@ interface WasmSignerExports {
     nonce_ptr: number,
     nonce_len: number,
   ) => number;
-  liner_sign_raw_payload: (ptr: number, len: number) => number;
+  cloudmusic_sign_raw_payload: (ptr: number, len: number) => number;
   memory: WebAssembly.Memory;
 }
 
@@ -113,19 +113,19 @@ function passStringToWasm(
   str: string,
 ): { ptr: number; len: number; free: () => void } {
   const bytes = Buffer.from(str, "utf8");
-  const ptr = exports.liner_alloc(bytes.length);
+  const ptr = exports.cloudmusic_alloc(bytes.length);
   const memoryView = new Uint8Array(exports.memory.buffer, ptr, bytes.length);
   memoryView.set(bytes);
   return {
     ptr,
     len: bytes.length,
-    free: () => exports.liner_dealloc(ptr, bytes.length),
+    free: () => exports.cloudmusic_dealloc(ptr, bytes.length),
   };
 }
 
 function readResultFromWasm(exports: WasmSignerExports): string {
-  const ptr = exports.liner_get_result_ptr();
-  const len = exports.liner_get_result_len();
+  const ptr = exports.cloudmusic_get_result_ptr();
+  const len = exports.cloudmusic_get_result_len();
   if (!ptr || len === 0) return "";
   const memoryView = new Uint8Array(exports.memory.buffer, ptr, len);
   return Buffer.from(memoryView).toString("utf8");
@@ -136,7 +136,7 @@ export function signCoverUrl(payload: string): string {
   const wasm = getWasmExports();
   const payloadBuf = passStringToWasm(wasm, payload);
   try {
-    const code = wasm.liner_sign_cover_url(payloadBuf.ptr, payloadBuf.len);
+    const code = wasm.cloudmusic_sign_cover_url(payloadBuf.ptr, payloadBuf.len);
     if (code !== 0) {
       throw new Error(`wasm sign_cover_url failed with code ${code}`);
     }
@@ -167,7 +167,7 @@ export function signRequest(input: SignRequestInput): SignedRequestHeaders {
   const nonceBuf = passStringToWasm(wasm, nonce);
 
   try {
-    const code = wasm.liner_sign_request(
+    const code = wasm.cloudmusic_sign_request(
       methodBuf.ptr,
       methodBuf.len,
       pathBuf.ptr,
@@ -209,7 +209,7 @@ export function signMonitorRequest(input: SignRequestInput): SignedRequestHeader
   const nonceBuf = passStringToWasm(wasm, nonce);
 
   try {
-    const code = wasm.liner_sign_monitor_request(
+    const code = wasm.cloudmusic_sign_monitor_request(
       methodBuf.ptr,
       methodBuf.len,
       pathBuf.ptr,
@@ -243,17 +243,17 @@ export function signMonitorRequest(input: SignRequestInput): SignedRequestHeader
 export function signRawPayload(payload: Buffer | Uint8Array): string {
   const wasm = getWasmExports();
   const bytes = Buffer.isBuffer(payload) ? payload : Buffer.from(payload);
-  const ptr = wasm.liner_alloc(bytes.length);
+  const ptr = wasm.cloudmusic_alloc(bytes.length);
   const memoryView = new Uint8Array(wasm.memory.buffer, ptr, bytes.length);
   memoryView.set(bytes);
   try {
-    const code = wasm.liner_sign_raw_payload(ptr, bytes.length);
+    const code = wasm.cloudmusic_sign_raw_payload(ptr, bytes.length);
     if (code !== 0) {
       throw new Error(`wasm sign_raw_payload failed with code ${code}`);
     }
     return readResultFromWasm(wasm);
   } finally {
-    wasm.liner_dealloc(ptr, bytes.length);
+    wasm.cloudmusic_dealloc(ptr, bytes.length);
   }
 }
 

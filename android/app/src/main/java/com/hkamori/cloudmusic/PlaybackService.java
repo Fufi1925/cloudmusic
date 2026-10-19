@@ -1,4 +1,4 @@
-package com.hkamori.liner;
+package com.hkamori.cloudmusic;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -49,9 +49,9 @@ import okhttp3.Response;
  * holder in the same app would steal focus from the WebView.
  */
 public final class PlaybackService extends Service {
-    private static final String TAG = "LinerPlayback";
+    private static final String TAG = "CloudMusicPlayback";
     private static final int NOTIFICATION_ID = 1001;
-    private static final String PREFIX = "com.hkamori.liner.playback.";
+    private static final String PREFIX = "com.hkamori.cloudmusic.playback.";
     static final String ACTION_UPDATE = PREFIX + "UPDATE";
     private static final String ACTION_PLAY = PREFIX + "PLAY";
     private static final String ACTION_PAUSE = PREFIX + "PAUSE";
@@ -59,7 +59,7 @@ public final class PlaybackService extends Service {
     private static final String ACTION_PREV = PREFIX + "PREV";
     private static final String ACTION_LIKE = PREFIX + "LIKE";
     private static final String ACTION_DISMISS = PREFIX + "DISMISS";
-    private static final String CUSTOM_LIKE = "liner.like";
+    private static final String CUSTOM_LIKE = "cloudmusic.like";
     /** keep the foreground state through short pauses so headset / notification resume always works */
     private static final long PAUSED_FOREGROUND_GRACE_MS = 10 * 60 * 1000L;
     private static final int ARTWORK_MAX_PX = 512;
@@ -143,14 +143,14 @@ public final class PlaybackService extends Service {
         instance = this;
         notifications = NotificationManagerCompat.from(this);
 
-        session = new MediaSessionCompat(this, "Liner");
+        session = new MediaSessionCompat(this, "CloudMusic");
         session.setCallback(new SessionCallback(), handler);
         session.setSessionActivity(openAppIntent());
         session.setActive(true);
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (pm != null) {
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "liner:playback");
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "cloudmusic:playback");
             wakeLock.setReferenceCounted(false);
         }
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -159,7 +159,7 @@ public final class PlaybackService extends Service {
             int mode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
                     ? WifiManager.WIFI_MODE_FULL_LOW_LATENCY
                     : WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-            wifiLock = wm.createWifiLock(mode, "liner:playback");
+            wifiLock = wm.createWifiLock(mode, "cloudmusic:playback");
             wifiLock.setReferenceCounted(false);
         }
     }
@@ -323,11 +323,11 @@ public final class PlaybackService extends Service {
 
     private void loadArtwork(String url) {
         loadingArtworkUrl = url;
-        LinerApp.get().io().execute(() -> {
+        CloudMusicApp.get().io().execute(() -> {
             Bitmap bitmap = null;
             try {
                 Request request = new Request.Builder().url(url).build();
-                try (Response response = LinerApp.get().netProxy().client().newCall(request).execute()) {
+                try (Response response = CloudMusicApp.get().netProxy().client().newCall(request).execute()) {
                     if (response.isSuccessful() && response.body() != null) {
                         bitmap = decodeSampled(response.body().bytes());
                     }
@@ -408,8 +408,8 @@ public final class PlaybackService extends Service {
         String artist = track == null ? "" : track.optString("artist", "");
         String album = track == null ? "" : track.optString("album", "");
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, LinerApp.PLAYBACK_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_liner)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CloudMusicApp.PLAYBACK_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_cloudmusic)
                 .setContentTitle(title)
                 .setContentText(artist)
                 .setSubText(album.isEmpty() ? null : album)

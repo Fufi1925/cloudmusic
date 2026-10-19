@@ -32,8 +32,8 @@ export function useTouchBarSync() {
   const [syncRequestTick, setSyncRequestTick] = useState(0);
 
   useEffect(() => {
-    if (!window.linerElectron?.onTouchBarRequestSync) return;
-    const cleanup = window.linerElectron.onTouchBarRequestSync(() => {
+    if (!window.cloudMusicElectron?.onTouchBarRequestSync) return;
+    const cleanup = window.cloudMusicElectron.onTouchBarRequestSync(() => {
       lastStateSentRef.current = "";
       setSyncRequestTick((t) => t + 1);
     });
@@ -41,9 +41,9 @@ export function useTouchBarSync() {
   }, []);
 
   useEffect(() => {
-    if (!window.linerElectron?.onTouchBarAction) return;
+    if (!window.cloudMusicElectron?.onTouchBarAction) return;
 
-    const cleanup = window.linerElectron.onTouchBarAction((action: TouchBarAction) => {
+    const cleanup = window.cloudMusicElectron.onTouchBarAction((action: TouchBarAction) => {
       switch (action.type) {
         case "togglePlay":
           void playerEngine.togglePlayPause();
@@ -142,7 +142,7 @@ export function useTouchBarSync() {
     const syncLoop = () => {
       const audioEl =
         typeof document !== "undefined"
-          ? (document.getElementById("liner-audio") as HTMLAudioElement | null)
+          ? (document.getElementById("cloudmusic-audio") as HTMLAudioElement | null)
           : null;
 
       if (audioEl && !Number.isNaN(audioEl.currentTime)) {
@@ -180,7 +180,7 @@ export function useTouchBarSync() {
   }, []);
 
   useEffect(() => {
-    if (!window.linerElectron?.touchbarUpdateState) return;
+    if (!window.cloudMusicElectron?.touchbarUpdateState) return;
 
     let activeLine: TouchBarActiveLine | null = null;
     let nextLyricText = "";
@@ -188,7 +188,7 @@ export function useTouchBarSync() {
 
     const audioEl =
       typeof document !== "undefined"
-        ? (document.getElementById("liner-audio") as HTMLAudioElement | null)
+        ? (document.getElementById("cloudmusic-audio") as HTMLAudioElement | null)
         : null;
     const currentAudioMs =
       audioEl && !Number.isNaN(audioEl.currentTime) && !audioEl.seeking
@@ -384,7 +384,7 @@ export function useTouchBarSync() {
 
     if (serialized !== lastStateSentRef.current) {
       lastStateSentRef.current = serialized;
-      window.linerElectron.touchbarUpdateState(payload);
+      window.cloudMusicElectron.touchbarUpdateState(payload);
     }
   }, [
     player.status,

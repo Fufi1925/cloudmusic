@@ -1,10 +1,10 @@
 export {
-  linerDb,
+  cloudMusicDb,
   type CachedTrackRecord,
   type CachedAudioRecord,
   type CachedLyricsRecord,
   type CachedArtistRecord,
-} from "./linerDb";
+} from "./cloudMusicDb";
 export {
   audioCache,
   AUDIO_CACHE_LIMIT_STORAGE_KEY,

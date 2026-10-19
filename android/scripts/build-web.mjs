@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds everything the Android WebView loads into android/app/src/main/assets/www:
-//   index.html + assets/*      the unchanged liner renderer (vite.android.config.ts)
-//   liner-android.js           the android bridge (replaces electron/preload.ts)
+//   index.html + assets/*      the unchanged cloudmusic renderer (vite.android.config.ts)
+//   cloudmusic-android.js           the android bridge (replaces electron/preload.ts)
 //   potoken-worker.js          BotGuard worker for the hidden youtube.com WebView
 import { build } from "vite";
 import path from "node:path";
@@ -41,11 +41,11 @@ const libBuild = (entry, fileName, name) =>
     },
   });
 
-console.log("[android] building bridge (liner-android.js)...");
-await libBuild("android/web/index.ts", "liner-android.js", "LinerAndroidBridge");
+console.log("[android] building bridge (cloudmusic-android.js)...");
+await libBuild("android/web/index.ts", "cloudmusic-android.js", "CloudMusicAndroidBridge");
 
 console.log("[android] building BotGuard worker (potoken-worker.js)...");
-await libBuild("android/web/potokenWorker.ts", "potoken-worker.js", "LinerPoTokenWorker");
+await libBuild("android/web/potokenWorker.ts", "potoken-worker.js", "CloudMusicPoTokenWorker");
 
 // electron unregisters the covers service worker; it is never used on android either
 for (const unused of ["cover-sw.js"]) {
@@ -53,8 +53,8 @@ for (const unused of ["cover-sw.js"]) {
 }
 
 const html = fs.readFileSync(path.join(outDir, "index.html"), "utf8");
-if (!html.includes("liner-android.js")) throw new Error("bridge script was not injected into index.html");
-for (const file of ["liner-android.js", "potoken-worker.js"]) {
+if (!html.includes("cloudmusic-android.js")) throw new Error("bridge script was not injected into index.html");
+for (const file of ["cloudmusic-android.js", "potoken-worker.js"]) {
   const size = fs.statSync(path.join(outDir, file)).size;
   console.log(`[android] ${file}: ${(size / 1024).toFixed(1)} KB`);
 }
