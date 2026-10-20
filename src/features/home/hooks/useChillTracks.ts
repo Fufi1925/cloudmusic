@@ -3,7 +3,7 @@ import { api, toClientTrack } from "@/shared/api";
 import type { PopularItem } from "./usePopularTracks";
 
 /**
- * Curated "chill" row for the home page. The liner/cloudmusic server has no
+ * Curated "chill" row for the home page. The cloudmusic server has no
  * dedicated editorial endpoint, so the row is assembled from a handful of
  * artist searches (quiet pop) whose results are interleaved and deduplicated
  * client side. Results are cached for ten minutes so switching pages does not

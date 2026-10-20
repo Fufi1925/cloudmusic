@@ -12,9 +12,10 @@ import { Tooltip } from "@/shared/ui";
 interface SidebarProps {
   searchOpen: boolean;
   onSearchToggle: () => void;
+  isEdgeToEdge?: boolean;
 }
 
-function Sidebar({ searchOpen, onSearchToggle }: SidebarProps) {
+function Sidebar({ searchOpen, onSearchToggle, isEdgeToEdge = false }: SidebarProps) {
   const { pathname } = useLocation();
   const { t } = useTranslation();
   const settingsOpen = useModalStore((state) => state.settingsOpen);
@@ -137,7 +138,9 @@ function Sidebar({ searchOpen, onSearchToggle }: SidebarProps) {
   return (
     <aside className="h-full">
       <div
-        className={`h-full w-[58px] rounded-l-xl rounded-r-sm ${
+        className={`h-full w-[58px] ${
+          isEdgeToEdge ? "rounded-l-none" : "rounded-l-xl"
+        } rounded-r-sm ${
           hasCustomBg ? "" : "bg-bg-primary"
         } flex flex-col overflow-hidden`}
         style={sidebarStyle}

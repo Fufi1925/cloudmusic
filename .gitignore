@@ -39,6 +39,54 @@ renderer.log
 *.tsbuildinfo
 
 # cache
+.liner_local_cache
+signer/
+
+# agent rules
+AGENTS.md
+GEMINI.md
+.agents/
+.agent/
+
+brag-output/
+scratch/
+
+# production / build
+/dist
+/dist-electron
+/release
+/build/*
+!/build/icons/
+!/build/icon.png
+!/build/icon.svg
+!/build/icon.ico
+
+# testing
+/coverage
+
+# misc
+.DS_Store
+*.pem
+temp_cover.bin
+test_stills/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+renderer.log
+
+# env files
+.env
+.env.*
+!.env.example
+
+# typescript
+*.tsbuildinfo
+
+# cache
 .cloudmusic_local_cache
 signer/
 
@@ -50,3 +98,7 @@ GEMINI.md
 
 brag-output/
 scratch/
+
+# native add-on build output
+/native/*/build/
+/native-build.log

@@ -25,6 +25,7 @@ import PageTransition from "./PageTransition";
 import RightDrawer from "./RightDrawer";
 import { useGlobalShortcuts } from "../hooks/useGlobalShortcuts";
 import { useDisableButtonFocus } from "../hooks/useDisableButtonFocus";
+import { useWindowState } from "../hooks/useWindowState";
 import {
   useSearchTracks,
   useSearchAll,
@@ -80,6 +81,7 @@ export default function AppFrame({ children }: AppFrameProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isCompact = useIsCompact();
+  const { isEdgeToEdge } = useWindowState();
 
   const searchOpen = useModalStore((state) => state.searchOpen);
   const openSearch = useModalStore((state) => state.openSearch);
@@ -690,7 +692,7 @@ export default function AppFrame({ children }: AppFrameProps) {
       className={`relative flex h-full w-full overflow-hidden bg-bg-canvas ${
         isCompact
           ? "flex-col gap-0 rounded-none p-0"
-          : "flex-row gap-1.5 rounded-5xl p-1.5"
+          : `flex-row gap-1.5 ${isEdgeToEdge ? "rounded-none p-0" : "rounded-5xl p-1.5"}`
       }`}
       onScroll={(e) => {
         if (e.currentTarget.scrollLeft !== 0) e.currentTarget.scrollLeft = 0;
@@ -700,7 +702,7 @@ export default function AppFrame({ children }: AppFrameProps) {
       {hasCustomBg && backgroundImage && (
         <div
           className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${
-            isCompact ? "rounded-none" : "rounded-5xl"
+            isCompact || isEdgeToEdge ? "rounded-none" : "rounded-5xl"
           }`}
           aria-hidden="true"
         >
@@ -730,6 +732,7 @@ export default function AppFrame({ children }: AppFrameProps) {
           <Sidebar
             searchOpen={searchOpen}
             onSearchToggle={handleSearchToggle}
+            isEdgeToEdge={isEdgeToEdge}
           />
         </aside>
       )}
@@ -746,7 +749,7 @@ export default function AppFrame({ children }: AppFrameProps) {
           } ${
             isCompact
               ? "rounded-none"
-              : `rounded-sm ${isFullscreenPlayer ? "rounded-tr-none" : "rounded-tr-xl"}`
+              : `rounded-sm ${isFullscreenPlayer || isEdgeToEdge ? "rounded-tr-none" : "rounded-tr-xl"}`
           } overflow-hidden`}
           style={mainStyle}
         >
@@ -814,6 +817,7 @@ export default function AppFrame({ children }: AppFrameProps) {
           >
             <MiniPlayer
               embedded
+              isEdgeToEdge={isEdgeToEdge}
               onQueueOpenChange={handleQueuePopupToggle}
               onQueueToggle={handleQueuePopupToggleRequest}
               onFullscreenOpen={openFullscreenPlayer}
@@ -1137,8 +1141,8 @@ export default function AppFrame({ children }: AppFrameProps) {
       <WindowControls
         isFullscreen={isFullscreenPlayer}
         style={{
-          top: isFullscreenPlayer ? 12 : 18,
-          right: isFullscreenPlayer ? 12 : 18,
+          top: isFullscreenPlayer || isEdgeToEdge ? 12 : 18,
+          right: isFullscreenPlayer || isEdgeToEdge ? 12 : 18,
           transition: "all 0.28s cubic-bezier(0.22, 1, 0.36, 1)",
           zIndex: 80,
         }}

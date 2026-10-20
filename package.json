@@ -21,8 +21,9 @@
     "test:watch": "vitest",
     "electron:build": "tsc -b && vite build && electron-builder",
     "electron:build:linux": "tsc -b && vite build && electron-builder --linux",
-    "electron:build:win": "tsc -b && vite build && electron-builder --win",
-    "electron:build:mac": "tsc -b && vite build && electron-builder --mac"
+    "electron:build:win": "pnpm native:build && tsc -b && vite build && electron-builder --win",
+    "electron:build:mac": "tsc -b && vite build && electron-builder --mac",
+    "native:build": "node scripts/native-build.cjs"
   },
   "build": {
     "appId": "com.hkamori.cloudmusic",
@@ -50,7 +51,8 @@
     ],
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "native/snap-preview/build/Release/snap_preview.node"
     ],
     "linux": {
       "executableName": "cloudmusic",
@@ -101,7 +103,10 @@
           ]
         }
       ]
-    }
+    },
+    "asarUnpack": [
+      "native/**/*.node"
+    ]
   },
   "dependencies": {
     "@braccato/core": "^1.4.0",
