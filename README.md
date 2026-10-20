@@ -90,6 +90,9 @@ Tap **Connect with Discord** in *Settings → Discord*: an in-app browser opens 
 in, and CloudMusic takes the token over automatically – the window closes itself. Everything else works
 exactly like the desktop (`DiscordRpc.java`, `DiscordLoginActivity.java`).
 
+The *Listen on CloudMusic* profile button (desktop and Android) points at
+`https://cloudtix.up.railway.app` (`electron/discord.ts`, `LISTEN_ON_CLOUDMUSIC_URL`).
+
 The token is encrypted with AES-256/GCM behind a key that lives in the Android keystore
 (`cloudmusic_discord_token_v1`). It never leaves the device, is never logged and is only sent to Discord's
 own gateway. "Delete token" removes it again.

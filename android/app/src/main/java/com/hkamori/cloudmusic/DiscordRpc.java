@@ -38,6 +38,10 @@ public final class DiscordRpc {
     private static final long HEARTBEAT_FALLBACK_MS = 41_250;
     private static final long RECONNECT_BASE_MS = 5_000;
     private static final long RECONNECT_MAX_MS = 60_000;
+    /** profile button targets, same as electron/discord.ts */
+    private static final String LISTEN_ON_CLOUDMUSIC_URL = "https://cloudtix.up.railway.app";
+    private static final String DOWNLOAD_CLOUDMUSIC_URL = "https://github.com/Fufi1925/cloudmusic/releases";
+
     private static final int MAX_TEXT_LENGTH = 128;
     private static final int MAX_IMAGE_URL_LENGTH = 256;
 
@@ -510,6 +514,16 @@ public final class DiscordRpc {
             }
             if (assets.length() > 0) activity.put("assets", assets);
 
+            // action buttons (Discord allows up to two)
+            JSONArray buttons = new JSONArray();
+            if (settings.optBoolean("showButton", true)) {
+                buttons.put(button("Listen on CloudMusic", LISTEN_ON_CLOUDMUSIC_URL));
+            }
+            if (settings.optBoolean("showDownloadButton", false)) {
+                buttons.put(button("Download CloudMusic", DOWNLOAD_CLOUDMUSIC_URL));
+            }
+            if (buttons.length() > 0) activity.put("buttons", buttons);
+
             return activity;
         } catch (Exception e) {
             return null;
@@ -529,6 +543,17 @@ public final class DiscordRpc {
             json.put("showPaused", true);
             json.put("showButton", true);
             json.put("showDownloadButton", false);
+        } catch (Exception ignored) {
+            // constant keys
+        }
+        return json;
+    }
+
+    private static JSONObject button(String label, String url) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("label", label);
+            json.put("url", url);
         } catch (Exception ignored) {
             // constant keys
         }

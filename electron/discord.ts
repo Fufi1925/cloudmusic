@@ -39,6 +39,11 @@ export interface DiscordRpcStatePayload {
 
 export const CLOUDMUSIC_DISCORD_APPLICATION_ID = "1561339119617974362";
 
+/** target of the "Listen on CloudMusic" profile button */
+export const LISTEN_ON_CLOUDMUSIC_URL = "https://cloudtix.up.railway.app";
+/** target of the optional second button */
+export const DOWNLOAD_CLOUDMUSIC_URL = "https://github.com/Fufi1925/cloudmusic/releases";
+
 function builtInApplicationId(): string {
   return process.env.CLOUDMUSIC_DISCORD_CLIENT_ID?.trim() || CLOUDMUSIC_DISCORD_APPLICATION_ID;
 }
@@ -372,17 +377,17 @@ export class DiscordRpcManager {
       // Action buttons linking to the song and the project page (Discord allows up to 2 buttons)
       const buttons: Array<{ label: string; url: string }> = [];
 
-      if (this.settings.showButton && track.id) {
+      if (this.settings.showButton) {
         buttons.push({
           label: "Listen on CloudMusic",
-          url: `https://link.tryliner.fun/track?id=${encodeURIComponent(track.id)}`,
+          url: LISTEN_ON_CLOUDMUSIC_URL,
         });
       }
 
       if (this.settings.showDownloadButton) {
         buttons.push({
           label: "Download CloudMusic",
-          url: "https://github.com/Fufi1925/Music./releases",
+          url: DOWNLOAD_CLOUDMUSIC_URL,
         });
       }
 
