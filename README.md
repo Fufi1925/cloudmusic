@@ -79,6 +79,28 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## What's new in 0.1.45 (upstream sync)
+
+The fork now tracks the upstream Liner `main` again (18 commits, `v0.1.40` + unreleased work):
+
+- **Windows 11 window motion** – drag to the top edge to maximize with Windows' own snap preview look;
+  maximize/restore and minimize↔overlay morph through the DWM compositor (native add-on
+  `native/snap-preview`), with an acrylic fallback when the add-on is not built.
+- **Edge-to-edge layout** when the window is maximized or fullscreen (no rounded corners / padding).
+- **Player** – the system media session survives track changes (Windows media controls keep working),
+  seeking no longer flashes the loading state, no endless reload loop on a broken spot.
+- **Library & home** – saved artists/albums/playlists keep name and artwork, daily mixes and recently
+  played are cached per account.
+- **Imports** – SoundCloud tracks without artwork inherit the set's or uploader's image; Spotify TOTP
+  is also read from the mobile web player.
+- **Small UI fixes** – styled login errors instead of the native email bubble, square login frame when
+  maximized, no stale hover on the window controls after returning.
+
+> The native window add-on needs MSVC (VS 2022 + Windows SDK): `pnpm native:build`. On non-Windows hosts
+> it is skipped and the app uses the acrylic fallback (`scripts/native-build.cjs`).
+
+---
+
 ## Discord Rich Presence
 
 Desktop builds talk to the local Discord client through its IPC socket (no login needed). Android has no
