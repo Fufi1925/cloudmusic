@@ -1,8 +1,7 @@
 import { memo } from "react";
-import AppImage from "@/features/covers/ui/AppImage";
 import { Link, useLocation } from "react-router-dom";
 import { sidebarNavItems } from "../data/navigation";
-import logo from "@/assets/logo.svg";
+import { CloudMusicMark } from "@/assets/CloudMusicMark";
 import { useTranslation } from "@/languages";
 import { useTheme } from "next-themes";
 import { useModalStore } from "@/features/library";
@@ -147,14 +146,9 @@ function Sidebar({ searchOpen, onSearchToggle, isEdgeToEdge = false }: SidebarPr
       >
         <div className="flex justify-center items-center pt-[16px] pb-[16px] shrink-0">
 
-          <AppImage
-            src={logo}
-            alt="CloudMusic"
-            width={34}
-            height={34}
-            className="w-[34px] h-[34px] rounded-[8px]"
-            draggable={false}
-          />
+          <span className="flex h-[34px] w-[34px] items-center justify-center">
+            <CloudMusicMark className="h-[26px] w-[34px] text-text-primary" />
+          </span>
         </div>
 
         <nav className="relative flex-1 flex flex-col items-center gap-[24px] pt-[12px]">

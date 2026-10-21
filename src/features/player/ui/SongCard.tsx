@@ -114,6 +114,7 @@ function SongCard({
 
   return (
     <div
+      data-row="song"
       className={`group w-full flex items-center justify-between rounded-md ${paddingClass} outline-none transition-colors duration-150 ease-out ${
         className ?? ""
       } ${onPlay ? "cursor-pointer" : ""} ${onPlay && !className?.includes("hover:bg-") ? "hover:bg-border-alpha-14" : ""}`}
@@ -160,6 +161,7 @@ function SongCard({
           </div>
         ) : (
           <div
+            data-row-cover
             className={`relative ${imageSizeClass} shrink-0 overflow-hidden bg-bg-panel flex items-center justify-center ${
               imageShape === "circle" ? "rounded-full" : "rounded-md"
             }`}

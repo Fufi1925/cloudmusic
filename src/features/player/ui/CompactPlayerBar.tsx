@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { Playlist, SkipNext } from "@solar-icons/react";
 import { usePlayerState } from "../hooks/usePlayerState";
 import { playerEngine } from "../engine/playerEngine";
@@ -19,6 +19,8 @@ interface CompactPlayerBarProps {
 function CompactPlayerBar({ onFullscreenOpen, onQueueToggle }: CompactPlayerBarProps) {
   const player = usePlayerState();
   const track = player.currentTrack;
+  // horizontal swipe on the bar skips tracks, the way phone players behave
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   if (!track) return null;
 
@@ -47,6 +49,23 @@ function CompactPlayerBar({ onFullscreenOpen, onQueueToggle }: CompactPlayerBarP
       <div
         role="button"
         tabIndex={0}
+        onPointerDown={(event) => {
+          if (event.pointerType === "mouse") return;
+          swipeStart.current = { x: event.clientX, y: event.clientY };
+        }}
+        onPointerUp={(event) => {
+          const start = swipeStart.current;
+          swipeStart.current = null;
+          if (!start || event.pointerType === "mouse") return;
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+          if (dx > 0) void playerEngine.skipPrevious();
+          else void playerEngine.skipNext();
+        }}
+        onPointerCancel={() => {
+          swipeStart.current = null;
+        }}
         onClick={onFullscreenOpen}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -54,15 +73,15 @@ function CompactPlayerBar({ onFullscreenOpen, onQueueToggle }: CompactPlayerBarP
             onFullscreenOpen();
           }
         }}
-        className="flex h-[60px] w-full items-center gap-[10px] pl-[10px] pr-[6px] cursor-pointer select-none active:bg-border-alpha-8"
+        className="flex h-[60px] w-full touch-pan-y items-center gap-[10px] pl-[12px] pr-[8px] cursor-pointer select-none active:bg-border-alpha-8"
       >
-        <div className="relative h-[42px] w-[42px] shrink-0 overflow-hidden rounded-[8px] bg-bg-elevated">
+        <div className="relative h-[40px] w-[40px] shrink-0 overflow-hidden rounded-[10px] bg-bg-elevated">
           <CoverImage
             key={track.coverUrl}
             src={track.coverUrl}
             alt={track.title}
             fill
-            sizes="42px"
+            sizes="40px"
             placeholder="empty"
             className="object-cover"
             draggable={false}
@@ -89,7 +108,7 @@ function CompactPlayerBar({ onFullscreenOpen, onQueueToggle }: CompactPlayerBarP
               event.stopPropagation();
               onQueueToggle();
             }}
-            className="flex h-[38px] w-[32px] shrink-0 items-center justify-center border-none bg-transparent text-text-secondary active:scale-[0.94] transition-transform"
+            className="flex h-[42px] w-[34px] shrink-0 items-center justify-center rounded-lg border-none bg-transparent text-text-secondary transition-transform active:scale-[0.94]"
           >
             <Playlist size={19} />
           </button>
@@ -117,7 +136,7 @@ function CompactPlayerBar({ onFullscreenOpen, onQueueToggle }: CompactPlayerBarP
             event.stopPropagation();
             void playerEngine.skipNext();
           }}
-          className="flex h-[38px] w-[34px] shrink-0 items-center justify-center border-none bg-transparent text-text-secondary active:scale-[0.94] transition-transform"
+          className="flex h-[42px] w-[34px] shrink-0 items-center justify-center rounded-lg border-none bg-transparent text-text-secondary transition-transform active:scale-[0.94]"
         >
           <SkipNext size={19} weight="Bold" />
         </button>

@@ -7,10 +7,9 @@ import Select from "@/shared/ui/Select";
 import { EyeLine, EyeCloseLine, ArrowLeftLine } from "@mingcute/react";
 import WindowControls from "@/features/navigation/ui/WindowControls";
 import { useWindowState } from "@/features/navigation/hooks/useWindowState";
-import logo from "@/assets/logo.svg";
+import { CloudMusicMark } from "@/assets/CloudMusicMark";
 import cloudsBanner from "@/assets/wallhaven-5g1yz8.jpg";
 import CircleDitherCanvas from "@/shared/ui/CircleDitherCanvas";
-import AppImage from "@/features/covers/ui/AppImage";
 import {
   authErrorMessage,
   getAuthErrorCode,
@@ -201,14 +200,7 @@ export default function LoginPage() {
         <div className="flex min-h-full w-full flex-col justify-between">
           {/* Top: logo + lang picker */}
           <div className="flex shrink-0 items-center gap-[10px]">
-            <AppImage
-              src={logo}
-              alt="CloudMusic"
-              width={22}
-              height={22}
-              className="h-[22px] w-[22px] rounded-[6px]"
-              priority
-            />
+            <CloudMusicMark className="h-[18px] w-[26px] shrink-0 text-text-primary" />
             <span className="text-[16px] font-[600] tracking-[-0.025em] text-text-primary">
               CloudMusic
             </span>

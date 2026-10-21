@@ -248,6 +248,16 @@ export default function AppFrame({ children }: AppFrameProps) {
     }
   }, [isFullscreenPlayer, hasCurrentTrack, handleCloseFullscreen]);
 
+  // the full screen player (route based) asks the shell to reveal the queue
+  useEffect(() => {
+    const openQueue = () => {
+      setRightDrawerTabState("queue");
+      setQueuePopupOpen(true);
+    };
+    window.addEventListener("cloudmusic:open-queue", openQueue);
+    return () => window.removeEventListener("cloudmusic:open-queue", openQueue);
+  }, []);
+
   const setRightDrawerTab = useCallback((tab: "queue" | "lyrics") => {
     setRightDrawerTabState(tab);
     localStorage.setItem("cloudmusic_right_drawer_tab", tab);
@@ -855,6 +865,10 @@ export default function AppFrame({ children }: AppFrameProps) {
             <FullscreenPlayer
               onClose={closeFullscreenPlayer}
               effectsReady={fullscreenEffectsReady}
+              onQueueOpen={() => {
+                closeFullscreenPlayer();
+                openRightPanel("queue");
+              }}
             />
           </motion.div>
         ) : isFullscreenRoute ? (

@@ -722,6 +722,66 @@
       "dark": "Sombre",
       "system": "Système"
     },
+    "appearance": {
+
+      "accent": "Couleur d’accent",
+
+      "accent_desc": "Colore le cœur des favoris, les anneaux de focus et les messages. Le rouge CloudMusic par défaut.",
+
+      "accent_default": "Standard",
+
+      "accent_custom": "Couleur personnalisée",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Bleu",
+
+      "violet": "Violet",
+
+      "green": "Vert",
+
+      "amber": "Ambre",
+
+      "rose": "Rose",
+
+      "teal": "Turquoise",
+
+      "corners": "Angles",
+
+      "corners_desc": "Arrondi des cartes, champs et fenêtres.",
+
+      "corners_soft": "Nets",
+
+      "corners_default": "Standard",
+
+      "corners_round": "Arrondis",
+
+      "surface": "Surfaces",
+
+      "surface_desc": "Séparation entre l’arrière-plan, les panneaux et les cartes.",
+
+      "surface_default": "Standard",
+
+      "surface_contrast": "Contraste",
+
+      "surface_oled": "Noir OLED",
+
+      "compact": "Listes compactes",
+
+      "compact_desc": "Lignes plus serrées dans les listes de titres et la file, pour en voir plus à l’écran.",
+
+      "reduce_motion": "Réduire les animations",
+
+      "reduce_motion_desc": "Désactive les transitions et animations (utile en cas de vertige ou sur un téléphone lent).",
+
+      "reset": "Réinitialiser l’apparence",
+
+      "reset_desc": "Actuel : {accent}. Réinitialise accent, angles, surfaces, densité et animations.",
+
+      "reset_action": "Réinitialiser"
+
+    },
+
     "branding": {
       "title": "Logo",
       "description": "Choisissez la couleur d'accent du logo.",

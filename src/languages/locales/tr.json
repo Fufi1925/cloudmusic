@@ -720,6 +720,66 @@
       "dark": "Koyu",
       "system": "Sistem"
     },
+    "appearance": {
+
+      "accent": "Vurgu rengi",
+
+      "accent_desc": "Beğeni kalbini, odak halkalarını ve ipuçlarını renklendirir. Varsayılan CloudMusic kırmızısıdır.",
+
+      "accent_default": "Varsayılan",
+
+      "accent_custom": "Özel renk",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Mavi",
+
+      "violet": "Mor",
+
+      "green": "Yeşil",
+
+      "amber": "Amber",
+
+      "rose": "Gül",
+
+      "teal": "Turkuaz",
+
+      "corners": "Köşeler",
+
+      "corners_desc": "Kartların, alanların ve pencerelerin ne kadar yuvarlak olacağı.",
+
+      "corners_soft": "Keskin",
+
+      "corners_default": "Varsayılan",
+
+      "corners_round": "Yuvarlak",
+
+      "surface": "Yüzeyler",
+
+      "surface_desc": "Arka plan, paneller ve kartlar arasındaki ayrım.",
+
+      "surface_default": "Varsayılan",
+
+      "surface_contrast": "Kontrast",
+
+      "surface_oled": "OLED siyahı",
+
+      "compact": "Kompakt listeler",
+
+      "compact_desc": "Şarkı ve kuyruk listelerinde daha sıkı satırlar — ekrana daha fazlası sığar.",
+
+      "reduce_motion": "Hareketi azalt",
+
+      "reduce_motion_desc": "Geçişleri ve animasyonları kapatır (hareket rahatsızlığı veya yavaş telefonlar için).",
+
+      "reset": "Görünümü sıfırla",
+
+      "reset_desc": "Şu an: {accent}. Vurgu, köşeler, yüzeyler, yoğunluk ve hareketi sıfırlar.",
+
+      "reset_action": "Sıfırla"
+
+    },
+
     "branding": {
       "title": "Marka",
       "description": "Logonun vurgu rengini seç.",

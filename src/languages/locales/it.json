@@ -720,6 +720,66 @@
       "dark": "Scuro",
       "system": "Sistema"
     },
+    "appearance": {
+
+      "accent": "Colore accento",
+
+      "accent_desc": "Colora il cuore dei preferiti, gli anelli di focus e gli avvisi. Il rosso CloudMusic è lo standard.",
+
+      "accent_default": "Standard",
+
+      "accent_custom": "Colore personalizzato",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Blu",
+
+      "violet": "Viola",
+
+      "green": "Verde",
+
+      "amber": "Ambra",
+
+      "rose": "Rosa",
+
+      "teal": "Turchese",
+
+      "corners": "Angoli",
+
+      "corners_desc": "Quanto sono arrotondati schede, campi e finestre.",
+
+      "corners_soft": "Neti",
+
+      "corners_default": "Standard",
+
+      "corners_round": "Arrotondati",
+
+      "surface": "Superfici",
+
+      "surface_desc": "Separazione tra sfondo, pannelli e schede.",
+
+      "surface_default": "Standard",
+
+      "surface_contrast": "Contrasto",
+
+      "surface_oled": "Nero OLED",
+
+      "compact": "Liste compatte",
+
+      "compact_desc": "Righe più strette nelle liste di brani e coda, per vederne di più sullo schermo.",
+
+      "reduce_motion": "Riduci il movimento",
+
+      "reduce_motion_desc": "Disattiva transizioni e animazioni (utile in caso di capogiri o su telefoni lenti).",
+
+      "reset": "Reimposta aspetto",
+
+      "reset_desc": "Attuale: {accent}. Reimposta accento, angoli, superfici, densità e movimento.",
+
+      "reset_action": "Reimposta"
+
+    },
+
     "branding": {
       "title": "Branding",
       "description": "Scegli il colore d'accento del logo.",

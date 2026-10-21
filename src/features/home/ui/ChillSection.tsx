@@ -22,7 +22,7 @@ export default function ChillSection({ items, loading = false }: ChillSectionPro
         <div className="mt-[18px] px-8 max-md:px-4 flex items-center gap-2.5">
           <MoonFill className="w-5 h-5 text-indigo-400" />
           <h2
-            className="text-text-primary text-[21px] font-semibold m-0 leading-tight tracking-tight"
+            className="m-0 min-w-0 text-balance text-[21px] font-semibold leading-tight tracking-tight text-text-primary max-md:text-[18px]"
             style={{ fontFamily: "var(--font-inter), sans-serif" }}
           >
             {t("home.chill.title") || "Chill"}

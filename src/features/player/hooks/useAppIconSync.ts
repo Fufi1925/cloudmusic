@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/app-icon.svg";
 
 // CloudMusic ships one fixed logo (square artwork), so the old branding variants
 // no longer redraw the app icon; setAppIcon is still notified once so desktop

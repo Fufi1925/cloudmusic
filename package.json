@@ -1,6 +1,6 @@
 {
   "name": "@cloudmusic/client",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "type": "module",
   "private": true,
   "description": "CloudMusic music player",
@@ -58,7 +58,7 @@
       "executableName": "cloudmusic",
       "syncDesktopName": true,
       "maintainer": "Fufi1925 <180835986+Fufi1925@users.noreply.github.com>",
-      "icon": "build/icons",
+      "icon": "icons",
       "target": [
         "AppImage",
         "deb"
@@ -74,7 +74,7 @@
     },
     "win": {
       "executableName": "cloudmusic",
-      "icon": "build/icon.ico",
+      "icon": "icon.ico",
       "target": [
         "nsis"
       ]
@@ -85,7 +85,7 @@
       "oneClick": false
     },
     "mac": {
-      "icon": "build/icon.png",
+      "icon": "icon.png",
       "category": "public.app-category.music",
       "target": [
         {
@@ -144,6 +144,7 @@
     "electron-builder": "^26.15.3",
     "eslint": "^9",
     "jsdom": "^30.0.1",
+    "puppeteer-core": "23",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5",

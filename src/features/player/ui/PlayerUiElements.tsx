@@ -4,6 +4,9 @@ import {
   SkipNext,
   SkipPrevious,
   MusicNote,
+  Pause,
+  Play,
+  Playlist,
   Repeat,
   RepeatOne,
   Shuffle,
@@ -61,11 +64,14 @@ function PlayPauseIcon({ status }: { status: string }) {
 interface PlayerUiElementsProps {
   onDuration?: (duration: number) => void;
   onClose?: () => void;
+  /** compact only: the queue sheet is unreachable from the full screen player otherwise */
+  onQueueOpen?: () => void;
 }
 
 export function PlayerUiElements({
   onDuration: _onDuration,
   onClose,
+  onQueueOpen,
 }: PlayerUiElementsProps) {
   const player = usePlayerState();
 
@@ -100,7 +106,7 @@ export function PlayerUiElements({
     <>
       {/* Artwork (Compact, flat, no drop shadows) */}
       <div
-        className={`relative shrink-0 overflow-hidden rounded-xl w-[280px] h-[280px] max-md:w-[min(320px,74vw)] max-md:h-[min(320px,74vw)] bg-black/20 ${
+        className={`relative shrink-0 overflow-hidden rounded-xl w-[280px] h-[280px] max-md:w-[min(330px,78vw)] max-md:h-[min(330px,78vw)] bg-black/20 ${
           coverUrl && !isCoverLoaded ? "animate-pulse" : ""
         }`}
       >
@@ -269,6 +275,20 @@ export function PlayerUiElements({
       {/* Volume (Compact smooth slider, size sm) */}
       <div className="max-md:hidden">
         <VolumePicker className="w-[180px]" size="sm" />
+      </div>
+
+      {/* phones get the queue instead of the volume slider */}
+      <div className="hidden w-full items-center justify-center max-md:flex">
+        {onQueueOpen && (
+          <button
+            type="button"
+            onClick={onQueueOpen}
+            className="inline-flex h-[40px] items-center gap-[8px] rounded-full border border-white/12 bg-white/[0.06] px-[20px] text-[13.5px] font-[550] text-white/80 transition-colors active:bg-white/[0.12]"
+          >
+            <Playlist size={18} />
+            {t("player.queue")}
+          </button>
+        )}
       </div>
     </>
   );

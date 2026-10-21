@@ -5,7 +5,7 @@ import Button from "@/shared/ui/Button";
 import { useToast } from "@/shared/ui";
 import { useTranslation, getTranslationsForAllLocales } from "@/languages";
 import { APP_VERSION } from "@/shared/config/version";
-import logo from "@/assets/logo.svg";
+import { CloudMusicMark } from "@/assets/CloudMusicMark";
 import { useUpdaterStore } from "@/features/updater";
 
 const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
@@ -97,14 +97,7 @@ export function AboutTab({ searchQuery }: { searchQuery?: string }) {
       <div className="relative w-full max-w-[440px] overflow-hidden rounded-2xl bg-border-alpha-14 p-[24px] flex flex-col items-center text-center border border-border-primary/40 shadow-sm">
         {/* Logo */}
         <div className="bg-bg-elevated flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-2xl border border-border-primary/50 shadow-inner mb-[14px]">
-          <img
-            src={logo}
-            alt="CloudMusic Logo"
-            width={52}
-            height={52}
-            className="h-[52px] w-[52px] rounded-xl"
-            draggable={false}
-          />
+          <CloudMusicMark className="h-[40px] w-[52px] text-text-primary" />
         </div>
 
         {/* Title & Version badge */}

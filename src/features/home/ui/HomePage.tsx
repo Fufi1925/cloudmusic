@@ -122,7 +122,7 @@ export default function HomePage() {
                     <FlashCircleFill className="w-5 h-5 text-amber-400" />
                     </div>
                     <h2
-                      className="text-text-primary text-[21px] font-semibold m-0 leading-tight tracking-tight"
+                      className="m-0 min-w-0 text-balance text-[21px] font-semibold leading-tight tracking-tight text-text-primary max-md:text-[18px]"
                       style={{ fontFamily: "var(--font-inter), sans-serif" }}
                     >
                       {t("home.speedDial") || "Speed dial"}
@@ -130,7 +130,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="px-8 max-md:px-4 mt-[12px] relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="px-8 max-md:px-4 mt-[12px] relative grid grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   <SongCard
                     title={t("library.liked_songs")}
                     artists={`${likedData.total} ${likedData.total === 1 ? t("library.song") : t("library.songs")}`}

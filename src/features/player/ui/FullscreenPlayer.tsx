@@ -290,11 +290,13 @@ function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
 export interface FullscreenPlayerProps {
   effectsReady?: boolean;
   onClose: () => void;
+  onQueueOpen?: () => void;
 }
 
 export function FullscreenPlayer({
   effectsReady = true,
   onClose,
+  onQueueOpen,
 }: FullscreenPlayerProps) {
   const { t } = useTranslation();
   const isCompact = useIsCompact();
@@ -372,13 +374,15 @@ export function FullscreenPlayer({
 
       <div className={`absolute inset-0 z-10 flex ${isCompact ? "flex-col" : ""}`}>
         <div
-          className={`flex flex-col items-center justify-center gap-5 ${
+          className={`flex flex-col items-center gap-5 max-md:gap-[14px] ${
             isCompact
-              ? "flex-[1.15] min-h-0 w-full pt-[env(safe-area-inset-top)] pb-[8px]"
-              : "flex-1"
+              ? `min-h-0 w-full justify-center gap-[18px] px-[16px] pt-[calc(env(safe-area-inset-top)+12px)] pb-[max(14px,env(safe-area-inset-bottom))] ${
+                  hasLyrics ? "flex-[1.15]" : "flex-1"
+                }`
+              : "flex-1 justify-center"
           }`}
         >
-          <PlayerUiElements onClose={onClose} />
+          <PlayerUiElements onClose={onClose} onQueueOpen={onQueueOpen} />
         </div>
 
         {(!isCompact || hasLyrics) && (
@@ -507,5 +511,14 @@ export function FullscreenPlayer({
 
 export default function PlayerPage() {
   const navigate = useNavigate();
-  return <FullscreenPlayer onClose={() => navigate(-1)} />;
+  return (
+    <FullscreenPlayer
+      onClose={() => navigate(-1)}
+      onQueueOpen={() => {
+        // leave the full screen player first: the queue sheet lives in the shell
+        navigate("/", { replace: true });
+        window.dispatchEvent(new CustomEvent("cloudmusic:open-queue"));
+      }}
+    />
+  );
 }

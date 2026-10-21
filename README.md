@@ -79,6 +79,26 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## What's new in 0.1.47 (new mark, appearance, phone UI)
+
+- **New CloudMusic mark** – the cloud with the two notes replaces the old cloud/headphone logo
+  everywhere: desktop window + installer icons, all Windows/Linux builds, the Android launcher
+  (adaptive, monochrome and notification icon), the web favicon and the in-app wordmark.
+  `branding/generate-icons.py` now derives every asset from `branding/cloudmusic-logo.svg`;
+  the VectorDrawables need the potrace grid (`8430×3100`, y-up) while the SVGs scale it down.
+- **Settings → Appearance** is a real tab now: nine accent colours plus a custom hex field,
+  three corner styles, three surface levels (default / contrast / OLED black), and switches for
+  reduced motion and compact lists. Everything writes CSS variables on `<html>` and survives a restart.
+- **Phones** – nothing spills off screen any more: the library grid is a fixed two-column grid,
+  home rows snap card by card, headings scale down and wrap instead of pushing the row wide,
+  dialogs use the full phone width, and the tab strip in settings fades at the edges.
+- **Player on phones** – the now-playing screen gained the queue button it was missing, swiping the
+  compact bar skips tracks, and the sheet respects the system bars.
+- **Language picker** – flags are inline SVG instead of CDN emoji, so the selector no longer shows
+  a broken image when the app is offline or freshly installed on Android.
+
+---
+
 ## What's new in 0.1.46 (equalizer + queue)
 
 - **10-band equalizer** (32 Hz – 16 kHz, ±12 dB, 10 presets) that sits after pitch and reverb in the

@@ -666,6 +666,66 @@
       "dark": "Dunkel",
       "system": "System"
     },
+    "appearance": {
+
+      "accent": "Akzentfarbe",
+
+      "accent_desc": "Färbt Favoriten-Herz, Fokus-Ringe und Hinweise. Standard ist das CloudMusic-Rot.",
+
+      "accent_default": "Standard",
+
+      "accent_custom": "Eigene Farbe",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Blau",
+
+      "violet": "Violett",
+
+      "green": "Grün",
+
+      "amber": "Bernstein",
+
+      "rose": "Rosé",
+
+      "teal": "Türkis",
+
+      "corners": "Ecken",
+
+      "corners_desc": "Wie rund Ecken von Karten, Feldern und Dialogen sind.",
+
+      "corners_soft": "Scharf",
+
+      "corners_default": "Standard",
+
+      "corners_round": "Rund",
+
+      "surface": "Flächen",
+
+      "surface_desc": "Abstufung zwischen Hintergrund, Panels und Karten.",
+
+      "surface_default": "Standard",
+
+      "surface_contrast": "Kontrast",
+
+      "surface_oled": "OLED-Schwarz",
+
+      "compact": "Kompakte Listen",
+
+      "compact_desc": "Engere Zeilen in Song- und Queue-Listen, damit mehr auf den Schirm passt.",
+
+      "reduce_motion": "Bewegung reduzieren",
+
+      "reduce_motion_desc": "Blendet Übergänge und Animationen aus (gut bei Reisekrankheit oder auf schwächeren Handys).",
+
+      "reset": "Darstellung zurücksetzen",
+
+      "reset_desc": "Aktuell: {accent}. Setzt Akzent, Ecken, Flächen, Dichte und Bewegung zurück.",
+
+      "reset_action": "Zurücksetzen"
+
+    },
+
     "branding": {
       "title": "Branding",
       "description": "Wähle die Akzentfarbe des Logos.",

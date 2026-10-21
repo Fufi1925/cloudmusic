@@ -798,6 +798,66 @@
       "dark": "Dark",
       "system": "System"
     },
+    "appearance": {
+
+      "accent": "Accent color",
+
+      "accent_desc": "Tints the like heart, focus rings and hints. Default is the CloudMusic red.",
+
+      "accent_default": "Default",
+
+      "accent_custom": "Custom color",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Blue",
+
+      "violet": "Violet",
+
+      "green": "Green",
+
+      "amber": "Amber",
+
+      "rose": "Rose",
+
+      "teal": "Teal",
+
+      "corners": "Corners",
+
+      "corners_desc": "How round cards, fields and dialogs are.",
+
+      "corners_soft": "Sharp",
+
+      "corners_default": "Default",
+
+      "corners_round": "Round",
+
+      "surface": "Surfaces",
+
+      "surface_desc": "Separation between canvas, panels and cards.",
+
+      "surface_default": "Default",
+
+      "surface_contrast": "Contrast",
+
+      "surface_oled": "OLED black",
+
+      "compact": "Compact lists",
+
+      "compact_desc": "Tighter rows in song and queue lists so more fits on screen.",
+
+      "reduce_motion": "Reduce motion",
+
+      "reduce_motion_desc": "Turns off transitions and animations (helps with motion sickness or on slower phones).",
+
+      "reset": "Reset appearance",
+
+      "reset_desc": "Currently: {accent}. Resets accent, corners, surfaces, density and motion.",
+
+      "reset_action": "Reset"
+
+    },
+
     "branding": {
       "title": "Branding",
       "description": "Choose the logo accent color.",

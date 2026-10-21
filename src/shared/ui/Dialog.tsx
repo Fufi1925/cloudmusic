@@ -137,8 +137,11 @@ export default function Dialog({
                 : "mx-[16px] max-h-[85vh] rounded-xl"
             } ${className || "pt-[16px]"}`}
             style={
-              isCompact && compactFullScreen
-                ? { minHeight: undefined, maxHeight: undefined }
+              isCompact
+                ? compactFullScreen
+                  ? { minHeight: undefined, maxHeight: undefined }
+                  // bottom sheets span the phone width; maxWidth only matters on desktop
+                  : { minHeight, ...(maxHeight ? { maxHeight } : {}) }
                 : { maxWidth, minHeight, ...(maxHeight ? { maxHeight } : {}) }
             }
           >

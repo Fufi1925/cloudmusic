@@ -1,57 +1,57 @@
-import { Emoji } from "react-apple-emojis";
 import type { SelectOption } from "@/shared/ui/Select";
 import type { Locale } from "./locale";
+import { LanguageFlag } from "./LanguageFlag";
 
 // shared locale options used across auth-wall and settings modal
 export const LOCALE_OPTIONS: SelectOption<Locale>[] = [
   {
     value: "en",
     label: "English",
-    icon: <Emoji name="flag-united-kingdom" width={16} />,
+    icon: <LanguageFlag locale="en" />,
   },
   {
     value: "es",
     label: "Español",
-    icon: <Emoji name="flag-spain" width={16} />,
+    icon: <LanguageFlag locale="es" />,
   },
   {
     value: "ru",
     label: "Русский",
-    icon: <Emoji name="flag-russia" width={16} />,
+    icon: <LanguageFlag locale="ru" />,
   },
   {
     value: "uk",
     label: "Українська",
-    icon: <Emoji name="flag-ukraine" width={16} />,
+    icon: <LanguageFlag locale="uk" />,
   },
   {
     value: "de",
     label: "Deutsch",
-    icon: <Emoji name="flag-germany" width={16} />,
+    icon: <LanguageFlag locale="de" />,
   },
   {
     value: "it",
     label: "Italiano",
-    icon: <Emoji name="flag-italy" width={16} />,
+    icon: <LanguageFlag locale="it" />,
   },
   {
     value: "fr",
     label: "Français",
-    icon: <Emoji name="flag-france" width={16} />,
+    icon: <LanguageFlag locale="fr" />,
   },
   {
     value: "pl",
     label: "Polski",
-    icon: <Emoji name="flag-poland" width={16} />,
+    icon: <LanguageFlag locale="pl" />,
   },
   {
     value: "tr",
     label: "Türkçe",
-    icon: <Emoji name="flag-turkey" width={16} />,
+    icon: <LanguageFlag locale="tr" />,
   },
   {
     value: "pt",
     label: "Português (Brasil)",
-    icon: <Emoji name="flag-brazil" width={16} />,
+    icon: <LanguageFlag locale="pt" />,
   },
 ];

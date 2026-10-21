@@ -120,7 +120,7 @@ function TrackCard({
 
   return (
     <div
-      className="group flex-shrink-0 w-[175px] max-md:w-[136px] cursor-pointer select-none"
+      className="group shrink-0 snap-start w-[175px] max-md:w-[136px] cursor-pointer select-none"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     >
@@ -233,7 +233,7 @@ function AlbumCard({
 
   return (
     <div
-      className="group flex-shrink-0 w-[175px] max-md:w-[136px] cursor-pointer select-none"
+      className="group shrink-0 snap-start w-[175px] max-md:w-[136px] cursor-pointer select-none"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     >
@@ -331,7 +331,7 @@ function PlaylistCard({
 
   return (
     <div
-      className="group flex-shrink-0 w-[175px] max-md:w-[136px] cursor-pointer select-none"
+      className="group shrink-0 snap-start w-[175px] max-md:w-[136px] cursor-pointer select-none"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     >
@@ -417,7 +417,7 @@ function ArtistCard({ item }: { item: PopularItem & { type: "artist" } }) {
 
   return (
     <div
-      className="group flex-shrink-0 w-[175px] max-md:w-[136px] cursor-pointer select-none"
+      className="group shrink-0 snap-start w-[175px] max-md:w-[136px] cursor-pointer select-none"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     >
@@ -501,7 +501,7 @@ function PopularTracksSection({
           <div className="flex items-center gap-2.5">
             {icon && <div className="flex items-center shrink-0">{icon}</div>}
             <h2
-              className="text-text-primary text-[21px] font-semibold m-0 leading-tight tracking-tight"
+              className="m-0 min-w-0 text-balance text-[21px] font-semibold leading-tight tracking-tight text-text-primary max-md:text-[18px]"
               style={{ fontFamily: "var(--font-inter), sans-serif" }}
             >
               {title}
@@ -517,7 +517,7 @@ function PopularTracksSection({
       </div>
 
       <ScrollableRow
-        className={`flex gap-[28px] max-md:gap-[14px] pl-8 pr-8 max-md:pl-4 max-md:pr-4 mt-[12px] overflow-x-auto pb-[2px] ${rowClassName}`}
+        className={`flex gap-[28px] max-md:snap-x max-md:snap-mandatory max-md:gap-[14px] overflow-x-auto pl-8 pr-8 max-md:pl-4 max-md:pr-4 mt-[12px] pb-[2px] ${rowClassName}`}
       >
         {items.map((item, index) => (
           <PopularItemCard

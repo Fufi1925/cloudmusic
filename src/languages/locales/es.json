@@ -714,6 +714,66 @@
       "dark": "Oscuro",
       "system": "Sistema"
     },
+    "appearance": {
+
+      "accent": "Color de acento",
+
+      "accent_desc": "Tiñe el corazón de favorito, los anillos de foco y los avisos. El rojo de CloudMusic es el estándar.",
+
+      "accent_default": "Estándar",
+
+      "accent_custom": "Color personalizado",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Azul",
+
+      "violet": "Violeta",
+
+      "green": "Verde",
+
+      "amber": "Ámbar",
+
+      "rose": "Rosa",
+
+      "teal": "Turquesa",
+
+      "corners": "Esquinas",
+
+      "corners_desc": "Cuánto se redondean tarjetas, campos y diálogos.",
+
+      "corners_soft": "Rectas",
+
+      "corners_default": "Estándar",
+
+      "corners_round": "Redondas",
+
+      "surface": "Superficies",
+
+      "surface_desc": "Separación entre fondo, paneles y tarjetas.",
+
+      "surface_default": "Estándar",
+
+      "surface_contrast": "Contraste",
+
+      "surface_oled": "Negro OLED",
+
+      "compact": "Listas compactas",
+
+      "compact_desc": "Filas más ajustadas en listas de canciones y cola, para que quepa más en pantalla.",
+
+      "reduce_motion": "Reducir movimiento",
+
+      "reduce_motion_desc": "Desactiva transiciones y animaciones (útil con mareo o en móviles lentos).",
+
+      "reset": "Restablecer apariencia",
+
+      "reset_desc": "Ahora: {accent}. Restablece acento, esquinas, superficies, densidad y movimiento.",
+
+      "reset_action": "Restablecer"
+
+    },
+
     "branding": {
       "title": "Color de énfasis",
       "description": "Elige el color de acento para el logotipo y detalles.",

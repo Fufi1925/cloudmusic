@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { HashRouter } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { ToastProvider, AppleEmojiProvider, RootErrorBoundary, GlobalTooltip, WindowAnimationContainer } from "@/shared/ui";
 import { useWindowDrag } from "@/shared/hooks";
@@ -7,7 +9,7 @@ import { I18nProvider } from "@/languages";
 import { AuthLock } from "@/features/auth";
 import { CoverSwRegistrar } from "@/features/covers";
 import { usePresenceSync } from "@/shared/presence";
-import { useThemeCustomizationSync } from "@/features/settings";
+import { useThemeCustomizationSync, useAppearanceSync, useAppearanceStore } from "@/features/settings";
 import { useTouchBarSync } from "@/features/touchbar";
 import { OverlayPlayer, useOverlaySync } from "@/features/overlay";
 import { useDiscordSync } from "@/features/discord";
@@ -30,7 +32,13 @@ function PresenceSync() {
 
 function ThemeSync() {
   useThemeCustomizationSync();
+  useAppearanceSync();
   return null;
+}
+
+function MotionPreferences({ children }: { children: ReactNode }) {
+  const reduceMotion = useAppearanceStore((s) => s.reduceMotion);
+  return <MotionConfig reducedMotion={reduceMotion ? "always" : "user"}>{children}</MotionConfig>;
 }
 
 function TouchBarSync() {
@@ -93,12 +101,14 @@ export default function App() {
             <ToastProvider>
               <RootErrorBoundary>
                 <WindowAnimationContainer>
-                  <DeeplinkHandler />
-                  <EnvironmentWarning />
-                  <ConnectivityWall />
-                  <AuthLock>
-                    <AppRoutes />
-                  </AuthLock>
+                  <MotionPreferences>
+                    <DeeplinkHandler />
+                    <EnvironmentWarning />
+                    <ConnectivityWall />
+                    <AuthLock>
+                      <AppRoutes />
+                    </AuthLock>
+                  </MotionPreferences>
                 </WindowAnimationContainer>
               </RootErrorBoundary>
             </ToastProvider>

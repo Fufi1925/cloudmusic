@@ -279,7 +279,14 @@ export default function SettingsModal() {
             </button>
           </div>
 
-          <div className="flex gap-[6px] overflow-x-auto px-[12px] py-[10px]">
+          <div
+            className="flex snap-x snap-mandatory gap-[6px] overflow-x-auto px-[12px] py-[10px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{
+              maskImage: "linear-gradient(to right, transparent 0, black 10px, black calc(100% - 18px), transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent 0, black 10px, black calc(100% - 18px), transparent 100%)",
+            }}
+          >
             {TAB_GROUPS.flatMap((group) => group.ids).map((id) => {
               const Icon = TAB_ICONS[id];
               const isActive = id === activeTab;
@@ -290,7 +297,7 @@ export default function SettingsModal() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveTab(id)}
-                  className={`flex shrink-0 items-center gap-[6px] rounded-full border-0 px-[11px] py-[7px] text-[12.5px] transition-colors ${
+                  className={`flex shrink-0 snap-start items-center gap-[6px] rounded-full border-0 px-[11px] py-[7px] text-[12.5px] transition-colors ${
                     isActive
                       ? "bg-text-primary text-bg-primary font-[600]"
                       : "bg-border-alpha-14 text-text-secondary"

@@ -782,6 +782,66 @@
       "dark": "Escuro",
       "system": "Sistema"
     },
+    "appearance": {
+
+      "accent": "Cor de destaque",
+
+      "accent_desc": "Colore o coração de favorito, os anéis de foco e os avisos. O vermelho do CloudMusic é o padrão.",
+
+      "accent_default": "Padrão",
+
+      "accent_custom": "Cor personalizada",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Azul",
+
+      "violet": "Violeta",
+
+      "green": "Verde",
+
+      "amber": "Âmbar",
+
+      "rose": "Rosa",
+
+      "teal": "Turquesa",
+
+      "corners": "Cantos",
+
+      "corners_desc": "Quanto cantos de cartões, campos e janelas são arredondados.",
+
+      "corners_soft": "Retos",
+
+      "corners_default": "Padrão",
+
+      "corners_round": "Arredondados",
+
+      "surface": "Superfícies",
+
+      "surface_desc": "Separação entre fundo, painéis e cartões.",
+
+      "surface_default": "Padrão",
+
+      "surface_contrast": "Contraste",
+
+      "surface_oled": "Preto OLED",
+
+      "compact": "Listas compactas",
+
+      "compact_desc": "Linhas mais justas nas listas de músicas e da fila, para caber mais na tela.",
+
+      "reduce_motion": "Reduzir movimento",
+
+      "reduce_motion_desc": "Desativa transições e animações (ajuda com tontura ou em celulares lentos).",
+
+      "reset": "Redefinir aparência",
+
+      "reset_desc": "Atual: {accent}. Redefine destaque, cantos, superfícies, densidade e movimento.",
+
+      "reset_action": "Redefinir"
+
+    },
+
     "branding": {
       "title": "Marca",
       "description": "Escolha a cor de destaque da logo.",

@@ -724,6 +724,66 @@
       "dark": "Ciemny",
       "system": "Systemowy"
     },
+    "appearance": {
+
+      "accent": "Kolor akcentu",
+
+      "accent_desc": "Koloruje serce polubień, obwódki fokusu i podpowiedzi. Domyślnie czerwień CloudMusic.",
+
+      "accent_default": "Domyślny",
+
+      "accent_custom": "Własny kolor",
+
+      "accent_custom_value": "{color}",
+
+      "blue": "Niebieski",
+
+      "violet": "Fioletowy",
+
+      "green": "Zielony",
+
+      "amber": "Bursztynowy",
+
+      "rose": "Różowy",
+
+      "teal": "Morski",
+
+      "corners": "Narożniki",
+
+      "corners_desc": "Jak mocno zaokrąglone są karty, pola i okna.",
+
+      "corners_soft": "Ostre",
+
+      "corners_default": "Domyślne",
+
+      "corners_round": "Zaokrąglone",
+
+      "surface": "Powierzchnie",
+
+      "surface_desc": "Kontrast między tłem, panelami i kartami.",
+
+      "surface_default": "Domyślne",
+
+      "surface_contrast": "Kontrast",
+
+      "surface_oled": "Czerń OLED",
+
+      "compact": "Kompaktowe listy",
+
+      "compact_desc": "Ciaśniejsze wiersze na listach utworów i kolejki — więcej mieści się na ekranie.",
+
+      "reduce_motion": "Ogranicz animacje",
+
+      "reduce_motion_desc": "Wyłącza przejścia i animacje (pomaga przy chorobie lokomocyjnej i na słabszych telefonach).",
+
+      "reset": "Przywróć wygląd",
+
+      "reset_desc": "Teraz: {accent}. Przywraca akcent, narożniki, powierzchnie, gęstość i animacje.",
+
+      "reset_action": "Przywróć"
+
+    },
+
     "branding": {
       "title": "Logo",
       "description": "Wybierz kolor akcentu logo.",

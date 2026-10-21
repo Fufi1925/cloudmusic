@@ -370,7 +370,7 @@ export default function LibraryPage() {
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-[10px] px-[32px] max-md:px-[16px] pb-[10px]">
+          <div className="flex flex-wrap items-center justify-between gap-[10px] px-[32px] max-md:gap-[8px] max-md:px-[16px] pb-[10px]">
             <LibraryTabs activeTab={activeTab} onChange={setActiveTab} />
             <LibraryControls
               activeTab={activeTab}
