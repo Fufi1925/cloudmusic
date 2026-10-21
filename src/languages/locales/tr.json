@@ -407,7 +407,25 @@
     "preset_nightcore": "1.35x Nightcore",
     "reverb": "Yankı",
     "reverb_hint": "Atmosferik alan ve ortam derinliği",
-    "reverb_amount": "Yankı"
+    "reverb_amount": "Yankı",
+    "queue_save_button": "Çalma listesi olarak kaydet",
+
+    "queue_save_title": "Kuyruğu çalma listesi olarak kaydet",
+
+    "queue_save_description": "Kuyruğunuzdaki {count} parçayla yeni bir çalma listesi oluşturur.",
+
+    "queue_save_action": "Kaydet",
+
+    "queue_saving": "Kaydediliyor…",
+
+    "queue_save_success": "Çalma listesi kaydedildi · {count} parça",
+
+    "queue_save_failed": "Çalma listesi kaydedilemedi",
+
+    "queue_empty_hint": "Kuyruk oluşturmak için bir şey çalın veya parça ekleyin.",
+
+    "queue_play_next_hint": "Bir parçaya sağ tıklayın → “Sırada çal”"
+
   },
   "playlist": {
     "playlist": "Çalma listesi",
@@ -733,7 +751,11 @@
       "low": "Düşük Kalite (Veri Tasarrufu)",
       "standard": "Standart Kalite (Opus 64kbps / MP3 128kbps)",
       "high": "Yüksek Kalite (AAC 256kbps)",
-      "lossless": "Kayıpsız (FLAC/ALAC) - Kullanılamıyor"
+      "lossless": "Kayıpsız (FLAC/ALAC) - Kullanılamıyor",
+      "equalizer_title": "Ekolayzer",
+
+      "equalizer_description": "Ön ayarlı 10 bantlı grafik ekolayzer. Oynatıcı çubuğundan da kullanılabilir."
+
     },
     "profile": {
       "title": "Profil",

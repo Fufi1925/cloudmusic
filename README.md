@@ -79,6 +79,18 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## What's new in 0.1.46 (equalizer + queue)
+
+- **10-band equalizer** (32 Hz – 16 kHz, ±12 dB, 10 presets) that sits after pitch and reverb in the
+  audio chain and auto-damps the preamp so boosted curves cannot clip. It is now available in
+  *Settings → Audio* with an on/off switch, and still opens from the player bar.
+- **Queue upgrades** – reorder by dragging, *Play next* / *Add to queue* from every track menu, and
+  **Save queue as playlist**, which snapshots the current queue into a new account playlist
+  (name + optional description, duplicates skipped).
+- Settings search finds the equalizer in all ten languages.
+
+---
+
 ## What's new in 0.1.45 (upstream sync)
 
 The fork now tracks the upstream Liner `main` again (18 commits, `v0.1.40` + unreleased work):

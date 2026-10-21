@@ -418,7 +418,25 @@
     "preset_nightcore": "1.35x Nightcore",
     "reverb": "Reverb",
     "reverb_hint": "Espaço atmosférico e profundidade ambiente",
-    "reverb_amount": "Reverb"
+    "reverb_amount": "Reverb",
+    "queue_save_button": "Salvar como playlist",
+
+    "queue_save_title": "Salvar fila como playlist",
+
+    "queue_save_description": "Cria uma nova playlist com {count} faixas da sua fila.",
+
+    "queue_save_action": "Salvar",
+
+    "queue_saving": "Salvando…",
+
+    "queue_save_success": "Playlist salva · {count} faixas",
+
+    "queue_save_failed": "Não foi possível salvar a playlist",
+
+    "queue_empty_hint": "Reproduza algo ou adicione faixas para montar uma fila.",
+
+    "queue_play_next_hint": "Clique com o botão direito na faixa → «Tocar em seguida»"
+
   },
   "playlist": {
     "playlist": "Playlist",
@@ -795,7 +813,11 @@
       "low": "Qualidade baixa (economia de dados)",
       "standard": "Qualidade padrão (Opus 64kbps / MP3 128kbps)",
       "high": "Qualidade alta (AAC 256kbps)",
-      "lossless": "Sem perdas (FLAC/ALAC) - Indisponível"
+      "lossless": "Sem perdas (FLAC/ALAC) - Indisponível",
+      "equalizer_title": "Equalizador",
+
+      "equalizer_description": "Equalizador gráfico de 10 bandas com presets. Também disponível na barra do player."
+
     },
     "profile": {
       "title": "Perfil",

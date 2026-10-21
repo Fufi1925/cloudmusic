@@ -7,6 +7,8 @@ import { useTranslation } from "@/languages";
 import { useToast, ReorderDropPlaceholder, FloatingDragCard } from "@/shared/ui";
 import { useListReorder } from "@/shared/hooks";
 import { FiMusic } from "react-icons/fi";
+import { LuListMusic } from "react-icons/lu";
+import SaveQueueDialog from "@/features/player/ui/SaveQueueDialog";
 import { ArrowLeftLine } from "@mingcute/react";
 import { useTheme } from "next-themes";
 import {
@@ -233,6 +235,7 @@ function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
     Math.max(50, Math.ceil(((player.currentIndex >= 0 ? player.currentIndex : 0) + 30) / 50) * 50),
   );
   const [isQueueScrolled, setIsQueueScrolled] = useState(false);
+  const [saveQueueOpen, setSaveQueueOpen] = useState(false);
   const [isLyricsScrolled, setIsLyricsScrolled] = useState(false);
   const isScrolled = activeTab === "queue" ? isQueueScrolled : isLyricsScrolled;
 
@@ -812,7 +815,33 @@ function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
             </button>
           </div>
         </div>
+
+        {activeTab === "queue" && player.queue.length > 0 && (
+          <div className="flex items-center justify-between gap-[8px] px-[16px] pb-[10px]">
+            <span
+              className="min-w-0 truncate text-[11.5px] text-text-tertiary"
+              style={{ fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              {t("player.queue_play_next_hint")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setSaveQueueOpen(true)}
+              className={`inline-flex h-[26px] shrink-0 items-center gap-[5px] rounded-md px-[8px] text-[11px] font-[500] transition-colors cursor-pointer border-0 active:scale-[0.97] ${
+                hasCustomBg
+                  ? "apple-glass-pill text-text-primary"
+                  : "bg-black/[0.04] text-text-secondary hover:bg-black/[0.08] hover:text-text-primary dark:bg-white/[0.05] dark:hover:bg-white/[0.10] dark:hover:text-text-primary"
+              }`}
+              style={{ fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              <LuListMusic size={13} />
+              {t("player.queue_save_button")}
+            </button>
+          </div>
+        )}
       </div>
+
+      <SaveQueueDialog open={saveQueueOpen} onOpenChange={setSaveQueueOpen} />
 
       <div className="flex-1 overflow-hidden relative z-10">
         {activeTab === "queue" && (

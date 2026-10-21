@@ -409,7 +409,25 @@
     "preset_nightcore": "1.35x Nightcore",
     "reverb": "Реверберация",
     "reverb_hint": "Атмосферное пространство и объёмная глубина",
-    "reverb_amount": "Реверберация"
+    "reverb_amount": "Реверберация",
+    "queue_save_button": "Сохранить как плейлист",
+
+    "queue_save_title": "Сохранить очередь как плейлист",
+
+    "queue_save_description": "Создаёт новый плейлист из {count} треков вашей очереди.",
+
+    "queue_save_action": "Сохранить",
+
+    "queue_saving": "Сохранение…",
+
+    "queue_save_success": "Плейлист сохранён · {count} треков",
+
+    "queue_save_failed": "Не удалось сохранить плейлист",
+
+    "queue_empty_hint": "Запустите трек или добавьте треки, чтобы создать очередь.",
+
+    "queue_play_next_hint": "Правый клик по треку → «Играть следующим»"
+
   },
   "playlist": {
     "playlist": "Плейлист",
@@ -819,7 +837,11 @@
       "low": "Низкое (экономия трафика)",
       "standard": "Стандартное (Opus 64kbps / MP3 128kbps)",
       "high": "Высокое (AAC 256kbps)",
-      "lossless": "Lossless (FLAC/ALAC) — недоступно"
+      "lossless": "Lossless (FLAC/ALAC) — недоступно",
+      "equalizer_title": "Эквалайзер",
+
+      "equalizer_description": "10-полосный графический эквалайзер с пресетами. Также доступен на панели плеера."
+
     },
     "profile": {
       "title": "Профиль",

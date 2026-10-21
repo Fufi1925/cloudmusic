@@ -3,16 +3,19 @@ import { FolderOpenLine } from "@mingcute/react";
 import { useToast } from "@/shared/ui";
 import Button from "@/shared/ui/Button";
 import { useTranslation } from "@/languages";
-import { usePlayerStore, type AudioQuality } from "@/features/player";
-import { Select } from "@/shared/ui";
+import { playerEngine, usePlayerState, usePlayerStore, type AudioQuality } from "@/features/player";
+import { Select, ToggleSwitch } from "@/shared/ui";
 import { useConnectivityStore } from "@/features/connectivity";
 import { SettingRow, SettingSection } from "../controls";
+import { getTranslationsForAllLocales } from "@/languages/translator";
+import { EqualizerPanel } from "@/features/player/ui/EqualizerPanel";
 
 export function AudioTab({ searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const { toast } = useToast();
   const [dumpExported, setDumpExported] = useState(false);
+  const eqEnabled = usePlayerState().eqEnabled;
   const audioQuality = usePlayerStore((state) => state.audioQuality);
   const setAudioQuality = usePlayerStore((state) => state.setAudioQuality);
   const connRunning = useConnectivityStore((s) => s.running);
@@ -55,6 +58,21 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
             )
           }
         />
+        <SettingRow
+          title={t("settings.audio.equalizer_title")}
+          description={t("settings.audio.equalizer_description")}
+          titleKey="settings.audio.equalizer_title"
+          descKey="settings.audio.equalizer_description"
+          searchQuery={searchQuery}
+          control={
+            <ToggleSwitch
+              checked={eqEnabled}
+              onChange={(checked) => playerEngine.setEqEnabled(checked)}
+              ariaLabel={t("player.equalizer")}
+            />
+          }
+        />
+        <EqPanelSlot searchQuery={searchQuery} />
       </SettingSection>
 
       <SettingSection label={t("settings.connection.title")}>
@@ -117,6 +135,28 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
           }
         />
       </SettingSection>
+    </div>
+  );
+}
+
+/** The EQ panel follows the settings search, but has no row title of its own. */
+function EqPanelSlot({ searchQuery }: { searchQuery?: string }) {
+  const { t } = useTranslation();
+  const query = searchQuery?.toLowerCase().trim();
+  if (query) {
+    const haystack = [
+      t("settings.audio.equalizer_title"),
+      t("settings.audio.equalizer_description"),
+      t("player.equalizer"),
+      ...getTranslationsForAllLocales("player.equalizer"),
+    ];
+    if (!haystack.some((text) => text.toLowerCase().includes(query))) return null;
+  }
+  return (
+    <div className="py-[13px]">
+      <div className="rounded-xl border border-border-primary/60 bg-border-alpha-10 p-[14px]">
+        <EqualizerPanel showHeader={false} />
+      </div>
     </div>
   );
 }

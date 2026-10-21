@@ -190,9 +190,14 @@ const BandSlider = memo(function BandSlider({
 
 export interface EqualizerPanelProps {
   className?: string;
+  /** Settings render their own titled row with the on/off toggle. */
+  showHeader?: boolean;
 }
 
-export const EqualizerPanel = memo(function EqualizerPanel({ className = "" }: EqualizerPanelProps) {
+export const EqualizerPanel = memo(function EqualizerPanel({
+  className = "",
+  showHeader = true,
+}: EqualizerPanelProps) {
   const { t } = useTranslation();
   const player = usePlayerState();
   const bands = player.eqBands;
@@ -239,18 +244,19 @@ export const EqualizerPanel = memo(function EqualizerPanel({ className = "" }: E
       onClick={(e) => e.stopPropagation()}
       style={{ fontFamily: "var(--font-inter), sans-serif" }}
     >
-      {/* header */}
-      <div className="flex items-center justify-between gap-[8px]">
-        <div className="flex min-w-0 flex-col">
-          <span className="text-[13px] font-semibold text-text-primary">{t("player.equalizer")}</span>
-          <span className="truncate text-[10px] leading-tight text-text-tertiary">{subtitle}</span>
+      {showHeader && (
+        <div className="flex items-center justify-between gap-[8px]">
+          <div className="flex min-w-0 flex-col">
+            <span className="text-[13px] font-semibold text-text-primary">{t("player.equalizer")}</span>
+            <span className="truncate text-[10px] leading-tight text-text-tertiary">{subtitle}</span>
+          </div>
+          <ToggleSwitch
+            checked={enabled}
+            onChange={(checked) => playerEngine.setEqEnabled(checked)}
+            ariaLabel={t("player.equalizer")}
+          />
         </div>
-        <ToggleSwitch
-          checked={enabled}
-          onChange={(checked) => playerEngine.setEqEnabled(checked)}
-          ariaLabel={t("player.equalizer")}
-        />
-      </div>
+      )}
 
       {/* presets */}
       <div className="flex flex-wrap gap-[4px]">

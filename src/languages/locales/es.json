@@ -409,7 +409,25 @@
     "preset_nightcore": "1.35x Nightcore",
     "reverb": "Reverberación",
     "reverb_hint": "Espacio atmosférico y profundidad ambiental",
-    "reverb_amount": "Reverberación"
+    "reverb_amount": "Reverberación",
+    "queue_save_button": "Guardar como playlist",
+
+    "queue_save_title": "Guardar cola como playlist",
+
+    "queue_save_description": "Crea una nueva playlist con {count} pistas de tu cola.",
+
+    "queue_save_action": "Guardar",
+
+    "queue_saving": "Guardando…",
+
+    "queue_save_success": "Playlist guardada · {count} pistas",
+
+    "queue_save_failed": "No se pudo guardar la playlist",
+
+    "queue_empty_hint": "Reproduce algo o añade pistas para crear una cola.",
+
+    "queue_play_next_hint": "Clic derecho en una pista → «Reproducir siguiente»"
+
   },
   "playlist": {
     "playlist": "Lista de reproducción",
@@ -727,7 +745,11 @@
       "low": "Calidad baja (Ahorro de datos)",
       "standard": "Calidad estándar (Opus 64kbps / MP3 128kbps)",
       "high": "Calidad alta (AAC 256kbps)",
-      "lossless": "Sin pérdida (FLAC/ALAC) - No disponible"
+      "lossless": "Sin pérdida (FLAC/ALAC) - No disponible",
+      "equalizer_title": "Ecualizador",
+
+      "equalizer_description": "Ecualizador gráfico de 10 bandas con presets. También disponible en la barra del reproductor."
+
     },
     "profile": {
       "title": "Perfil",
