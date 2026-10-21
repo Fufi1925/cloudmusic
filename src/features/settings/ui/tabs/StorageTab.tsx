@@ -5,6 +5,7 @@ import { FolderOpenLine, CheckLine } from "@mingcute/react";
 import { CheckCircle } from "@solar-icons/react";
 import Button from "@/shared/ui/Button";
 import { useToast } from "@/shared/ui";
+import { useIsCompact } from "@/shared/hooks/useCompactLayout";
 import { useTranslation } from "@/languages";
 import cleanDuckAnimationData from "@/assets/animations/clean_duck.json";
 import {
@@ -105,6 +106,7 @@ function TelegramCleaningDuck({ size = 130 }: { size?: number }) {
 
 export function StorageTab({ searchQuery: _searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
+  const isCompact = useIsCompact();
   const { toast } = useToast();
 
   const initialCached = getCachedStorageAnalytics();
@@ -576,17 +578,20 @@ export function StorageTab({ searchQuery: _searchQuery }: { searchQuery?: string
             : t("settings.storage.clear_selected")}
         </Button>
 
-        <Button
-          variant="secondary"
-          size="default"
-          type="button"
-          onClick={handleOpenFolder}
-          title={t("settings.storage.open_folder")}
-          className="flex items-center gap-[6px] !h-[40px] px-[14px] font-[500] text-[13px] rounded-xl shrink-0"
-        >
-          <FolderOpenLine size={16} />
-          <span>{t("settings.storage.open_folder")}</span>
-        </Button>
+        {/* no file manager to open on a phone */}
+        {!isCompact && (
+          <Button
+            variant="secondary"
+            size="default"
+            type="button"
+            onClick={handleOpenFolder}
+            title={t("settings.storage.open_folder")}
+            className="flex items-center gap-[6px] !h-[40px] px-[14px] font-[500] text-[13px] rounded-xl shrink-0"
+          >
+            <FolderOpenLine size={16} />
+            <span>{t("settings.storage.open_folder")}</span>
+          </Button>
+        )}
       </div>
           </motion.div>
         )}

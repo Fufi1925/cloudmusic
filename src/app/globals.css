@@ -369,6 +369,31 @@ button.apple-glass-action:hover,
   cursor: default;
 }
 
+/* wallpaper "ken burns": very slow zoom + drift, purely decorative */
+@keyframes wallpaper-ken-burns {
+  0% {
+    transform: scale(1.06) translate3d(-0.6%, -0.4%, 0);
+  }
+  50% {
+    transform: scale(1.13) translate3d(0.7%, 0.5%, 0);
+  }
+  100% {
+    transform: scale(1.06) translate3d(-0.6%, -0.4%, 0);
+  }
+}
+
+.wallpaper-kenburns {
+  animation: wallpaper-ken-burns 46s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallpaper-kenburns {
+    animation: none;
+  }
+}
+
 @keyframes skeleton-breathe {
   0%, 100% {
     opacity: 0.95;

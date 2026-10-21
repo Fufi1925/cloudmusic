@@ -686,6 +686,9 @@ export default function AppFrame({ children }: AppFrameProps) {
   const backgroundImage = useCustomizationStore((s) => s.backgroundImage);
   const backgroundBlur = useCustomizationStore((s) => s.backgroundBlur);
   const backgroundDim = useCustomizationStore((s) => s.backgroundDim);
+  const backgroundFit = useCustomizationStore((s) => s.backgroundFit);
+  const backgroundSaturation = useCustomizationStore((s) => s.backgroundSaturation);
+  const backgroundKenBurns = useCustomizationStore((s) => s.backgroundKenBurns);
   const contentViewConfig = useCustomizationStore((s) => s.contentView);
 
   const hasCustomBg = Boolean(backgroundImage && isDark);
@@ -716,15 +719,48 @@ export default function AppFrame({ children }: AppFrameProps) {
           }`}
           aria-hidden="true"
         >
-          <img
-            src={backgroundImage}
-            alt=""
-            className="w-full h-full object-cover select-none"
-            style={{
-              filter: backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : undefined,
-              transform: backgroundBlur > 0 ? "scale(1.05)" : undefined,
-            }}
-          />
+          {backgroundFit === "tile" ? (
+            <div
+              className={`h-full w-full select-none ${
+                backgroundKenBurns ? "wallpaper-kenburns" : ""
+              }`}
+              style={{
+                backgroundImage: `url(${JSON.stringify(backgroundImage)})`,
+                backgroundRepeat: "repeat",
+                backgroundPosition: "center",
+                filter: [
+                  backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : null,
+                  backgroundSaturation !== 100
+                    ? `saturate(${backgroundSaturation}%)`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" ") || undefined,
+              }}
+            />
+          ) : (
+            <img
+              src={backgroundImage}
+              alt=""
+              className={`w-full h-full select-none ${
+                backgroundKenBurns ? "wallpaper-kenburns" : ""
+              }`}
+              style={{
+                objectFit: backgroundFit === "contain" ? "contain" : "cover",
+                filter:
+                  [
+                    backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : null,
+                    backgroundSaturation !== 100
+                      ? `saturate(${backgroundSaturation}%)`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" ") || undefined,
+                transform:
+                  backgroundBlur > 0 && !backgroundKenBurns ? "scale(1.05)" : undefined,
+              }}
+            />
+          )}
           {backgroundDim > 0 && (
             <div
               className="absolute inset-0 bg-black"

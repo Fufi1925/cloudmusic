@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   useCustomizationStore,
+  GLASS_PRESETS,
   clampBlockConfig,
   getBlockStyle,
   isGlassThemeActive,
@@ -45,6 +46,39 @@ describe("customizationStore", () => {
     expect(state.sidebar.opacity).toBe(100);
     expect(state.sidebar.blur).toBe(0);
     expect(state.contentView.opacity).toBe(60);
+  });
+
+  it("applies a glass preset to every block at once", () => {
+    const store = useCustomizationStore.getState();
+    store.applyGlassPreset("strong");
+
+    let state = useCustomizationStore.getState();
+    expect(state.sidebar).toEqual(GLASS_PRESETS.strong);
+    expect(state.contentView).toEqual(GLASS_PRESETS.strong);
+    expect(state.miniplayer).toEqual(GLASS_PRESETS.strong);
+
+    store.applyGlassPreset("off");
+    state = useCustomizationStore.getState();
+    expect(state.contentView).toEqual({ opacity: 100, blur: 0, dim: 0 });
+  });
+
+  it("clamps the wallpaper saturation and keeps the fit options", () => {
+    const store = useCustomizationStore.getState();
+    store.setBackgroundSaturation(320);
+    expect(useCustomizationStore.getState().backgroundSaturation).toBe(200);
+    store.setBackgroundSaturation(-20);
+    expect(useCustomizationStore.getState().backgroundSaturation).toBe(0);
+
+    store.setBackgroundFit("tile");
+    store.setBackgroundKenBurns(true);
+    expect(useCustomizationStore.getState().backgroundFit).toBe("tile");
+    expect(useCustomizationStore.getState().backgroundKenBurns).toBe(true);
+
+    store.resetAll();
+    const state = useCustomizationStore.getState();
+    expect(state.backgroundFit).toBe("cover");
+    expect(state.backgroundSaturation).toBe(100);
+    expect(state.backgroundKenBurns).toBe(false);
   });
 
   it("applies one block configuration to all blocks", () => {

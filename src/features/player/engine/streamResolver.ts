@@ -12,21 +12,41 @@ import { findYoutubeStandIn } from "./youtubeStandIn";
 
 export type { BufferedPlaybackStream, PlayableTrack, PlaybackStream, UrlPlaybackStream } from "./playbackStream";
 
-async function resolveYoutubeStandIn(track: PlayableTrack, signal?: AbortSignal): Promise<PlaybackStream> {
+/**
+ * Bandwidth cap per audio quality tier. `high` (and the retired `lossless`)
+ * keeps the best available format, lower tiers drop the bigger ones.
+ */
+export function maxBitrateForQuality(
+  quality: "low" | "standard" | "high" | "lossless" | undefined,
+): number | undefined {
+  if (quality === "low") return 96_000;
+  if (quality === "standard") return 170_000;
+  return undefined;
+}
+
+async function resolveYoutubeStandIn(
+  track: PlayableTrack,
+  signal?: AbortSignal,
+  maxBitrate?: number,
+): Promise<PlaybackStream> {
   const videoId = await findYoutubeStandIn(track, signal);
   if (!videoId) throw new Error("No matching YouTube track found");
   log("cyan", "playback", `playing youtube stand-in ${videoId} for "${track.title}"`);
-  return fromInnertubeStream(await resolveDirectAudioStream(videoId, { signal }));
+  return fromInnertubeStream(await resolveDirectAudioStream(videoId, { signal, maxBitrate }));
 }
 
-async function resolveSoundCloud(track: PlayableTrack, signal?: AbortSignal): Promise<PlaybackStream> {
+async function resolveSoundCloud(
+  track: PlayableTrack,
+  signal?: AbortSignal,
+  maxBitrate?: number,
+): Promise<PlaybackStream> {
   try {
     return fromSoundCloudStream(await resolveSoundCloudStream(track.id, { signal }));
   } catch (soundCloudError) {
     if (isAbortError(soundCloudError, signal)) throw soundCloudError;
     log("yellow", "playback", `soundcloud resolution failed, searching youtube: ${String(soundCloudError)}`);
     try {
-      return await resolveYoutubeStandIn(track, signal);
+      return await resolveYoutubeStandIn(track, signal, maxBitrate);
     } catch (standInError) {
       if (isAbortError(standInError, signal)) throw standInError;
       throw soundCloudError;
@@ -34,8 +54,17 @@ async function resolveSoundCloud(track: PlayableTrack, signal?: AbortSignal): Pr
   }
 }
 
-export async function resolvePlaybackStream(track: PlayableTrack, signal?: AbortSignal): Promise<PlaybackStream> {
-  if (toSoundCloudTrackId(track.id)) return resolveSoundCloud(track, signal);
-  if (toVideoId(track.id)) return fromInnertubeStream(await resolveDirectAudioStream(track.id, { signal }));
-  return resolveYoutubeStandIn(track, signal);
+export async function resolvePlaybackStream(
+  track: PlayableTrack,
+  signal?: AbortSignal,
+  quality?: "low" | "standard" | "high" | "lossless",
+): Promise<PlaybackStream> {
+  const maxBitrate = maxBitrateForQuality(quality);
+  if (toSoundCloudTrackId(track.id)) return resolveSoundCloud(track, signal, maxBitrate);
+  if (toVideoId(track.id)) {
+    return fromInnertubeStream(
+      await resolveDirectAudioStream(track.id, { signal, maxBitrate }),
+    );
+  }
+  return resolveYoutubeStandIn(track, signal, maxBitrate);
 }

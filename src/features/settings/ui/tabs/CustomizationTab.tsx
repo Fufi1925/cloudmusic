@@ -17,12 +17,17 @@ import {
 } from "../controls";
 import {
   useCustomizationStore,
+  GLASS_PRESETS,
   MIN_OPACITY,
   MAX_OPACITY,
   MIN_BLUR,
   MAX_BLUR,
   MIN_DIM,
   MAX_DIM,
+  MIN_SATURATION,
+  MAX_SATURATION,
+  type BackgroundFit,
+  type GlassPresetId,
 } from "../../store/customizationStore";
 
 const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
@@ -35,10 +40,14 @@ export function CustomizationTab({ searchQuery }: { searchQuery?: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeBlock, setActiveBlock] = useState<BlockTarget>("contentView");
   const [isDragOver, setIsDragOver] = useState(false);
+  const [urlDraft, setUrlDraft] = useState("");
 
   const backgroundImage = useCustomizationStore((s) => s.backgroundImage);
   const backgroundBlur = useCustomizationStore((s) => s.backgroundBlur);
   const backgroundDim = useCustomizationStore((s) => s.backgroundDim);
+  const backgroundFit = useCustomizationStore((s) => s.backgroundFit);
+  const backgroundSaturation = useCustomizationStore((s) => s.backgroundSaturation);
+  const backgroundKenBurns = useCustomizationStore((s) => s.backgroundKenBurns);
   const sidebar = useCustomizationStore((s) => s.sidebar);
   const contentView = useCustomizationStore((s) => s.contentView);
   const miniplayer = useCustomizationStore((s) => s.miniplayer);
@@ -46,6 +55,10 @@ export function CustomizationTab({ searchQuery }: { searchQuery?: string }) {
   const setBackgroundImage = useCustomizationStore((s) => s.setBackgroundImage);
   const setBackgroundBlur = useCustomizationStore((s) => s.setBackgroundBlur);
   const setBackgroundDim = useCustomizationStore((s) => s.setBackgroundDim);
+  const setBackgroundFit = useCustomizationStore((s) => s.setBackgroundFit);
+  const setBackgroundSaturation = useCustomizationStore((s) => s.setBackgroundSaturation);
+  const setBackgroundKenBurns = useCustomizationStore((s) => s.setBackgroundKenBurns);
+  const applyGlassPreset = useCustomizationStore((s) => s.applyGlassPreset);
   const setBlockConfig = useCustomizationStore((s) => s.setBlockConfig);
   const applyToAllBlocks = useCustomizationStore((s) => s.applyToAllBlocks);
   const resetBlock = useCustomizationStore((s) => s.resetBlock);
@@ -112,6 +125,17 @@ export function CustomizationTab({ searchQuery }: { searchQuery?: string }) {
     }
   };
 
+  const applyUrl = () => {
+    const url = urlDraft.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      toast(t("settings.customization.url_invalid"), "error");
+      return;
+    }
+    setBackgroundImage(url);
+    setUrlDraft("");
+    toast(t("settings.customization.applied"), "success");
+  };
+
   const currentBlockConfig =
     activeBlock === "sidebar"
       ? sidebar
@@ -141,15 +165,46 @@ export function CustomizationTab({ searchQuery }: { searchQuery?: string }) {
           descKey="settings.customization.wallpaper_description"
           searchQuery={searchQuery}
         >
+          <div className="flex items-center gap-[8px] max-md:flex-col max-md:items-stretch">
+            <input
+              type="url"
+              value={urlDraft}
+              onChange={(e) => setUrlDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") applyUrl();
+              }}
+              placeholder={t("settings.customization.url_placeholder")}
+              className="h-[34px] min-w-0 flex-1 rounded-lg border border-border-primary/60 bg-border-alpha-10 px-[10px] text-[12.5px] text-text-primary outline-none placeholder:text-text-tertiary focus:border-text-tertiary"
+              style={font}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className="!h-[34px] !px-[12px] !text-[12.5px] shrink-0"
+              onClick={applyUrl}
+            >
+              <Upload2Line size={14} />
+              {t("settings.customization.url_apply")}
+            </Button>
+          </div>
+
           {backgroundImage ? (
             <div className="flex flex-col gap-[12px] rounded-xl border border-border-primary/60 bg-border-alpha-14 p-[12px]">
               <div className="relative h-[120px] w-full overflow-hidden rounded-lg bg-black/40">
                 <img
                   src={backgroundImage}
                   alt="Window Background"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full"
                   style={{
-                    filter: backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : undefined,
+                    objectFit: backgroundFit === "tile" ? "cover" : backgroundFit,
+                    filter: [
+                      backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : null,
+                      backgroundSaturation !== 100
+                        ? `saturate(${backgroundSaturation}%)`
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" ") || undefined,
                   }}
                 />
                 {backgroundDim > 0 && (
@@ -212,6 +267,53 @@ export function CustomizationTab({ searchQuery }: { searchQuery?: string }) {
                   />
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-[16px] max-md:grid-cols-1 max-md:gap-[12px]">
+                <div className="flex flex-col gap-[6px]">
+                  <span className="text-text-secondary text-[12px]" style={font}>
+                    {t("settings.customization.wallpaper_fit")}
+                  </span>
+                  <SegmentedControl<BackgroundFit>
+                    ariaLabel={t("settings.customization.wallpaper_fit")}
+                    value={backgroundFit}
+                    onChange={setBackgroundFit}
+                    options={[
+                      { value: "cover", label: t("settings.customization.fit_cover") },
+                      { value: "contain", label: t("settings.customization.fit_contain") },
+                      { value: "tile", label: t("settings.customization.fit_tile") },
+                    ]}
+                  />
+                </div>
+                <div className="flex flex-col gap-[4px]">
+                  <span className="text-text-secondary text-[12px]" style={font}>
+                    {t("settings.customization.wallpaper_saturation")}
+                  </span>
+                  <Slider
+                    value={backgroundSaturation}
+                    onChange={setBackgroundSaturation}
+                    min={MIN_SATURATION}
+                    max={MAX_SATURATION}
+                    unit="%"
+                    ariaLabel={t("settings.customization.wallpaper_saturation")}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-[12px] max-md:flex-col max-md:items-stretch max-md:gap-[8px]">
+                <div className="flex flex-col gap-[2px] min-w-0">
+                  <span className="text-text-primary text-[13px] font-[500]" style={font}>
+                    {t("settings.customization.wallpaper_motion")}
+                  </span>
+                  <span className="text-text-tertiary text-[11.5px]" style={font}>
+                    {t("settings.customization.wallpaper_motion_desc")}
+                  </span>
+                </div>
+                <ToggleSwitch
+                  checked={backgroundKenBurns}
+                  onChange={setBackgroundKenBurns}
+                  ariaLabel={t("settings.customization.wallpaper_motion")}
+                />
+              </div>
             </div>
           ) : (
             <div
@@ -257,6 +359,29 @@ export function CustomizationTab({ searchQuery }: { searchQuery?: string }) {
           searchQuery={searchQuery}
         >
           <div className="flex flex-col gap-[14px]">
+            {/* One-click glass presets for all three blocks */}
+            <div className="flex flex-col gap-[6px]">
+              <span className="text-text-secondary text-[12px]" style={font}>
+                {t("settings.customization.presets")}
+              </span>
+              <div className="flex flex-wrap items-center gap-[6px]">
+                {(Object.keys(GLASS_PRESETS) as GlassPresetId[]).map((preset) => (
+                  <Button
+                    key={preset}
+                    variant="secondary"
+                    size="sm"
+                    className="!h-[30px] !px-[12px] !text-[12px]"
+                    onClick={() => {
+                      applyGlassPreset(preset);
+                      toast(t("settings.customization.preset_applied"), "success");
+                    }}
+                  >
+                    {t(`settings.customization.preset_${preset}`)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
             {/* Block Target Selector */}
             <div className="flex items-center justify-between max-md:flex-col max-md:items-stretch max-md:gap-[10px]">
               <SegmentedControl<BlockTarget>

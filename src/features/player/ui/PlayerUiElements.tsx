@@ -11,7 +11,7 @@ import {
   RepeatOne,
   Shuffle,
 } from "@solar-icons/react";
-import { HeartFill, HeartLine } from "@mingcute/react";
+import { HeartFill, HeartLine, MoonFill, CloseLine } from "@mingcute/react";
 import {
   PlayerMorphIcon,
   ICON_PLAY,
@@ -27,6 +27,10 @@ import { useCoverReady, CoverImage } from "@/features/covers";
 import ExplicitBadge from "@/shared/ui/ExplicitBadge";
 import { VolumePicker } from "./VolumePicker";
 import { TimelineSlider } from "./TimelineSlider";
+import {
+  formatSleepTimerRemaining,
+  useSleepTimerRemaining,
+} from "../hooks/useSleepTimer";
 
 import { useTranslation } from "@/languages";
 
@@ -107,6 +111,8 @@ export function PlayerUiElements({
   const isCoverLoaded = useCoverReady(coverUrl);
 
   const { t } = useTranslation();
+
+  const sleepTimerRemaining = useSleepTimerRemaining();
 
   return (
     <>
@@ -212,6 +218,22 @@ export function PlayerUiElements({
           </p>
         </div>
       </div>
+
+      {/* Sleep timer countdown: tap to cancel, sits right under the track info */}
+      {sleepTimerRemaining !== null && (
+        <button
+          type="button"
+          onClick={() => playerEngine.cancelSleepTimer()}
+          aria-label={t("settings.sleep_timer.cancel")}
+          title={t("settings.sleep_timer.cancel")}
+          className="inline-flex h-[28px] items-center gap-[7px] rounded-full border border-white/12 bg-white/[0.07] px-[11px] text-[12px] font-[550] text-white/80 transition-colors active:bg-white/[0.14] hover:text-white"
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          <MoonFill size={13} className="text-white/70" />
+          <span>{formatSleepTimerRemaining(sleepTimerRemaining)}</span>
+          <CloseLine size={12} className="text-white/45" />
+        </button>
+      )}
 
       {/* Timeline (Compact, with smooth spring pill, no thumb) */}
       <TimelineSlider

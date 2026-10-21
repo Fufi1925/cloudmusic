@@ -268,6 +268,7 @@ class PlayerEngine {
   private consecutiveAutoSkips = 0;
   private lastPreloadKey: string | null = null;
   private inFlightLyricsPrefetches = new Map<string, Promise<void>>();
+  private sleepTimerInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     usePlayerStore.setState({
@@ -290,6 +291,13 @@ class PlayerEngine {
 
       window.addEventListener("beforeunload", () => {
         this.telemetry.flushCurrentTrack();
+      });
+
+      // a throttled/suspended WebView may miss timer ticks; re-check on wake
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          this.checkSleepTimer();
+        }
       });
 
       let prevTrackId: string | null =
@@ -784,6 +792,48 @@ class PlayerEngine {
     usePlayerStore.getState().resetSpeedAndPitch();
   }
 
+  /**
+   * Sleep timer: pauses playback (with a soft fade) once the deadline is
+   * reached. The deadline lives in the store so the UI can render a countdown.
+   */
+  public startSleepTimer(durationMs: number): void {
+    usePlayerStore.getState().startSleepTimer(durationMs);
+    this.clearSleepTimerTicker();
+    this.sleepTimerInterval = setInterval(() => this.checkSleepTimer(), 1000);
+    this.checkSleepTimer();
+  }
+
+  public cancelSleepTimer(): void {
+    this.clearSleepTimerTicker();
+    usePlayerStore.getState().cancelSleepTimer();
+  }
+
+  private clearSleepTimerTicker(): void {
+    if (this.sleepTimerInterval !== null) {
+      clearInterval(this.sleepTimerInterval);
+      this.sleepTimerInterval = null;
+    }
+  }
+
+  private checkSleepTimer(): void {
+    const state = usePlayerStore.getState();
+    if (state.sleepTimerEndsAt === null) {
+      this.clearSleepTimerTicker();
+      return;
+    }
+    if (Date.now() < state.sleepTimerEndsAt) return;
+
+    this.clearSleepTimerTicker();
+    state.cancelSleepTimer();
+    if (playerRuntime) {
+      playerRuntime.fadeOutAndPause(4000);
+    } else {
+      this.pause();
+    }
+    const translate = createTranslatorSync(getStoredLocale());
+    showToast(translate("settings.sleep_timer.finished"), "info");
+  }
+
   public setRepeat(mode: RepeatMode): void {
     usePlayerStore.getState().setRepeat(mode);
   }
@@ -1134,7 +1184,8 @@ class PlayerEngine {
 
     void cloudMusicDb.putTrack(nextTrack);
 
-    if (playerRuntime) {
+    // gapless off: cover/lyrics are still warmed, only the audio buffer is skipped
+    if (playerRuntime && state.gaplessPlayback !== false) {
       void playerRuntime.preloadTrack(nextTrack);
     }
   }

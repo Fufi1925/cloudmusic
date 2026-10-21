@@ -535,6 +535,22 @@
       "remove_button": "Entfernen",
       "wallpaper_blur": "Hintergrund-Unschärfe",
       "wallpaper_dim": "Hintergrund abdunkeln",
+      "url_placeholder": "https://example.com/hintergrund.jpg",
+      "url_apply": "URL übernehmen",
+      "url_invalid": "Bitte eine gültige http(s)-Bild-URL eingeben",
+      "wallpaper_fit": "Hintergrund-Anpassung",
+      "fit_cover": "Füllen",
+      "fit_contain": "Einpassen",
+      "fit_tile": "Kacheln",
+      "wallpaper_saturation": "Farbintensität",
+      "wallpaper_motion": "Sanfte Hintergrundbewegung",
+      "wallpaper_motion_desc": "Zoomt und schwenkt den Hintergrund langsam (Ken-Burns-Effekt).",
+      "presets": "Glas-Presets",
+      "preset_off": "Keine",
+      "preset_soft": "Sanft",
+      "preset_glass": "Glas",
+      "preset_strong": "Stark",
+      "preset_applied": "Preset angewendet",
       "blocks_title": "Glas-Effekte für einzelne Bereiche",
       "blocks_description": "Passe Transparenz, Hintergrundunschärfe und Abdunklung für jeden Bereich der Oberfläche an.",
       "block_sidebar": "Seitenleiste",
@@ -755,14 +771,58 @@
         "title": "Aktuellen Titel herunterladen",
         "description": "Lädt den aktuell wiedergegebenen Titel als MP3-Datei herunter."
       },
-      "low": "Niedrige Qualität (Datensparmodus)",
-      "standard": "Standardqualität (Opus 64kbps / MP3 128kbps)",
-      "high": "Hohe Qualität (AAC 256kbps)",
+      "low": "Niedrig (bis 96 kbit/s)",
+      "standard": "Standard (bis 160 kbit/s)",
+      "high": "Hoch (bestes Format)",
       "lossless": "Verlustfrei (FLAC/ALAC) – derzeit nicht verfügbar",
       "equalizer_title": "Equalizer",
 
-      "equalizer_description": "10-Band-Grafik-EQ mit Presets. Auch direkt in der Player-Leiste."
+      "equalizer_description": "10-Band-Grafik-EQ mit Presets. Auch direkt in der Player-Leiste.",
+      "quality_hint_low": "Datensparmodus – begrenzt den Stream auf ca. 96 kbit/s.",
+      "quality_hint_standard": "Ausgewogen – begrenzt den Stream auf ca. 160 kbit/s.",
+      "quality_hint_high": "Bestes verfügbares Format, meist 160–256 kbit/s (Opus/AAC).",
+      "crossfade": {
+        "title": "Überblenden",
+        "description": "Den aktuellen Titel aus- und den nächsten einblenden, statt hart zu schneiden.",
+        "off": "Aus"
+      },
+      "gapless": {
+        "title": "Lückenlose Wiedergabe",
+        "description": "Lädt den nächsten Titel vor, damit beim Wechsel keine Pause entsteht."
+      },
+      "normalization": {
+        "title": "Lautheits-Normalisierung",
+        "description": "Gleicht leise und laute Titel mit einer langsamen automatischen Verstärkung an."
+      },
+      "normalization_level": {
+        "title": "Normalisierungsstufe",
+        "description": "Ziel-Lautstärke für die automatische Verstärkung.",
+        "quiet": "Leise",
+        "balanced": "Ausgewogen",
+        "loud": "Laut"
+      },
+      "balance": {
+        "title": "Kanal-Balance",
+        "description": "Verschiebt das Stereobild nach links oder rechts.",
+        "center": "Mitte",
+        "left": "L {value}",
+        "right": "R {value}"
+      },
+      "reset": {
+        "title": "Audioeinstellungen zurücksetzen",
+        "description": "Setzt Qualität, Überblenden, Normalisierung, Balance und Equalizer auf Standard.",
+        "done": "Audioeinstellungen zurückgesetzt"
+      }
 
+    },
+    "sleep_timer": {
+      "title": "Sleep-Timer",
+      "description": "Pausiert die Wiedergabe automatisch nach der gewählten Zeit.",
+      "remaining": "Pause in {time}",
+      "off": "Aus",
+      "minutes": "{count} Min.",
+      "cancel": "Sleep-Timer abbrechen",
+      "finished": "Sleep-Timer: Wiedergabe pausiert"
     },
     "profile": {
       "title": "Profil",

@@ -9,10 +9,19 @@ export interface BlockCustomization {
   dim: number;
 }
 
+export type BackgroundFit = "cover" | "contain" | "tile";
+export type GlassPresetId = "off" | "soft" | "glass" | "strong";
+
 export interface CustomizationState {
   backgroundImage: string | null;
   backgroundBlur: number;
   backgroundDim: number;
+  /** how the wallpaper fills the window: crop, letterbox or tile it */
+  backgroundFit: BackgroundFit;
+  /** 0-200 %, 100 keeps the original colours */
+  backgroundSaturation: number;
+  /** slow zoom/pan over the wallpaper */
+  backgroundKenBurns: boolean;
   sidebar: BlockCustomization;
   contentView: BlockCustomization;
   miniplayer: BlockCustomization;
@@ -20,6 +29,10 @@ export interface CustomizationState {
   setBackgroundImage: (image: string | null) => void;
   setBackgroundBlur: (blur: number) => void;
   setBackgroundDim: (dim: number) => void;
+  setBackgroundFit: (fit: BackgroundFit) => void;
+  setBackgroundSaturation: (saturation: number) => void;
+  setBackgroundKenBurns: (enabled: boolean) => void;
+  applyGlassPreset: (preset: GlassPresetId) => void;
   setBlockConfig: (
     block: "sidebar" | "contentView" | "miniplayer",
     patch: Partial<BlockCustomization>,
@@ -47,6 +60,17 @@ export const DEFAULT_GLASS_CONFIG: BlockCustomization = {
   blur: 20,
   dim: 15,
 };
+
+/** one-click looks for the three interface blocks */
+export const GLASS_PRESETS: Record<GlassPresetId, BlockCustomization> = {
+  off: { ...DEFAULT_BLOCK_CONFIG },
+  soft: { opacity: 85, blur: 14, dim: 10 },
+  glass: { ...DEFAULT_GLASS_CONFIG },
+  strong: { opacity: 40, blur: 32, dim: 28 },
+};
+
+export const MIN_SATURATION = 0;
+export const MAX_SATURATION = 200;
 
 const DB_NAME = "cloudmusic_customization_db";
 const STORE_NAME = "wallpapers";
@@ -145,6 +169,9 @@ export const useCustomizationStore = create<CustomizationState>()(
       backgroundImage: null,
       backgroundBlur: 0,
       backgroundDim: 0,
+      backgroundFit: "cover",
+      backgroundSaturation: 100,
+      backgroundKenBurns: false,
       sidebar: { ...DEFAULT_BLOCK_CONFIG },
       contentView: { ...DEFAULT_BLOCK_CONFIG },
       miniplayer: { ...DEFAULT_BLOCK_CONFIG },
@@ -179,6 +206,7 @@ export const useCustomizationStore = create<CustomizationState>()(
           set({
             backgroundBlur: 0,
             backgroundDim: 0,
+            backgroundKenBurns: false,
             sidebar: { ...DEFAULT_BLOCK_CONFIG },
             contentView: { ...DEFAULT_BLOCK_CONFIG },
             miniplayer: { ...DEFAULT_BLOCK_CONFIG },
@@ -194,6 +222,27 @@ export const useCustomizationStore = create<CustomizationState>()(
       setBackgroundDim: (dim) => {
         const clamped = Math.max(0, Math.min(85, Math.round(dim)));
         set({ backgroundDim: clamped });
+      },
+
+      setBackgroundFit: (backgroundFit) => set({ backgroundFit }),
+
+      setBackgroundSaturation: (saturation) => {
+        const clamped = Math.max(
+          MIN_SATURATION,
+          Math.min(MAX_SATURATION, Math.round(saturation)),
+        );
+        set({ backgroundSaturation: clamped });
+      },
+
+      setBackgroundKenBurns: (backgroundKenBurns) => set({ backgroundKenBurns }),
+
+      applyGlassPreset: (preset) => {
+        const config = GLASS_PRESETS[preset] ?? DEFAULT_GLASS_CONFIG;
+        set({
+          sidebar: { ...config },
+          contentView: { ...config },
+          miniplayer: { ...config },
+        });
       },
 
       setBlockConfig: (block, patch) => {
@@ -233,6 +282,9 @@ export const useCustomizationStore = create<CustomizationState>()(
           backgroundImage: null,
           backgroundBlur: 0,
           backgroundDim: 0,
+          backgroundFit: "cover",
+          backgroundSaturation: 100,
+          backgroundKenBurns: false,
           sidebar: { ...DEFAULT_BLOCK_CONFIG },
           contentView: { ...DEFAULT_BLOCK_CONFIG },
           miniplayer: { ...DEFAULT_BLOCK_CONFIG },
@@ -245,6 +297,9 @@ export const useCustomizationStore = create<CustomizationState>()(
       partialize: (state) => ({
         backgroundBlur: state.backgroundBlur,
         backgroundDim: state.backgroundDim,
+        backgroundFit: state.backgroundFit,
+        backgroundSaturation: state.backgroundSaturation,
+        backgroundKenBurns: state.backgroundKenBurns,
         sidebar: state.sidebar,
         contentView: state.contentView,
         miniplayer: state.miniplayer,
@@ -254,6 +309,23 @@ export const useCustomizationStore = create<CustomizationState>()(
         state.sidebar = clampBlockConfig(state.sidebar || {});
         state.contentView = clampBlockConfig(state.contentView || {});
         state.miniplayer = clampBlockConfig(state.miniplayer || {});
+        if (
+          state.backgroundFit !== "cover" &&
+          state.backgroundFit !== "contain" &&
+          state.backgroundFit !== "tile"
+        ) {
+          state.backgroundFit = "cover";
+        }
+        if (typeof state.backgroundSaturation !== "number" || isNaN(state.backgroundSaturation)) {
+          state.backgroundSaturation = 100;
+        }
+        state.backgroundSaturation = Math.max(
+          MIN_SATURATION,
+          Math.min(MAX_SATURATION, Math.round(state.backgroundSaturation)),
+        );
+        if (typeof state.backgroundKenBurns !== "boolean") {
+          state.backgroundKenBurns = false;
+        }
         void loadPersistedWallpaper().then((img) => {
           if (img) {
             useCustomizationStore.setState({ backgroundImage: img });

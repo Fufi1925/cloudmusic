@@ -72,6 +72,22 @@ describe("audio format selection", () => {
   it("returns null when there are no direct audio formats", () => {
     expect(selectBestAudioFormat([])).toBeNull();
   });
+
+  it("honours the quality cap by dropping formats above it", () => {
+    const high: AudioFormat = { ...opus, itag: 141, bitrate: 256_000 };
+    // 96 kbit/s cap: only the low 249 format survives
+    expect(selectBestAudioFormat([low, aac, opus, high], undefined, 96_000)?.itag).toBe(249);
+    // 170 kbit/s cap: opus 251 + aac 140 pass, the 256 kbit/s format does not
+    expect(selectBestAudioFormat([low, aac, opus, high], undefined, 170_000)?.itag).toBe(251);
+    expect(selectBestAudioFormat([low, aac, high], undefined, 170_000)?.itag).toBe(140);
+    // no cap keeps the normal preference order
+    expect(selectBestAudioFormat([low, aac, opus, high])?.itag).toBe(251);
+  });
+
+  it("falls back to the full list when the cap would leave nothing playable", () => {
+    const tiny: AudioFormat = { ...opus, itag: 249, bitrate: 50_000 };
+    expect(selectBestAudioFormat([tiny], undefined, 10_000)?.itag).toBe(249);
+  });
 });
 
 describe("resolveDirectAudioStream", () => {

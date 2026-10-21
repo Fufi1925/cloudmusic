@@ -12,6 +12,7 @@ export type MiniPlayerStyle = "default" | "rounded";
 export type AudioQuality = "low" | "standard" | "high" | "lossless";
 export type TrackDoubleClickBehavior = "play" | "queue";
 export type DefaultPlaybackContext = "resume" | "empty";
+export type NormalizationLevel = "quiet" | "balanced" | "loud";
 export type AccentVariant =
   | "default"
   | "spotify"
@@ -67,6 +68,19 @@ export interface SessionState {
   /** 10-band graphic equaliser (see engine/eqMath) */
   eqEnabled: boolean;
   eqBands: number[];
+  /** seconds of fade out / fade in between tracks (0 = hard cut) */
+  crossfadeSeconds: number;
+  /** preload the next queue item so track changes have no silent gap */
+  gaplessPlayback: boolean;
+  /** gentle auto gain (rms based) so quiet and loud tracks sit at one level */
+  normalizeVolume: boolean;
+  normalizationLevel: NormalizationLevel;
+  /** -1 = full left, 0 = centre, 1 = full right */
+  channelBalance: number;
+  /** epoch ms at which the sleep timer pauses playback (null = off) */
+  sleepTimerEndsAt: number | null;
+  /** total duration of the running sleep timer, for the countdown ring */
+  sleepTimerDurationMs: number | null;
 }
 
 export type PlayerState = TransportState &
@@ -124,9 +138,23 @@ export interface PlayerStore extends PlayerState {
   setEqEnabled: (enabled: boolean) => void;
   setEqBand: (index: number, db: number) => void;
   setEqBands: (bands: readonly number[]) => void;
+  setCrossfadeSeconds: (seconds: number) => void;
+  setGaplessPlayback: (value: boolean) => void;
+  setNormalizeVolume: (value: boolean) => void;
+  setNormalizationLevel: (level: NormalizationLevel) => void;
+  setChannelBalance: (balance: number) => void;
+  startSleepTimer: (durationMs: number) => void;
+  cancelSleepTimer: () => void;
   resetSpeedAndPitch: () => void;
   clearQueue: () => void;
 }
+
+export const CROSSFADE_MAX_SECONDS = 12;
+export const NORMALIZATION_TARGET_DB: Record<NormalizationLevel, number> = {
+  quiet: -20,
+  balanced: -16,
+  loud: -12,
+};
 
 const PLAYER_SESSION_STORAGE_KEY = "cloudmusic_player_session_v2";
 
@@ -169,6 +197,13 @@ export const usePlayerStore = create<PlayerStore>()(
       reverbLevel: 0.35,
       eqEnabled: false,
       eqBands: new Array<number>(EQ_BAND_COUNT).fill(0),
+      crossfadeSeconds: 0,
+      gaplessPlayback: true,
+      normalizeVolume: false,
+      normalizationLevel: "balanced",
+      channelBalance: 0,
+      sleepTimerEndsAt: null,
+      sleepTimerDurationMs: null,
 
       dispatch: () => {
         // Implementation injected by PlayerEngine
@@ -227,6 +262,26 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ eqBands: next });
       },
       setEqBands: (bands: readonly number[]) => set({ eqBands: normalizeBands(bands) }),
+      setCrossfadeSeconds: (seconds) =>
+        set({
+          crossfadeSeconds: Math.max(
+            0,
+            Math.min(CROSSFADE_MAX_SECONDS, Math.round(seconds)),
+          ),
+        }),
+      setGaplessPlayback: (gaplessPlayback: boolean) => set({ gaplessPlayback }),
+      setNormalizeVolume: (normalizeVolume: boolean) => set({ normalizeVolume }),
+      setNormalizationLevel: (normalizationLevel: NormalizationLevel) =>
+        set({ normalizationLevel }),
+      setChannelBalance: (balance) =>
+        set({ channelBalance: Math.max(-1, Math.min(1, balance)) }),
+      startSleepTimer: (durationMs) =>
+        set({
+          sleepTimerEndsAt: Date.now() + Math.max(1000, Math.round(durationMs)),
+          sleepTimerDurationMs: Math.max(1000, Math.round(durationMs)),
+        }),
+      cancelSleepTimer: () =>
+        set({ sleepTimerEndsAt: null, sleepTimerDurationMs: null }),
       resetSpeedAndPitch: () => set({ playbackRate: 1, pitchSemitones: 0 }),
       clearQueue: () => {
         const state = get();
@@ -300,6 +355,32 @@ export const usePlayerStore = create<PlayerStore>()(
             state.eqEnabled = false;
           }
           state.eqBands = normalizeBands(state.eqBands);
+          if (typeof state.crossfadeSeconds !== "number" || isNaN(state.crossfadeSeconds)) {
+            state.crossfadeSeconds = 0;
+          }
+          state.crossfadeSeconds = Math.max(
+            0,
+            Math.min(CROSSFADE_MAX_SECONDS, Math.round(state.crossfadeSeconds)),
+          );
+          if (typeof state.gaplessPlayback !== "boolean") {
+            state.gaplessPlayback = true;
+          }
+          if (typeof state.normalizeVolume !== "boolean") {
+            state.normalizeVolume = false;
+          }
+          if (
+            state.normalizationLevel !== "quiet" &&
+            state.normalizationLevel !== "balanced" &&
+            state.normalizationLevel !== "loud"
+          ) {
+            state.normalizationLevel = "balanced";
+          }
+          if (typeof state.channelBalance !== "number" || isNaN(state.channelBalance)) {
+            state.channelBalance = 0;
+          }
+          // the sleep timer never survives a reload
+          state.sleepTimerEndsAt = null;
+          state.sleepTimerDurationMs = null;
         }
       },
       partialize: (state) => ({
@@ -333,6 +414,11 @@ export const usePlayerStore = create<PlayerStore>()(
         reverbLevel: state.reverbLevel,
         eqEnabled: state.eqEnabled,
         eqBands: state.eqBands,
+        crossfadeSeconds: state.crossfadeSeconds,
+        gaplessPlayback: state.gaplessPlayback,
+        normalizeVolume: state.normalizeVolume,
+        normalizationLevel: state.normalizationLevel,
+        channelBalance: state.channelBalance,
       }),
     },
   ),

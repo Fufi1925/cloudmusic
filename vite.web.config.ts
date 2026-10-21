@@ -16,5 +16,7 @@ export default defineConfig({
       "next/image": path.resolve(import.meta.dirname, "./src/components/ui/AppImage.tsx"),
     },
   },
-  server: { host: "0.0.0.0", port: 5199, strictPort: true },
+  // ".e2b.app" keeps the sandbox live preview working when the dev server is
+  // proxied under a *.e2b.app hostname.
+  server: { host: "0.0.0.0", port: 5199, strictPort: true, allowedHosts: [".e2b.app"] },
 });

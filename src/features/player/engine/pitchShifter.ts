@@ -223,6 +223,12 @@ interface AudioEffectsGraph {
   /** anti-clipping gain in front of the eq bands */
   eqPreamp: GainNode;
   eqFilters: BiquadFilterNode[];
+  /** stereo balance, sits after the eq chain */
+  balanceNode: AudioNode;
+  /** auto gain for loudness normalisation (unity when disabled) */
+  normalizeGain: GainNode;
+  /** taps the pre-normalisation signal for the rms measurement */
+  analyser: AnalyserNode;
 }
 
 export interface AudioEffectsParams {
@@ -232,6 +238,9 @@ export interface AudioEffectsParams {
   reverbLevel?: number;
   eqEnabled?: boolean;
   eqBands?: readonly number[];
+  channelBalance?: number;
+  normalizeVolume?: boolean;
+  normalizationTargetDb?: number;
 }
 
 export class PitchShifterController {
@@ -239,6 +248,10 @@ export class PitchShifterController {
   private sourceNode: MediaElementAudioSourceNode | null = null;
   private graph: AudioEffectsGraph | null = null;
   private isConnected = false;
+  private normalizeTimer: ReturnType<typeof setInterval> | null = null;
+  private normalizeSample: Float32Array<ArrayBuffer> | null = null;
+  private normalizeTargetDb = -16;
+  private normalizeGainDb = 0;
 
   public attach(audio: HTMLAudioElement): void {
     if (typeof window === "undefined") return;
@@ -302,6 +315,9 @@ export class PitchShifterController {
           g.masterDryGain &&
           g.shifter &&
           g.eqPreamp &&
+          g.balanceNode &&
+          g.normalizeGain &&
+          g.analyser &&
           Array.isArray(g.eqFilters) &&
           g.eqFilters.length === EQ_BAND_COUNT
         );
@@ -328,6 +344,9 @@ export class PitchShifterController {
             (graph as any).reverbWetGain?.disconnect();
             (graph as any).eqPreamp?.disconnect();
             for (const f of (graph as any).eqFilters ?? []) f?.disconnect?.();
+            (graph as any).balanceNode?.disconnect?.();
+            (graph as any).normalizeGain?.disconnect?.();
+            (graph as any).analyser?.disconnect?.();
           } catch {}
         }
         delete audioObj.__cloudmusic_pitch_graph;
@@ -404,7 +423,24 @@ export class PitchShifterController {
           eqTail.connect(filter);
           eqTail = filter;
         }
-        eqTail.connect(ctx.destination);
+
+        // Balance + loudness normalisation sit at the very end of the chain so
+        // they act on everything the player renders (stream, cache, effects).
+        const balanceNode: AudioNode =
+          typeof (ctx as any).createStereoPanner === "function"
+            ? (ctx as any).createStereoPanner()
+            : ctx.createGain();
+        const normalizeGain = ctx.createGain();
+        normalizeGain.gain.value = 1.0;
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0.4;
+
+        eqTail.connect(balanceNode);
+        balanceNode.connect(normalizeGain);
+        normalizeGain.connect(ctx.destination);
+        // measurement tap: no path to the speakers, so it can never feedback
+        eqTail.connect(analyser);
 
         graph = {
           ctx,
@@ -421,6 +457,9 @@ export class PitchShifterController {
           reverbWetGain,
           eqPreamp,
           eqFilters,
+          balanceNode,
+          normalizeGain,
+          analyser,
         };
 
         audioObj.__cloudmusic_pitch_graph = graph;
@@ -474,6 +513,9 @@ export class PitchShifterController {
     let reverbLevel = 0.35;
     let eqEnabled = false;
     let eqBands: readonly number[] = [];
+    let channelBalance = 0;
+    let normalizeVolume = false;
+    let normalizationTargetDb = -16;
 
     if (typeof arg1 === "object" && arg1 !== null) {
       semitones = arg1.pitchSemitones ?? 0;
@@ -482,6 +524,9 @@ export class PitchShifterController {
       reverbLevel = arg1.reverbLevel ?? 0.35;
       eqEnabled = arg1.eqEnabled ?? false;
       eqBands = arg1.eqBands ?? [];
+      channelBalance = arg1.channelBalance ?? 0;
+      normalizeVolume = arg1.normalizeVolume ?? false;
+      normalizationTargetDb = arg1.normalizationTargetDb ?? -16;
     } else {
       semitones = typeof arg1 === "number" ? arg1 : 0;
       isPitchLinked = arg2 ?? true;
@@ -519,6 +564,82 @@ export class PitchShifterController {
     this.graph.eqFilters.forEach((filter, i) => {
       filter.gain.setTargetAtTime(eqActive ? eqBands[i] : 0, now, 0.03);
     });
+
+    // Stereo balance (falls back to a plain gain when panning is unsupported)
+    const panner = this.graph.balanceNode as Partial<StereoPannerNode>;
+    if (panner.pan && typeof panner.pan.setTargetAtTime === "function") {
+      panner.pan.setTargetAtTime(
+        Math.max(-1, Math.min(1, channelBalance)),
+        now,
+        0.03,
+      );
+    }
+
+    // Loudness normalisation: measured rms drives a slow auto gain
+    if (normalizeVolume) {
+      this.startNormalization(normalizationTargetDb);
+    } else {
+      this.stopNormalization();
+    }
+  }
+
+  private startNormalization(targetDb: number): void {
+    if (!this.graph) return;
+    this.normalizeTargetDb = targetDb;
+    if (this.normalizeTimer !== null) return;
+    this.normalizeGainDb = 0;
+    this.graph.normalizeGain.gain.setTargetAtTime(
+      1,
+      this.graph.ctx.currentTime,
+      0.05,
+    );
+    this.normalizeTimer = setInterval(() => this.tickNormalization(), 400);
+  }
+
+  private stopNormalization(): void {
+    if (this.normalizeTimer !== null) {
+      clearInterval(this.normalizeTimer);
+      this.normalizeTimer = null;
+    }
+    this.normalizeGainDb = 0;
+    if (this.graph) {
+      this.graph.normalizeGain.gain.setTargetAtTime(
+        1,
+        this.graph.ctx.currentTime,
+        0.08,
+      );
+    }
+  }
+
+  /** one measurement pass: rms -> needed gain, moved slowly to avoid pumping */
+  private tickNormalization(): void {
+    const graph = this.graph;
+    if (!graph) return;
+    const analyser = graph.analyser;
+    if (!this.normalizeSample || this.normalizeSample.length !== analyser.fftSize) {
+      this.normalizeSample = new Float32Array(new ArrayBuffer(analyser.fftSize * 4));
+    }
+    analyser.getFloatTimeDomainData(this.normalizeSample);
+
+    let sum = 0;
+    for (let i = 0; i < this.normalizeSample.length; i += 1) {
+      const v = this.normalizeSample[i];
+      sum += v * v;
+    }
+    const rms = Math.sqrt(sum / this.normalizeSample.length);
+    const rmsDb = 20 * Math.log10(rms + 1e-7);
+    // treat near silence as "no measurement" so gaps do not slam the gain up
+    if (rmsDb < -55) return;
+
+    const wantedDb = Math.max(-9, Math.min(12, this.normalizeTargetDb - rmsDb));
+    // 40 % per tick towards the target: reacts to track changes, never jumps
+    this.normalizeGainDb += (wantedDb - this.normalizeGainDb) * 0.4;
+    const linear = Math.pow(10, this.normalizeGainDb / 20);
+    graph.normalizeGain.gain.setTargetAtTime(
+      linear,
+      graph.ctx.currentTime,
+      0.35,
+    );
   }
 }
 

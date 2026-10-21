@@ -44,6 +44,10 @@ const TAB_ICONS: Record<TabId, React.ComponentType<any>> = {
   About: InfoCircle,
 };
 
+// No keyboard and no desktop mini-player window on a phone, so these tabs would
+// only show settings that cannot do anything there.
+const COMPACT_HIDDEN_TABS: ReadonlySet<TabId> = new Set<TabId>(["Shortcuts", "Overlay"]);
+
 const TAB_GROUPS: { labelKey: "preferences" | "application"; ids: TabId[] }[] = [
   { labelKey: "preferences", ids: ["Playback", "Shortcuts", "Overlay", "Discord", "Audio", "Appearance", "Customization"] },
   { labelKey: "application", ids: ["Storage", "About"] },
@@ -52,6 +56,7 @@ const TAB_GROUPS: { labelKey: "preferences" | "application"; ids: TabId[] }[] = 
 
 const SETTING_ITEMS: { tabId: TabId; titleKey: string; descKey?: string }[] = [
   // Playback
+  { tabId: "Playback", titleKey: "settings.sleep_timer.title", descKey: "settings.sleep_timer.description" },
   { tabId: "Playback", titleKey: "settings.autoplay_similar.title", descKey: "settings.autoplay_similar.description" },
   { tabId: "Playback", titleKey: "settings.track_double_click.title", descKey: "settings.track_double_click.description" },
   { tabId: "Playback", titleKey: "settings.default_playback_context.title", descKey: "settings.default_playback_context.description" },
@@ -91,10 +96,18 @@ const SETTING_ITEMS: { tabId: TabId; titleKey: string; descKey?: string }[] = [
   // Customization
   { tabId: "Customization", titleKey: "settings.customization.wallpaper_title", descKey: "settings.customization.wallpaper_description" },
   { tabId: "Customization", titleKey: "settings.customization.blocks_title", descKey: "settings.customization.blocks_description" },
+  { tabId: "Customization", titleKey: "settings.customization.wallpaper_fit", descKey: "settings.customization.fit_cover" },
+  { tabId: "Customization", titleKey: "settings.customization.wallpaper_motion", descKey: "settings.customization.wallpaper_motion_desc" },
+  { tabId: "Customization", titleKey: "settings.customization.presets" },
   { tabId: "Customization", titleKey: "settings.customization.reset_all", descKey: "settings.customization.reset_all_desc" },
 
   // Audio
   { tabId: "Audio", titleKey: "settings.audio.title", descKey: "settings.audio.description" },
+  { tabId: "Audio", titleKey: "settings.audio.crossfade.title", descKey: "settings.audio.crossfade.description" },
+  { tabId: "Audio", titleKey: "settings.audio.gapless.title", descKey: "settings.audio.gapless.description" },
+  { tabId: "Audio", titleKey: "settings.audio.normalization.title", descKey: "settings.audio.normalization.description" },
+  { tabId: "Audio", titleKey: "settings.audio.balance.title", descKey: "settings.audio.balance.description" },
+  { tabId: "Audio", titleKey: "settings.audio.reset.title", descKey: "settings.audio.reset.description" },
   { tabId: "Audio", titleKey: "settings.connection.checks_title" },
 
   // Storage
@@ -117,6 +130,21 @@ export default function SettingsModal() {
 
   const [activeTab, setActiveTab] = useState<TabId>("Playback");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const visibleGroups = useMemo(() => {
+    if (!isCompact) return TAB_GROUPS;
+    return TAB_GROUPS.map((group) => ({
+      ...group,
+      ids: group.ids.filter((id) => !COMPACT_HIDDEN_TABS.has(id)),
+    })).filter((group) => group.ids.length > 0);
+  }, [isCompact]);
+
+  // a hidden tab must never stay selected (e.g. desktop -> narrow window)
+  useEffect(() => {
+    if (isCompact && COMPACT_HIDDEN_TABS.has(activeTab)) {
+      setActiveTab("Playback");
+    }
+  }, [isCompact, activeTab]);
 
   const handleClose = () => {
     setSearchQuery("");
@@ -178,6 +206,7 @@ export default function SettingsModal() {
 
 
     (Object.keys(TAB_LABEL_KEYS) as TabId[]).forEach((tabId) => {
+      if (COMPACT_HIDDEN_TABS.has(tabId) && isCompact) return;
       const texts = [
         ...getTranslationsForAllLocales(TAB_LABEL_KEYS[tabId]),
         ...getTranslationsForAllLocales(TAB_DESC_KEYS[tabId]),
@@ -188,6 +217,7 @@ export default function SettingsModal() {
     });
 
     SETTING_ITEMS.forEach((item) => {
+      if (COMPACT_HIDDEN_TABS.has(item.tabId) && isCompact) return;
       const texts = [
         ...getTranslationsForAllLocales(item.titleKey),
         ...(item.descKey ? getTranslationsForAllLocales(item.descKey) : []),
@@ -198,26 +228,28 @@ export default function SettingsModal() {
     });
 
     return set;
-  }, [searchQuery]);
+  }, [searchQuery, isCompact]);
 
   const filteredGroups = useMemo(() => {
-    if (!matchingTabIds) return TAB_GROUPS;
+    if (!matchingTabIds) return visibleGroups;
 
-    return TAB_GROUPS.map((group) => {
+    return visibleGroups.map((group) => {
       const ids = group.ids.filter((id) => matchingTabIds.has(id));
       return { ...group, ids };
     }).filter((group) => group.ids.length > 0);
-  }, [matchingTabIds]);
+  }, [matchingTabIds, visibleGroups]);
 
   useEffect(() => {
     if (!searchQuery.trim()) return;
     if (matchingTabIds && matchingTabIds.size > 0 && !matchingTabIds.has(activeTab)) {
-      const firstMatch = TAB_GROUPS.flatMap((g) => g.ids).find((id) => matchingTabIds.has(id));
+      const firstMatch = visibleGroups
+        .flatMap((g) => g.ids)
+        .find((id) => matchingTabIds.has(id));
       if (firstMatch) {
         setActiveTab(firstMatch);
       }
     }
-  }, [searchQuery, matchingTabIds, activeTab]);
+  }, [searchQuery, matchingTabIds, activeTab, visibleGroups]);
 
   const openExternal = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -287,7 +319,7 @@ export default function SettingsModal() {
                 "linear-gradient(to right, transparent 0, black 10px, black calc(100% - 18px), transparent 100%)",
             }}
           >
-            {TAB_GROUPS.flatMap((group) => group.ids).map((id) => {
+            {visibleGroups.flatMap((group) => group.ids).map((id) => {
               const Icon = TAB_ICONS[id];
               const isActive = id === activeTab;
               return (

@@ -3,6 +3,7 @@ import { useTranslation } from "@/languages";
 import { usePlayerStore } from "@/features/player";
 import { ToggleSwitch } from "@/shared/ui";
 import { SettingRow, SettingSection, SegmentedControl } from "../controls";
+import { SleepTimerRow } from "./SleepTimerRow";
 
 export function PlaybackTab({ searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
@@ -36,6 +37,8 @@ export function PlaybackTab({ searchQuery }: { searchQuery?: string }) {
 
   return (
     <SettingSection>
+
+      <SleepTimerRow searchQuery={searchQuery} />
 
       <SettingRow
         title={t("settings.autoplay_similar.title")}

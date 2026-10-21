@@ -57,7 +57,11 @@ function throwIfAborted(signal?: AbortSignal): void {
 
 export async function resolveWebRemixAudioStream(
   videoId: string,
-  options: { signal?: AbortSignal; preferredCodec?: "opus" | "aac" } = {},
+  options: {
+    signal?: AbortSignal;
+    preferredCodec?: "opus" | "aac";
+    maxBitrate?: number;
+  } = {},
 ): Promise<ResolvedAudioStream> {
   installPlayerEvaluator();
   const [poToken, visitorData] = await Promise.all([mintContentPoToken(videoId), getClientVisitorData()]);
@@ -79,7 +83,11 @@ export async function resolveWebRemixAudioStream(
     bitrate: format.bitrate || format.average_bitrate || 0,
     ...(Number(format.content_length) > 0 ? { contentLength: Number(format.content_length) } : {}),
   }));
-  const best = selectBestAudioFormat(candidates, options.preferredCodec);
+  const best = selectBestAudioFormat(
+    candidates,
+    options.preferredCodec,
+    options.maxBitrate,
+  );
   const source = best ? audioFormats.find((format) => format.itag === best.itag) : undefined;
   if (!best || !source) throw new InnertubeError("WEB_REMIX returned no audio formats.", 502);
 

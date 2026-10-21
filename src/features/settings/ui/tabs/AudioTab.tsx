@@ -3,12 +3,25 @@ import { FolderOpenLine } from "@mingcute/react";
 import { useToast } from "@/shared/ui";
 import Button from "@/shared/ui/Button";
 import { useTranslation } from "@/languages";
-import { playerEngine, usePlayerState, usePlayerStore, type AudioQuality } from "@/features/player";
-import { Select, ToggleSwitch } from "@/shared/ui";
+import {
+  playerEngine,
+  usePlayerState,
+  usePlayerStore,
+  type AudioQuality,
+} from "@/features/player";
+import { CROSSFADE_MAX_SECONDS } from "@/features/player/store/playerStore";
+import { EQ_BAND_COUNT } from "@/features/player/engine/eqMath";
+import { Select, Slider, ToggleSwitch } from "@/shared/ui";
 import { useConnectivityStore } from "@/features/connectivity";
-import { SettingRow, SettingSection } from "../controls";
+import { SettingRow, SettingSection, SegmentedControl } from "../controls";
 import { getTranslationsForAllLocales } from "@/languages/translator";
 import { EqualizerPanel } from "@/features/player/ui/EqualizerPanel";
+
+const QUALITY_HINT_KEYS: Record<Exclude<AudioQuality, "lossless">, string> = {
+  low: "settings.audio.quality_hint_low",
+  standard: "settings.audio.quality_hint_standard",
+  high: "settings.audio.quality_hint_high",
+};
 
 export function AudioTab({ searchQuery }: { searchQuery?: string }) {
   const { t } = useTranslation();
@@ -18,6 +31,16 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
   const eqEnabled = usePlayerState().eqEnabled;
   const audioQuality = usePlayerStore((state) => state.audioQuality);
   const setAudioQuality = usePlayerStore((state) => state.setAudioQuality);
+  const crossfadeSeconds = usePlayerStore((state) => state.crossfadeSeconds);
+  const setCrossfadeSeconds = usePlayerStore((state) => state.setCrossfadeSeconds);
+  const gaplessPlayback = usePlayerStore((state) => state.gaplessPlayback);
+  const setGaplessPlayback = usePlayerStore((state) => state.setGaplessPlayback);
+  const normalizeVolume = usePlayerStore((state) => state.normalizeVolume);
+  const setNormalizeVolume = usePlayerStore((state) => state.setNormalizeVolume);
+  const normalizationLevel = usePlayerStore((state) => state.normalizationLevel);
+  const setNormalizationLevel = usePlayerStore((state) => state.setNormalizationLevel);
+  const channelBalance = usePlayerStore((state) => state.channelBalance);
+  const setChannelBalance = usePlayerStore((state) => state.setChannelBalance);
   const connRunning = useConnectivityStore((s) => s.running);
   const connChecks = useConnectivityStore((s) => s.checks);
   const connLastRunAt = useConnectivityStore((s) => s.lastRunAt);
@@ -31,12 +54,32 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
   const quality: Exclude<AudioQuality, "lossless"> =
     audioQuality === "lossless" ? "high" : audioQuality;
 
+  const balanceLabel = (value: number) => {
+    if (value === 0) return t("settings.audio.balance.center");
+    return value < 0
+      ? t("settings.audio.balance.left", { value: Math.abs(value) })
+      : t("settings.audio.balance.right", { value });
+  };
+
+  const handleReset = () => {
+    const store = usePlayerStore.getState();
+    store.setAudioQuality("high");
+    store.setCrossfadeSeconds(0);
+    store.setGaplessPlayback(true);
+    store.setNormalizeVolume(false);
+    store.setNormalizationLevel("balanced");
+    store.setChannelBalance(0);
+    store.setEqBands(new Array(EQ_BAND_COUNT).fill(0));
+    store.setEqEnabled(false);
+    toast(t("settings.audio.reset_done"), "info");
+  };
+
   return (
     <div className="flex flex-col gap-[16px]">
       <SettingSection>
         <SettingRow
           title={t("settings.audio.title")}
-          description={t("settings.audio.description")}
+          description={t(QUALITY_HINT_KEYS[quality])}
           titleKey="settings.audio.title"
           descKey="settings.audio.description"
           searchQuery={searchQuery}
@@ -44,7 +87,7 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
             mounted ? (
               <Select
                 aria-label={t("settings.audio.title")}
-                className="w-[210px]"
+                className="w-[210px] max-md:w-full"
                 value={quality}
                 onChange={setAudioQuality}
                 options={[
@@ -56,6 +99,97 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
             ) : (
               <span />
             )
+          }
+        />
+        <SettingRow
+          title={t("settings.audio.crossfade.title")}
+          description={t("settings.audio.crossfade.description")}
+          titleKey="settings.audio.crossfade.title"
+          descKey="settings.audio.crossfade.description"
+          searchQuery={searchQuery}
+          control={
+            <div className="w-[190px] max-md:w-full">
+              <Slider
+                value={crossfadeSeconds}
+                onChange={setCrossfadeSeconds}
+                min={0}
+                max={CROSSFADE_MAX_SECONDS}
+                step={1}
+                ariaLabel={t("settings.audio.crossfade.title")}
+                formatValue={(value) =>
+                  value <= 0 ? t("settings.audio.crossfade.off") : `${value} s`
+                }
+              />
+            </div>
+          }
+        />
+        <SettingRow
+          title={t("settings.audio.gapless.title")}
+          description={t("settings.audio.gapless.description")}
+          titleKey="settings.audio.gapless.title"
+          descKey="settings.audio.gapless.description"
+          searchQuery={searchQuery}
+          control={
+            <ToggleSwitch
+              checked={gaplessPlayback}
+              onChange={setGaplessPlayback}
+              ariaLabel={t("settings.audio.gapless.title")}
+            />
+          }
+        />
+        <SettingRow
+          title={t("settings.audio.normalization.title")}
+          description={t("settings.audio.normalization.description")}
+          titleKey="settings.audio.normalization.title"
+          descKey="settings.audio.normalization.description"
+          searchQuery={searchQuery}
+          control={
+            <ToggleSwitch
+              checked={normalizeVolume}
+              onChange={setNormalizeVolume}
+              ariaLabel={t("settings.audio.normalization.title")}
+            />
+          }
+        />
+        {normalizeVolume && (
+          <SettingRow
+            title={t("settings.audio.normalization_level.title")}
+            description={t("settings.audio.normalization_level.description")}
+            titleKey="settings.audio.normalization_level.title"
+            descKey="settings.audio.normalization_level.description"
+            searchQuery={searchQuery}
+            control={
+              <SegmentedControl
+                ariaLabel={t("settings.audio.normalization_level.title")}
+                value={normalizationLevel}
+                onChange={setNormalizationLevel}
+                options={[
+                  { value: "quiet", label: t("settings.audio.normalization_level.quiet") },
+                  { value: "balanced", label: t("settings.audio.normalization_level.balanced") },
+                  { value: "loud", label: t("settings.audio.normalization_level.loud") },
+                ]}
+              />
+            }
+          />
+        )}
+        <SettingRow
+          title={t("settings.audio.balance.title")}
+          description={t("settings.audio.balance.description")}
+          titleKey="settings.audio.balance.title"
+          descKey="settings.audio.balance.description"
+          searchQuery={searchQuery}
+          control={
+            <div className="w-[190px] max-md:w-full">
+              <Slider
+                value={Math.round(channelBalance * 100)}
+                onChange={(value) => setChannelBalance(value / 100)}
+                min={-100}
+                max={100}
+                step={5}
+                ariaLabel={t("settings.audio.balance.title")}
+                formatValue={() => balanceLabel(Math.round(channelBalance * 100))}
+              />
+            </div>
           }
         />
         <SettingRow
@@ -73,6 +207,18 @@ export function AudioTab({ searchQuery }: { searchQuery?: string }) {
           }
         />
         <EqPanelSlot searchQuery={searchQuery} />
+        <SettingRow
+          title={t("settings.audio.reset.title")}
+          description={t("settings.audio.reset.description")}
+          titleKey="settings.audio.reset.title"
+          descKey="settings.audio.reset.description"
+          searchQuery={searchQuery}
+          control={
+            <Button variant="secondary" size="sm" onClick={handleReset}>
+              {t("settings.reset_defaults") || "Reset"}
+            </Button>
+          }
+        />
       </SettingSection>
 
       <SettingSection label={t("settings.connection.title")}>

@@ -79,6 +79,26 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## What's new in 0.1.49 (sleep timer, audio depth, more customisation)
+
+- **Phone settings trimmed** – *Shortcuts* and *Overlay* disappear from the settings on a phone
+  (no hardware keyboard, no desktop overlay window); the desktop build keeps both. The storage
+  tab hides its *open folder* button there too, and a selected tab always falls back to
+  *Playback* when the window gets narrow.
+- **Sleep timer** – *Settings → Wiedergabe* offers 5/15/30/45/60/90/120 minutes. The player
+  shows a moon pill with the live countdown; tapping it cancels. When the deadline hits, playback
+  fades out over four seconds and pauses. The timer never survives a restart.
+- **Audio tab, more depth** – the streaming quality now really caps the stream (low ≈ 96 kbit/s,
+  standard ≈ 160 kbit/s, high = best available format) instead of only being stored. New:
+  crossfade 0–12 s (fade out at the end, fade in on start), gapless preloading, loudness
+  normalisation with three levels (RMS auto-gain in the WebAudio chain), L/R channel balance,
+  and a reset row that restores quality, crossfade, normalisation, balance and EQ at once.
+- **Customisation, more options** – wallpapers can be applied from a URL, fitted (fill / fit /
+  tile), desaturated or amplified (0–200 %), and set in slow Ken-Burns motion. Four one-click
+  glass presets (none / soft / glass / strong) restyle all three interface blocks together.
+
+---
+
 ## What's new in 0.1.48 (phone polish, live lyrics)
 
 - **Full screen live lyrics** – a new `/lyrics` screen (also reachable from the queue sheet's

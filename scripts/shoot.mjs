@@ -7,6 +7,8 @@ const width = Number(process.argv[4] || 390);
 const height = Number(process.argv[5] || 844);
 const hash = process.argv[6] || "";
 const seed = process.argv.includes("--seed");
+// --wallpaper seeds a tiny gradient wallpaper so the customisation controls render
+const seedWallpaper = process.argv.includes("--wallpaper");
 
 const browser = await puppeteer.launch({
   executablePath: "/usr/bin/chromium",
@@ -165,6 +167,35 @@ if (seed) {
       }),
     );
     sessionStorage.setItem("cloudmusic:env-warning-skipped", "1");
+  });
+}
+
+// wallpaper seeding runs in its own script so the flag is serialised in
+if (seedWallpaper) {
+  await page.evaluateOnNewDocument(() => {
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="#1b2a4a"/><stop offset="0.5" stop-color="#4a2d5e"/>' +
+      '<stop offset="1" stop-color="#0f172a"/></linearGradient></defs>' +
+      '<rect width="24" height="24" fill="url(#g)"/></svg>';
+    localStorage.setItem(
+      "cloudmusic_customization_v1",
+      JSON.stringify({
+        state: {
+          backgroundImage: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
+          backgroundBlur: 6,
+          backgroundDim: 12,
+          backgroundFit: "cover",
+          backgroundSaturation: 120,
+          backgroundKenBurns: true,
+          sidebar: { opacity: 60, blur: 20, dim: 15 },
+          contentView: { opacity: 72, blur: 18, dim: 12 },
+          miniplayer: { opacity: 60, blur: 20, dim: 15 },
+        },
+        version: 0,
+      }),
+    );
   });
 }
 

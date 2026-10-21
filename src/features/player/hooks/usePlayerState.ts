@@ -31,6 +31,13 @@ const EMPTY_STATE: PlayerState = {
   reverbLevel: 0.35,
   eqEnabled: false,
   eqBands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  crossfadeSeconds: 0,
+  gaplessPlayback: true,
+  normalizeVolume: false,
+  normalizationLevel: "balanced",
+  channelBalance: 0,
+  sleepTimerEndsAt: null,
+  sleepTimerDurationMs: null,
 };
 
 export function usePlayerState(): PlayerState {

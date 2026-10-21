@@ -44,14 +44,28 @@ export function extractAudioFormats(playerResponse: unknown): AudioFormat[] {
     .filter((format): format is AudioFormat => Boolean(format));
 }
 
-export function selectBestAudioFormat(formats: AudioFormat[], preferredCodec?: "opus" | "aac"): AudioFormat | null {
+export function selectBestAudioFormat(
+  formats: AudioFormat[],
+  preferredCodec?: "opus" | "aac",
+  /**
+   * Quality cap from the settings: formats above it are dropped first, so
+   * "low"/"standard" actually save bandwidth. When the cap would leave nothing
+   * playable the full list is used again instead of failing the track.
+   */
+  maxBitrate?: number,
+): AudioFormat | null {
   if (formats.length === 0) return null;
+  const capped =
+    maxBitrate && maxBitrate > 0
+      ? formats.filter((format) => format.bitrate > 0 && format.bitrate <= maxBitrate)
+      : formats;
+  const pool = capped.length > 0 ? capped : formats;
   const order = preferredCodec === "aac" ? [140, 139, 251, 250, 249] : PREFERRED_ITAGS;
   for (const itag of order) {
-    const match = formats.find((format) => format.itag === itag);
+    const match = pool.find((format) => format.itag === itag);
     if (match) return match;
   }
-  return [...formats].sort((a, b) => b.bitrate - a.bitrate)[0] ?? null;
+  return [...pool].sort((a, b) => b.bitrate - a.bitrate)[0] ?? null;
 }
 
 function expiryFromUrl(url: string): string | null {

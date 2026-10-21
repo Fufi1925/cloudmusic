@@ -1,4 +1,7 @@
-import { usePlayerStore } from "../store/playerStore";
+import {
+  usePlayerStore,
+  NORMALIZATION_TARGET_DB,
+} from "../store/playerStore";
 import { ApiError } from "@/shared/api";
 import { log } from "@/shared/utils/logger";
 import { telemetry } from "@/shared/telemetry";
@@ -45,6 +48,8 @@ export class PlayerRuntime {
   // loaded / cached track fires waiting -> playing within milliseconds, and flipping
   // the status for that re-animated the play / pause button on every seek
   private waitingTimer: ReturnType<typeof setTimeout> | null = null;
+  // crossfade bookkeeping: fade out once when the track approaches its end
+  private crossfadeFadeOutArmed = false;
   public onEnded?: () => void;
   public onError?: (info: { trackId: string; message: string }) => void;
 
@@ -88,7 +93,10 @@ export class PlayerRuntime {
         state.isReverbEnabled !== prevState.isReverbEnabled ||
         state.reverbLevel !== prevState.reverbLevel ||
         state.eqEnabled !== prevState.eqEnabled ||
-        state.eqBands !== prevState.eqBands
+        state.eqBands !== prevState.eqBands ||
+        state.channelBalance !== prevState.channelBalance ||
+        state.normalizeVolume !== prevState.normalizeVolume ||
+        state.normalizationLevel !== prevState.normalizationLevel
       ) {
         const rate = state.playbackRate ?? 1;
         const preservesPitch = !state.isPitchLinked;
@@ -242,6 +250,7 @@ export class PlayerRuntime {
 
       const posMs = Math.round(audioEl.currentTime * 1000);
       usePlayerStore.getState().setPosition(posMs);
+      this.maybeCrossfadeOut(audioEl, posMs);
       if (this.recoveryHoldUntilMs !== null && posMs >= this.recoveryHoldUntilMs) {
         this.recoveryHoldUntilMs = null;
         this.recoveryAttempts = 0;
@@ -433,10 +442,16 @@ export class PlayerRuntime {
       const reverbLevel = store.reverbLevel ?? 0.35;
       const eqEnabled = store.eqEnabled ?? false;
       const eqBands = store.eqBands ?? [];
+      const channelBalance = store.channelBalance ?? 0;
+      const normalizeVolume = store.normalizeVolume ?? false;
+      const normalizationTargetDb =
+        NORMALIZATION_TARGET_DB[store.normalizationLevel ?? "balanced"] ?? -16;
       const needsEffects =
         isReverbEnabled ||
         (!isPitchLinked && Math.abs(pitchSemitones) >= 0.05) ||
-        (eqEnabled && !isFlat(eqBands));
+        (eqEnabled && !isFlat(eqBands)) ||
+        Math.abs(channelBalance) > 0.01 ||
+        normalizeVolume;
       if (!needsEffects && !pitchShifter.isAttached()) return;
       pitchShifter.attach(this.audio);
       pitchShifter.update({
@@ -446,6 +461,9 @@ export class PlayerRuntime {
         reverbLevel,
         eqEnabled,
         eqBands,
+        channelBalance,
+        normalizeVolume,
+        normalizationTargetDb,
       });
     } catch (err) {
       console.error("[PlayerRuntime] applyPlaybackRateAndPitch error:", err);
@@ -494,6 +512,18 @@ export class PlayerRuntime {
     };
 
     this.fadeTimer = setTimeout(tick, 16);
+  }
+
+  /** configured crossfade length in ms (0 = disabled) */
+  private crossfadeMs(): number {
+    const seconds = usePlayerStore.getState().crossfadeSeconds ?? 0;
+    return Math.max(0, seconds) * 1000;
+  }
+
+  /** fade-in length on a fresh track; a touch shorter than the fade-out */
+  private fadeInMs(): number {
+    const cf = this.crossfadeMs();
+    return cf > 0 ? Math.max(250, Math.round(cf * 0.6)) : 180;
   }
 
   private safeResetAudioElement() {
@@ -567,7 +597,11 @@ export class PlayerRuntime {
 
     const promise = (async () => {
       try {
-        const stream = await resolvePlaybackStream(track, controller.signal);
+        const stream = await resolvePlaybackStream(
+        track,
+        controller.signal,
+        usePlayerStore.getState().audioQuality,
+      );
         if (controller.signal.aborted) return;
 
         const blob = await this.downloadAudioBlob(stream, controller.signal);
@@ -683,6 +717,7 @@ export class PlayerRuntime {
         const blobUrl = URL.createObjectURL(cachedAudio.blob);
         this.attachSource(blobUrl, true, track.id);
         this.audio.volume = 0;
+        this.crossfadeFadeOutArmed = false;
         this.audio.load();
         this.applyPlaybackRateAndPitch();
 
@@ -723,7 +758,7 @@ export class PlayerRuntime {
 
         if (epoch === this.loadEpoch) {
           usePlayerStore.getState().setStatus("playing");
-          this.fadeVolume(usePlayerStore.getState().volume, 180);
+          this.fadeVolume(usePlayerStore.getState().volume, this.fadeInMs());
         }
         log(
           "green",
@@ -733,7 +768,11 @@ export class PlayerRuntime {
         return;
       }
 
-      const stream = await resolvePlaybackStream(track, controller.signal);
+      const stream = await resolvePlaybackStream(
+        track,
+        controller.signal,
+        usePlayerStore.getState().audioQuality,
+      );
       this.ttfbMs = Math.round(performance.now() - this.loadStartTime);
 
       if (epoch !== this.loadEpoch || controller.signal.aborted) {
@@ -748,6 +787,7 @@ export class PlayerRuntime {
       const url = stream.blob ? URL.createObjectURL(stream.blob) : stream.url;
       this.attachSource(url, Boolean(stream.blob), track.id);
       this.audio.volume = 0;
+      this.crossfadeFadeOutArmed = false;
       this.audio.load();
       this.applyPlaybackRateAndPitch();
 
@@ -788,7 +828,7 @@ export class PlayerRuntime {
 
       if (epoch === this.loadEpoch) {
         usePlayerStore.getState().setStatus("playing");
-        this.fadeVolume(usePlayerStore.getState().volume, 180);
+        this.fadeVolume(usePlayerStore.getState().volume, this.fadeInMs());
         this.cacheAudioInBackground(track, stream, bgCacheController.signal);
       }
       log(
@@ -936,6 +976,39 @@ export class PlayerRuntime {
     } else {
       this.fadeVolume(targetVolume, 180);
     }
+  }
+
+  /**
+   * Crossfade out: when a track is inside the configured window before its end,
+   * fade the element down so the next track starts out of silence. Seeking back
+   * out of the window (or pausing) cancels the fade again.
+   */
+  private maybeCrossfadeOut(audioEl: HTMLAudioElement, posMs: number): void {
+    const cf = this.crossfadeMs();
+    if (cf <= 0) return;
+    if (!Number.isFinite(audioEl.duration) || audioEl.duration <= 0) return;
+
+    const remainingMs = audioEl.duration * 1000 - posMs;
+    if (remainingMs > cf + 1500) {
+      if (this.crossfadeFadeOutArmed) {
+        this.crossfadeFadeOutArmed = false;
+        this.fadeVolume(usePlayerStore.getState().volume, 300);
+      }
+      return;
+    }
+    if (this.crossfadeFadeOutArmed) return;
+    if (remainingMs < 250 || remainingMs > cf) return;
+
+    this.crossfadeFadeOutArmed = true;
+    this.fadeVolume(0, Math.round(remainingMs));
+  }
+
+  /** sleep timer: silence the element over `durationMs`, then pause */
+  public fadeOutAndPause(durationMs: number = 4000): void {
+    this.crossfadeFadeOutArmed = true;
+    this.fadeVolume(0, durationMs, () => {
+      this.pause();
+    });
   }
 
   public seek(positionMs: number) {

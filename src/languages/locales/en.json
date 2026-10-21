@@ -667,6 +667,22 @@
       "remove_button": "Remove",
       "wallpaper_blur": "Wallpaper blur",
       "wallpaper_dim": "Wallpaper dimming",
+      "url_placeholder": "https://example.com/wallpaper.jpg",
+      "url_apply": "Use URL",
+      "url_invalid": "Please enter a valid http(s) image URL",
+      "wallpaper_fit": "Wallpaper fit",
+      "fit_cover": "Fill",
+      "fit_contain": "Fit",
+      "fit_tile": "Tile",
+      "wallpaper_saturation": "Colour intensity",
+      "wallpaper_motion": "Gentle wallpaper motion",
+      "wallpaper_motion_desc": "Slowly zoom and pan the wallpaper (Ken Burns effect).",
+      "presets": "Glass presets",
+      "preset_off": "None",
+      "preset_soft": "Soft",
+      "preset_glass": "Glass",
+      "preset_strong": "Strong",
+      "preset_applied": "Preset applied",
       "blocks_title": "Interface Blocks Glassmorphism",
       "blocks_description": "Adjust transparency, backdrop blur and dimming for each interface area.",
       "block_sidebar": "Sidebar",
@@ -887,14 +903,58 @@
         "title": "Download current song",
         "description": "Download the currently playing track as an MP3 file."
       },
-      "low": "Low Quality (Data Saver)",
-      "standard": "Standard Quality (Opus 64kbps / MP3 128kbps)",
-      "high": "High Quality (AAC 256kbps)",
+      "low": "Low (up to 96 kbit/s)",
+      "standard": "Standard (up to 160 kbit/s)",
+      "high": "High (best available)",
       "lossless": "Lossless (FLAC/ALAC) - Unavailable",
       "equalizer_title": "Equalizer",
 
-      "equalizer_description": "10-band graphic EQ with presets. Also available from the player bar."
+      "equalizer_description": "10-band graphic EQ with presets. Also available from the player bar.",
+      "quality_hint_low": "Data saver — caps the stream at about 96 kbit/s.",
+      "quality_hint_standard": "Balanced — caps the stream at about 160 kbit/s.",
+      "quality_hint_high": "Best available format, usually 160–256 kbit/s (Opus/AAC).",
+      "crossfade": {
+        "title": "Crossfade",
+        "description": "Fade the current track out and the next one in instead of cutting hard.",
+        "off": "Off"
+      },
+      "gapless": {
+        "title": "Gapless playback",
+        "description": "Preload the next track so track changes have no audible gap."
+      },
+      "normalization": {
+        "title": "Loudness normalization",
+        "description": "Evens out quiet and loud tracks with a slow automatic gain."
+      },
+      "normalization_level": {
+        "title": "Normalization level",
+        "description": "Target loudness for the automatic gain.",
+        "quiet": "Quiet",
+        "balanced": "Balanced",
+        "loud": "Loud"
+      },
+      "balance": {
+        "title": "Channel balance",
+        "description": "Shift the stereo image towards the left or right speaker.",
+        "center": "Center",
+        "left": "L {value}",
+        "right": "R {value}"
+      },
+      "reset": {
+        "title": "Reset audio settings",
+        "description": "Restore quality, crossfade, normalization, balance and equalizer to their defaults.",
+        "done": "Audio settings reset"
+      }
 
+    },
+    "sleep_timer": {
+      "title": "Sleep timer",
+      "description": "Pause playback automatically after the selected time.",
+      "remaining": "Pausing in {time}",
+      "off": "Off",
+      "minutes": "{count} min",
+      "cancel": "Cancel sleep timer",
+      "finished": "Sleep timer: playback paused"
     },
     "profile": {
       "title": "Profile",

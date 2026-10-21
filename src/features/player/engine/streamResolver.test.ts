@@ -18,7 +18,7 @@ vi.mock("@/shared/media/soundcloud", async (importOriginal) => {
   return { ...actual, resolveSoundCloudStream: mocks.resolveSoundCloudStream };
 });
 
-import { resolvePlaybackStream } from "./streamResolver";
+import { maxBitrateForQuality, resolvePlaybackStream } from "./streamResolver";
 import { clearYoutubeStandInCache } from "./youtubeStandIn";
 
 const directStream = {
@@ -44,6 +44,25 @@ afterEach(() => {
   mocks.searchRaw.mockReset();
   mocks.resolveSoundCloudStream.mockReset();
   clearYoutubeStandInCache();
+});
+
+describe("maxBitrateForQuality", () => {
+  it("caps the low and standard tiers, leaves high unconstrained", () => {
+    expect(maxBitrateForQuality("low")).toBe(96_000);
+    expect(maxBitrateForQuality("standard")).toBe(170_000);
+    expect(maxBitrateForQuality("high")).toBeUndefined();
+    expect(maxBitrateForQuality("lossless")).toBeUndefined();
+    expect(maxBitrateForQuality(undefined)).toBeUndefined();
+  });
+
+  it("passes the cap to the resolver", async () => {
+    mocks.resolveDirectAudioStream.mockResolvedValue(directStream);
+    await resolvePlaybackStream(track("yt:dQw4w9WgXcQ"), undefined, "low");
+    expect(mocks.resolveDirectAudioStream).toHaveBeenCalledWith(
+      "yt:dQw4w9WgXcQ",
+      expect.objectContaining({ maxBitrate: 96_000 }),
+    );
+  });
 });
 
 describe("resolvePlaybackStream for youtube ids", () => {
