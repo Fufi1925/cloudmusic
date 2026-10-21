@@ -6,6 +6,7 @@ import ArtistPage from "@/features/artist/ui/ArtistPage";
 import CollectionPage from "@/features/collection/ui/CollectionPage";
 import LoginPage from "@/features/auth/ui/LoginPage";
 import PlayerPage from "@/features/player/ui/FullscreenPlayer";
+import LyricsPage from "@/features/player/ui/LyricsPage";
 
 export function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/settings" element={<Navigate to="/" replace />} />
       <Route path="/player" element={<PlayerPage />} />
+      <Route path="/lyrics" element={<LyricsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

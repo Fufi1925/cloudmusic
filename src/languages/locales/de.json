@@ -385,6 +385,7 @@
     "home_subtitle": "Nutze die Suche, um Musik zu hören",
     "queue_empty": "Deine Warteschlange ist leer",
     "no_lyrics": "Kein Songtext gefunden",
+    "lyrics_fullscreen": "Songtext im Vollbild",
     "back": "Zurück",
     "tracks": "Titel",
     "queue_saved": "Warteschlange gespeichert",
@@ -720,7 +721,7 @@
 
       "reset": "Darstellung zurücksetzen",
 
-      "reset_desc": "Aktuell: {accent}. Setzt Akzent, Ecken, Flächen, Dichte und Bewegung zurück.",
+      "reset_desc": "Setzt Ecken, Flächen, Dichte und Bewegung auf die Standardwerte zurück.",
 
       "reset_action": "Zurücksetzen"
 

@@ -5,9 +5,11 @@ import {
   Search3Fill,
   BookmarksFill,
   Settings4Fill,
+  HeadphoneFill,
 } from "@mingcute/react";
 import { useTranslation } from "@/languages";
 import { useModalStore } from "@/features/library";
+import { usePlayerState } from "@/features/player";
 
 interface BottomNavProps {
   searchOpen: boolean;
@@ -23,6 +25,8 @@ function BottomNav({ searchOpen, onSearchToggle }: BottomNavProps) {
   const { t } = useTranslation();
   const settingsOpen = useModalStore((state) => state.settingsOpen);
   const toggleSettings = useModalStore((state) => state.toggleSettings);
+  const { currentTrack } = usePlayerState();
+  const isLyrics = pathname === "/lyrics";
 
   const itemClass = (active: boolean) =>
     [
@@ -78,6 +82,24 @@ function BottomNav({ searchOpen, onSearchToggle }: BottomNavProps) {
           </span>
           <span className="max-w-full truncate px-[2px] text-[10px] font-[550] leading-none">
             {t("common.sidebar.library") || "Library"}
+          </span>
+        </Link>
+
+        {/* live lyrics are one tap away while a track is loaded */}
+        <Link
+          to={currentTrack ? "/lyrics" : "/"}
+          aria-disabled={!currentTrack}
+          onClick={(event) => {
+            if (!currentTrack) event.preventDefault();
+          }}
+          className={`${itemClass(isLyrics)} ${currentTrack ? "" : "pointer-events-none opacity-40"}`}
+          aria-current={isLyrics ? "page" : undefined}
+        >
+          <span className={iconWrapClass(isLyrics)}>
+            <HeadphoneFill size={20} />
+          </span>
+          <span className="max-w-full truncate px-[2px] text-[10px] font-[550] leading-none">
+            {t("player.lyrics") || "Lyrics"}
           </span>
         </Link>
 

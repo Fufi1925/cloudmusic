@@ -519,7 +519,7 @@ function LibraryPlaylistContent() {
           >
             <div className="relative z-10 flex flex-row items-stretch gap-[16px] pl-[32px] pr-[16px] h-full w-full min-h-0 box-border max-md:flex-col max-md:gap-0 max-md:pl-[16px] max-md:pr-[16px]">
               <div
-                className="shrink-0 w-[280px] self-start pt-[56px] pb-[24px] max-md:w-full max-md:pt-[calc(env(safe-area-inset-top,0px)+12px)] max-md:pb-[4px]"
+                className="relative z-10 shrink-0 w-[280px] self-start pt-[56px] pb-[24px] max-md:w-full max-md:bg-bg-primary max-md:pt-[calc(env(safe-area-inset-top,0px)+12px)] max-md:pb-[8px]"
                 data-no-window-drag
               >
                 <EntitySidebar
@@ -836,7 +836,7 @@ function LibraryPlaylistContent() {
                     targetScrollTopRef.current = null;
                   }
                 }}
-                className="min-w-0 flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-[8px] pt-[56px] pb-[24px] overscroll-contain max-md:px-0 max-md:pt-[10px] max-md:pb-[24px]"
+                className="min-w-0 flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-[8px] pt-[56px] pb-[24px] overscroll-contain max-md:h-auto max-md:px-0 max-md:pt-[6px] max-md:pb-[24px] max-md:[mask-image:linear-gradient(to_bottom,transparent_0,black_14px)]"
                 style={{ willChange: "scroll-position" }}
               >
               {currentTracks.length === 0 ? (

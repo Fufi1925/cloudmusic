@@ -378,6 +378,7 @@
     "home_subtitle": "Usa la búsqueda para escuchar música",
     "queue_empty": "La cola está vacía",
     "no_lyrics": "No se encontró la letra",
+    "lyrics_fullscreen": "Letra a pantalla completa",
     "back": "Atrás",
     "tracks": "canciones",
     "queue_saved": "Cola guardada",
@@ -768,7 +769,7 @@
 
       "reset": "Restablecer apariencia",
 
-      "reset_desc": "Ahora: {accent}. Restablece acento, esquinas, superficies, densidad y movimiento.",
+      "reset_desc": "Restaura esquinas, superficies, densidad y movimiento a sus valores predeterminados.",
 
       "reset_action": "Restablecer"
 

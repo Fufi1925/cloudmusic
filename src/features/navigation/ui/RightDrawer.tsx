@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, memo, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePlayerState, playerEngine } from "@/features/player";
 import SongCardWithMenu from "@/features/player/ui/SongCardWithMenu";
@@ -198,6 +199,7 @@ export interface RightDrawerProps {
 }
 
 function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
+  const navigate = useNavigate();
   const player = usePlayerState();
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -739,7 +741,7 @@ function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
 
         <div className="px-[16px] pb-[10px]">
           <div
-            className={`grid grid-cols-2 w-full items-center gap-[4px] rounded-xl p-[4px] ${
+            className={`flex w-full items-center gap-[4px] rounded-xl p-[4px] ${
               hasCustomBg
                 ? "apple-glass-pill"
                 : "bg-bg-elevated"
@@ -748,7 +750,7 @@ function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
             <button
               type="button"
               onClick={() => onTabChange("queue")}
-              className={`relative inline-flex items-center justify-center rounded-lg px-[16px] py-[7px] text-[13px] leading-none transition-colors duration-150 border-0 bg-transparent cursor-pointer select-none active:scale-[0.97] ${
+              className={`relative flex flex-1 items-center justify-center rounded-lg px-[16px] py-[7px] text-[13px] leading-none transition-colors duration-150 border-0 bg-transparent cursor-pointer select-none active:scale-[0.97] ${
                 activeTab === "queue"
                   ? hasCustomBg
                     ? "text-white dark:text-black font-semibold"
@@ -782,7 +784,7 @@ function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
             <button
               type="button"
               onClick={() => onTabChange("lyrics")}
-              className={`relative inline-flex items-center justify-center rounded-lg px-[16px] py-[7px] text-[13px] leading-none transition-colors duration-150 border-0 bg-transparent cursor-pointer select-none active:scale-[0.97] ${
+              className={`relative flex flex-1 items-center justify-center rounded-lg px-[16px] py-[7px] text-[13px] leading-none transition-colors duration-150 border-0 bg-transparent cursor-pointer select-none active:scale-[0.97] ${
                 activeTab === "lyrics"
                   ? hasCustomBg
                     ? "text-white dark:text-black font-semibold"
@@ -812,6 +814,28 @@ function RightDrawer({ activeTab, onTabChange, onClose }: RightDrawerProps) {
                 />
               )}
               <span className="relative z-10">{t("player.lyrics")}</span>
+            </button>
+
+            {/* live lyrics, full screen */}
+            <button
+              type="button"
+              onClick={() => {
+                onClose?.();
+                navigate("/lyrics");
+              }}
+              aria-label={t("player.lyrics_fullscreen") || "Lyrics full screen"}
+              title={t("player.lyrics_fullscreen") || "Lyrics full screen"}
+              className="inline-flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-lg border-0 bg-transparent text-text-secondary transition-colors hover:text-text-primary active:scale-[0.95]"
+            >
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M6 2H2v4M10 2h4v4M6 14H2v-4M10 14h4v-4"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
         </div>

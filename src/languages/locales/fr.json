@@ -378,6 +378,7 @@
     "home_subtitle": "Utilisez la recherche pour écouter de la musique",
     "queue_empty": "La file d'attente est vide",
     "no_lyrics": "Aucune parole trouvée",
+    "lyrics_fullscreen": "Paroles en plein écran",
     "back": "Retour",
     "tracks": "titres",
     "queue_saved": "File d'attente enregistrée",
@@ -776,7 +777,7 @@
 
       "reset": "Réinitialiser l’apparence",
 
-      "reset_desc": "Actuel : {accent}. Réinitialise accent, angles, surfaces, densité et animations.",
+      "reset_desc": "Rétablit les coins, surfaces, densité et mouvement par défaut.",
 
       "reset_action": "Réinitialiser"
 

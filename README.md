@@ -79,6 +79,25 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## What's new in 0.1.48 (phone polish, live lyrics)
+
+- **Full screen live lyrics** – a new `/lyrics` screen (also reachable from the queue sheet's
+  expand button, the player's *Songtext* pill and a dedicated entry in the bottom navigation).
+  The back button sits top right, the artwork is used as a blurred backdrop, and the line size
+  drops to a phone-friendly value so lines stop wrapping.
+- **Settings → Anpassung (customization) on phones** – the glass-effect sliders no longer squeeze
+  the label and the 190 px track into one row: label, value and track stack vertically, the block
+  selector and *Auf alle / Zurücksetzen* buttons get their own row.
+- **Accent colours removed** from *Settings → Darstellung*; that tab keeps language, theme,
+  corners, surfaces, compact lists and reduced motion. The reset row no longer mentions an accent.
+- **Library / playlist scrolling** – the library header gets a frosted backdrop once the list is
+  scrolled, and the playlist page no longer clips rows under the header: the cover block has its
+  own background, the track list fades in at the top edge instead of being cut mid-row.
+- **Player** – with lyrics on screen the artwork shrinks to a compact 150 px tile instead of
+  pushing the controls off the page; the provider/timestamp island is desktop-only now.
+
+---
+
 ## What's new in 0.1.47 (new mark, appearance, phone UI)
 
 - **New CloudMusic mark** – the cloud with the two notes replaces the old cloud/headphone logo

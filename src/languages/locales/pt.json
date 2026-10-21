@@ -387,6 +387,7 @@
     "home_subtitle": "Use a pesquisa para ouvir música",
     "queue_empty": "A fila está vazia",
     "no_lyrics": "Letra não encontrada",
+    "lyrics_fullscreen": "Letra em tela cheia",
     "back": "Voltar",
     "tracks": "faixas",
     "queue_saved": "Fila salva",
@@ -836,7 +837,7 @@
 
       "reset": "Redefinir aparência",
 
-      "reset_desc": "Atual: {accent}. Redefine destaque, cantos, superfícies, densidade e movimento.",
+      "reset_desc": "Restaura cantos, superfícies, densidade e movimento para o padrão.",
 
       "reset_action": "Redefinir"
 

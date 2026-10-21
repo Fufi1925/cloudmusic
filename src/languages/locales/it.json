@@ -376,6 +376,7 @@
     "home_subtitle": "Usa la ricerca per ascoltare musica",
     "queue_empty": "La coda è vuota",
     "no_lyrics": "Nessun testo trovato",
+    "lyrics_fullscreen": "Testo a schermo intero",
     "back": "Indietro",
     "tracks": "brani",
     "queue_saved": "Coda salvata",
@@ -774,7 +775,7 @@
 
       "reset": "Reimposta aspetto",
 
-      "reset_desc": "Attuale: {accent}. Reimposta accento, angoli, superfici, densità e movimento.",
+      "reset_desc": "Ripristina angoli, superfici, densità e movimento ai valori predefiniti.",
 
       "reset_action": "Reimposta"
 

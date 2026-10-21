@@ -387,6 +387,7 @@
     "home_subtitle": "Use search to listen to music",
     "queue_empty": "Queue is empty",
     "no_lyrics": "No lyrics found",
+    "lyrics_fullscreen": "Lyrics full screen",
     "back": "Back",
     "tracks": "tracks",
     "queue_saved": "Queue saved",
@@ -852,7 +853,7 @@
 
       "reset": "Reset appearance",
 
-      "reset_desc": "Currently: {accent}. Resets accent, corners, surfaces, density and motion.",
+      "reset_desc": "Restores corners, surfaces, density and motion to their defaults.",
 
       "reset_action": "Reset"
 

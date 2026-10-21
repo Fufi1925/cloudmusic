@@ -32,7 +32,7 @@ interface BraccatoLyricsViewProps {
   lyrics: any[];
 }
 
-function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
+export function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
   const player = usePlayerState();
   const elementRef = useRef<any>(null);
   const latestLyricsRef = useRef(lyrics);
@@ -275,7 +275,8 @@ function BraccatoLyricsView({ lyrics }: BraccatoLyricsViewProps) {
       {createElement(BRACCATO_TAG, {
         ref: setElement,
         source: "#cloudmusic-audio",
-        className: "block flex-1 w-full h-full px-6",
+        // phones wrap every line at the shipped 2rem, so the size comes down there
+        className: "lyrics-compact block flex-1 w-full h-full px-4 max-md:px-4 md:px-6",
         style: {
           overflowY: "auto",
           overflowX: "hidden",
@@ -291,12 +292,14 @@ export interface FullscreenPlayerProps {
   effectsReady?: boolean;
   onClose: () => void;
   onQueueOpen?: () => void;
+  onLyricsOpen?: () => void;
 }
 
 export function FullscreenPlayer({
   effectsReady = true,
   onClose,
   onQueueOpen,
+  onLyricsOpen,
 }: FullscreenPlayerProps) {
   const { t } = useTranslation();
   const isCompact = useIsCompact();
@@ -382,7 +385,12 @@ export function FullscreenPlayer({
               : "flex-1 justify-center"
           }`}
         >
-          <PlayerUiElements onClose={onClose} onQueueOpen={onQueueOpen} />
+          <PlayerUiElements
+            onClose={onClose}
+            onQueueOpen={onQueueOpen}
+            onLyricsOpen={onLyricsOpen}
+            dense={isCompact && hasLyrics}
+          />
         </div>
 
         {(!isCompact || hasLyrics) && (
@@ -394,7 +402,7 @@ export function FullscreenPlayer({
           }`}
         >
           {showProviderIsland && (
-            <div className="absolute top-[12px] left-1/2 -translate-x-1/2 z-30 pointer-events-none flex justify-center">
+            <div className="absolute top-[12px] left-1/2 -translate-x-1/2 z-30 pointer-events-none hidden justify-center md:flex">
               <LyricsProviderIsland />
             </div>
           )}
@@ -514,6 +522,7 @@ export default function PlayerPage() {
   return (
     <FullscreenPlayer
       onClose={() => navigate(-1)}
+      onLyricsOpen={() => navigate("/lyrics")}
       onQueueOpen={() => {
         // leave the full screen player first: the queue sheet lives in the shell
         navigate("/", { replace: true });

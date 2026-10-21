@@ -359,7 +359,13 @@ export default function LibraryPage() {
         }}
         className="h-full w-full overflow-y-auto bg-transparent pb-[80px]"
       >
-        <div className="sticky top-0 z-20 bg-transparent">
+        <div
+          className={`sticky top-0 z-20 transition-colors duration-200 ${
+            showTopFog
+              ? "bg-bg-primary/88 backdrop-blur-xl supports-[backdrop-filter]:bg-bg-primary/75"
+              : "bg-transparent"
+          }`}
+        >
 
           <div className="px-[32px] max-md:px-[16px] pt-[20px] max-md:pt-[calc(env(safe-area-inset-top,0px)+14px)] pb-[10px]">
             <h1

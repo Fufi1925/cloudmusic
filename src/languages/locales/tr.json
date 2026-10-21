@@ -376,6 +376,7 @@
     "home_subtitle": "Müzik dinlemek için aramayı kullan",
     "queue_empty": "Sıra boş",
     "no_lyrics": "Şarkı sözü bulunamadı",
+    "lyrics_fullscreen": "Şarkı sözleri tam ekran",
     "back": "Geri",
     "tracks": "parça",
     "queue_saved": "Sıra kaydedildi",
@@ -774,7 +775,7 @@
 
       "reset": "Görünümü sıfırla",
 
-      "reset_desc": "Şu an: {accent}. Vurgu, köşeler, yüzeyler, yoğunluk ve hareketi sıfırlar.",
+      "reset_desc": "Köşeleri, yüzeyleri, yoğunluğu ve hareketi varsayılana döndürür.",
 
       "reset_action": "Sıfırla"
 

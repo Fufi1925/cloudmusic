@@ -56,9 +56,51 @@ page.on("request", (req) => {
     if (path.startsWith("/v1/me/history")) return req.respond(json({ items: TRACKS.slice(0, 5) }));
     if (path.startsWith("/v1/me/recommendations/daily-mixes"))
       return req.respond(json({ items: [{ id: "mix1", title: "Daily Mix 1", description: "Für dich", cover: { url: "" }, tracks: TRACKS }] }));
+    if (path.includes("/lyrics")) {
+      // minimal SSE stream so the full screen lyrics page can be captured
+      const lrc = Array.from({ length: 24 }, (_, i) => {
+        const t = 8 + i * 6;
+        const mm = String(Math.floor(t / 60)).padStart(2, "0");
+        const ss = String(t % 60).padStart(2, "0");
+        return `[${mm}:${ss}.00] Line ${i + 1} of the demo song`;
+      }).join("\n");
+      const body = [
+        "data: " + JSON.stringify({ type: "metadata", track: { id: "demoTrack1", title: "Midnight Drive", artists: [], durationMs: 194000 } }),
+        "",
+        "data: " + JSON.stringify({
+          type: "provider",
+          provider: "demo",
+          status: "found",
+          syncLevel: "line_level",
+          candidate: {
+            provider: "demo",
+            lyrics: { format: "lrc", content: lrc },
+            contentKind: "line_synced",
+            syncLevel: "line_level",
+            quality: { total: 90, match: 90, content: 90, sync: 90, source: 90, reasons: [] },
+          },
+        }),
+        "",
+        "",
+      ].join("\n");
+      return req.respond({
+        status: 200,
+        headers: { ...CORS, "content-type": "text/event-stream" },
+        body,
+      });
+    }
     if (path === "/health") return req.respond(json({ ok: true }));
     if (path.includes("/radio")) return req.respond(json({ items: TRACKS }));
-    if (path.includes("/library/tracks")) return req.respond(json({ items: TRACKS.slice(0, 4), nextCursor: null }));
+    if (path.includes("/library/tracks"))
+      return req.respond(
+        json({
+          items: Array.from({ length: 24 }, (_, i) => TRACKS[i % TRACKS.length]).map((t, i) => ({
+            track: { ...t, id: `${t.id}_${i}`, title: `${t.title} ${i + 1}`, cover: { url: "", width: 480, height: 480 } },
+            likedAt: new Date().toISOString(),
+          })),
+          nextCursor: null,
+        }),
+      );
     if (path.includes("/me/playlists")) return req.respond(json({ items: [{ id: "pl1", title: "Roadtrip", description: "", trackCount: 12 }] }));
     if (path.includes("/library/")) return req.respond(json({ items: [] }));
     return req.respond(json({ items: [], nextCursor: null }));
@@ -136,6 +178,20 @@ if (hash && hash !== "/") {
 }
 await new Promise((r) => setTimeout(r, 4500));
 
+// --scroll=<px> scrolls the deepest scrollable container before the shot
+const scrollArg = process.argv.find((a) => a.startsWith("--scroll="));
+if (scrollArg) {
+  const amount = Number(scrollArg.split("=")[1]) || 0;
+  await page.evaluate((px) => {
+    const all = [...document.querySelectorAll("div, main, section")].filter((el) => {
+      const s = getComputedStyle(el);
+      return /(auto|scroll)/.test(s.overflowY) && el.scrollHeight > el.clientHeight + 20;
+    });
+    for (const el of all) el.scrollTop = px;
+  }, amount);
+  await new Promise((r) => setTimeout(r, 900));
+}
+
 // --click=<visible text> presses the first matching button/link; repeatable
 for (const arg of process.argv.filter((a) => /^--click(\d*)=/.test(a))) {
   const label = arg.split("=")[1];
@@ -170,6 +226,24 @@ const overflow = await page.evaluate(() => {
   return { href: location.href, docW, scrollW: document.documentElement.scrollWidth, bad: bad.slice(0, 25) };
 });
 console.log(JSON.stringify(overflow, null, 1));
+
+// --probe=css-selector prints the geometry of matching nodes (debugging helper)
+const probeArg = process.argv.find((a) => a.startsWith("--probe="));
+if (probeArg) {
+  const sel = probeArg.slice("--probe=".length);
+  const info = await page.evaluate((s) => {
+    const nodes = [...document.querySelectorAll(s)];
+    return {
+      innerH: window.innerHeight,
+      count: nodes.length,
+      nodes: nodes.slice(0, 6).map((n) => {
+        const r = n.getBoundingClientRect();
+        return { tag: n.tagName.toLowerCase(), cls: (n.className || "").toString().slice(0, 80), top: Math.round(r.top), bottom: Math.round(r.bottom), h: Math.round(r.height), text: (n.textContent || "").trim().slice(0, 30) };
+      }),
+    };
+  }, sel);
+  console.log("PROBE:", JSON.stringify(info, null, 1));
+}
 if (process.argv.includes("--paths")) console.log("PATHS:", [...new Set(seen)].join("\n"));
 if (logs.length) console.log("LOGS:", logs.slice(0, 40).join("\n"));
 await page.screenshot({ path: out, fullPage: false });

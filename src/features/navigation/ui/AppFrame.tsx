@@ -217,7 +217,7 @@ export default function AppFrame({ children }: AppFrameProps) {
   const isAlbumSearchFilter = activeFilter === "albums";
   const isPlaylistSearchFilter = activeFilter === "playlists";
   const hasSearchQuery = searchQuery.trim().length > 0;
-  const isFullscreenRoute = pathname === "/player";
+  const isFullscreenRoute = pathname === "/player" || pathname === "/lyrics";
   const isFullscreenPlayer = isFullscreenRoute || fullscreenPlayerOpen;
   const shellChildrenRef = useRef<React.ReactNode>(null);
   if (!isFullscreenRoute) {
@@ -868,6 +868,10 @@ export default function AppFrame({ children }: AppFrameProps) {
               onQueueOpen={() => {
                 closeFullscreenPlayer();
                 openRightPanel("queue");
+              }}
+              onLyricsOpen={() => {
+                closeFullscreenPlayer();
+                navigate("/lyrics");
               }}
             />
           </motion.div>

@@ -7,10 +7,7 @@ import {
   selectIsGlassThemeActive,
 } from "../../store/customizationStore";
 import {
-  ACCENT_IDS,
-  accentSwatch,
   useAppearanceStore,
-  type AccentId,
   type CornerStyle,
   type SurfaceStyle,
 } from "../../store/appearanceStore";
@@ -131,96 +128,12 @@ function ThemeCard({
   );
 }
 
-/** Accent swatches; the last chip opens the native colour picker for a custom tone. */
-function AccentPicker() {
-  const { t } = useTranslation();
-  const accent = useAppearanceStore((s) => s.accent);
-  const customAccent = useAppearanceStore((s) => s.customAccent);
-  const setAccent = useAppearanceStore((s) => s.setAccent);
-  const setCustomAccent = useAppearanceStore((s) => s.setCustomAccent);
-
-  const chips: AccentId[] = ACCENT_IDS;
-
-  return (
-    <div className="flex flex-wrap items-center gap-[8px]">
-      {chips.map((id) => {
-        const isActive = !customAccent && accent === id;
-        return (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setAccent(id)}
-            aria-pressed={isActive}
-            aria-label={id === "default" ? t("settings.appearance.accent_default") : id}
-            title={id === "default" ? t("settings.appearance.accent_default") : id}
-            className={`relative flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-full border-0 p-0 transition-transform active:scale-[0.92] ${
-              isActive ? "ring-2 ring-text-primary ring-offset-2 ring-offset-bg-primary" : ""
-            }`}
-            style={{ backgroundColor: accentSwatch(id) }}
-          >
-            {isActive ? (
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path
-                  d="M2 6.5L4.5 9L10 3"
-                  stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : null}
-          </button>
-        );
-      })}
-
-      <label
-        className={`relative flex h-[28px] w-[28px] cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border-secondary bg-bg-elevated ${
-          customAccent ? "ring-2 ring-text-primary ring-offset-2 ring-offset-bg-primary" : ""
-        }`}
-        title={t("settings.appearance.accent_custom")}
-      >
-        <span
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "conic-gradient(from 0deg, #ff3b3b, #f59e0b, #10b981, #3b82f6, #8b5cf6, #f43f5e, #ff3b3b)",
-            opacity: customAccent ? 0 : 1,
-          }}
-        />
-        <span
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundColor: customAccent ?? "transparent" }}
-        />
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 12 12"
-          fill="none"
-          aria-hidden="true"
-          className="relative z-10 drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
-        >
-          <path d="M6 1v10M1 6h10" stroke="#ffffff" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
-        <input
-          type="color"
-          aria-label={t("settings.appearance.accent_custom")}
-          value={customAccent ?? "#8b5cf6"}
-          onChange={(event) => setCustomAccent(event.target.value)}
-          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-        />
-      </label>
-    </div>
-  );
-}
-
 export function AppearanceTab({ searchQuery }: { searchQuery?: string }) {
   const { t, locale, setLocale } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const isGlassActive = useCustomizationStore(selectIsGlassThemeActive);
 
-  const accent = useAppearanceStore((s) => s.accent);
-  const customAccent = useAppearanceStore((s) => s.customAccent);
   const corners = useAppearanceStore((s) => s.corners);
   const surface = useAppearanceStore((s) => s.surface);
   const reduceMotion = useAppearanceStore((s) => s.reduceMotion);
@@ -239,14 +152,6 @@ export function AppearanceTab({ searchQuery }: { searchQuery?: string }) {
     mounted &&
     typeof window !== "undefined" &&
     !window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-  const accentLabel = customAccent
-    ? t("settings.appearance.accent_custom_value", { color: customAccent.toUpperCase() })
-    : (() => {
-        const key = `settings.appearance.accent_${accent === "default" ? "default" : accent}`;
-        const label = t(key);
-        return label === key ? accent : label;
-      })();
 
   return (
     <>
@@ -318,15 +223,6 @@ export function AppearanceTab({ searchQuery }: { searchQuery?: string }) {
             </div>
           ) : null}
         </SettingBlock>
-
-        <SettingRow
-          title={t("settings.appearance.accent")}
-          description={t("settings.appearance.accent_desc")}
-          titleKey="settings.appearance.accent"
-          descKey="settings.appearance.accent_desc"
-          searchQuery={searchQuery}
-          control={mounted ? <AccentPicker /> : <span />}
-        />
 
         <SettingRow
           title={t("settings.appearance.corners")}
@@ -408,7 +304,7 @@ export function AppearanceTab({ searchQuery }: { searchQuery?: string }) {
 
         <SettingRow
           title={t("settings.appearance.reset")}
-          description={t("settings.appearance.reset_desc", { accent: accentLabel })}
+          description={t("settings.appearance.reset_desc")}
           titleKey="settings.appearance.reset"
           descKey="settings.appearance.reset_desc"
           searchQuery={searchQuery}

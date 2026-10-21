@@ -380,6 +380,7 @@
     "home_subtitle": "Użyj wyszukiwarki, aby słuchać muzyki",
     "queue_empty": "Kolejka jest pusta",
     "no_lyrics": "Nie znaleziono tekstu",
+    "lyrics_fullscreen": "Tekst na pełnym ekranie",
     "back": "Wstecz",
     "tracks": "utworów",
     "queue_saved": "Kolejka zapisana",
@@ -778,7 +779,7 @@
 
       "reset": "Przywróć wygląd",
 
-      "reset_desc": "Teraz: {accent}. Przywraca akcent, narożniki, powierzchnie, gęstość i animacje.",
+      "reset_desc": "Przywraca domyślne narożniki, powierzchnie, gęstość i ruch.",
 
       "reset_action": "Przywróć"
 

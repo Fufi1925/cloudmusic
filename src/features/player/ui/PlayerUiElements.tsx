@@ -66,12 +66,18 @@ interface PlayerUiElementsProps {
   onClose?: () => void;
   /** compact only: the queue sheet is unreachable from the full screen player otherwise */
   onQueueOpen?: () => void;
+  /** compact only: full screen live lyrics */
+  onLyricsOpen?: () => void;
+  /** compact + lyrics on screen: shrink the artwork so controls stay visible */
+  dense?: boolean;
 }
 
 export function PlayerUiElements({
   onDuration: _onDuration,
   onClose,
   onQueueOpen,
+  onLyricsOpen,
+  dense = false,
 }: PlayerUiElementsProps) {
   const player = usePlayerState();
 
@@ -106,7 +112,11 @@ export function PlayerUiElements({
     <>
       {/* Artwork (Compact, flat, no drop shadows) */}
       <div
-        className={`relative shrink-0 overflow-hidden rounded-xl w-[280px] h-[280px] max-md:w-[min(330px,78vw)] max-md:h-[min(330px,78vw)] bg-black/20 ${
+        className={`relative shrink-0 overflow-hidden rounded-xl ${
+          dense
+            ? "w-[min(150px,38vw)] h-[min(150px,38vw)] max-md:w-[min(150px,38vw)] max-md:h-[min(150px,38vw)]"
+            : "w-[280px] h-[280px] max-md:w-[min(330px,78vw)] max-md:h-[min(330px,78vw)]"
+        } bg-black/20 ${
           coverUrl && !isCoverLoaded ? "animate-pulse" : ""
         }`}
       >
@@ -172,7 +182,11 @@ export function PlayerUiElements({
       </div>
 
       {/* Track info */}
-      <div className="w-[280px] max-md:w-[min(280px,78vw)] flex items-start justify-center min-w-0">
+      <div
+        className={`flex items-start justify-center min-w-0 ${
+          dense ? "w-[min(220px,60vw)]" : "w-[280px] max-md:w-[min(280px,78vw)]"
+        }`}
+      >
         <div className="flex flex-col gap-[2px] min-w-0 text-center">
           <p
             className="m-0 text-[15px] max-md:text-[16px] font-[600] text-white flex items-center justify-center gap-[6px] max-w-[280px] max-md:max-w-[78vw]"
@@ -277,8 +291,12 @@ export function PlayerUiElements({
         <VolumePicker className="w-[180px]" size="sm" />
       </div>
 
-      {/* phones get the queue instead of the volume slider */}
-      <div className="hidden w-full items-center justify-center max-md:flex">
+      {/* phones get the queue and lyrics instead of the volume slider */}
+      <div
+        className={`w-full items-center justify-center gap-[10px] ${
+          dense ? "hidden" : "hidden max-md:flex"
+        }`}
+      >
         {onQueueOpen && (
           <button
             type="button"
@@ -287,6 +305,16 @@ export function PlayerUiElements({
           >
             <Playlist size={18} />
             {t("player.queue")}
+          </button>
+        )}
+        {onLyricsOpen && (
+          <button
+            type="button"
+            onClick={onLyricsOpen}
+            className="inline-flex h-[40px] items-center gap-[8px] rounded-full border border-white/12 bg-white/[0.06] px-[20px] text-[13.5px] font-[550] text-white/80 transition-colors active:bg-white/[0.12]"
+          >
+            <MusicNote size={18} />
+            {t("player.lyrics")}
           </button>
         )}
       </div>
