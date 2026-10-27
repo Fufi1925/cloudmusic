@@ -241,10 +241,77 @@ export function OverlayPlayer() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentPosMs, durationMs, sendAction, state.volume]);
 
+  // ── dragging the pill ──────────────────────────────────────────────────
+  // the window is frameless, so we move it ourselves: the renderer just reports
+  // pointer travel and the main process shifts the window (position is kept in
+  // overlay-settings.json). buttons opt out via the closest() check.
+  const dragRef = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+
+  // linux hands the move to the compositor (css app-region) because wayland
+  // ignores setPosition; windows/macos get the explicit ipc drag, which also
+  // keeps the window size pinned while crossing displays
+  const usesNativeDrag = window.cloudMusicElectron?.platform === "linux";
+
+  const handleDragPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (usesNativeDrag) return;
+    if (e.button !== 0) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.closest?.("button, a, input, textarea, select, [role='button'], [data-no-overlay-drag]")) return;
+    dragRef.current = { x: e.screenX, y: e.screenY, moved: false };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  }, [usesNativeDrag]);
+
+  const handleDragPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (usesNativeDrag) return;
+    const drag = dragRef.current;
+    if (!drag) return;
+    if (!drag.moved) {
+      if (Math.abs(e.screenX - drag.x) < 3 && Math.abs(e.screenY - drag.y) < 3) return;
+      drag.moved = true;
+      window.cloudMusicElectron?.startOverlayDrag?.();
+    }
+    window.cloudMusicElectron?.moveOverlayDrag?.();
+  }, [usesNativeDrag]);
+
+  const endDrag = useCallback((pointerId?: number) => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    if (pointerId !== undefined) {
+      try {
+        (document.querySelector("[data-overlay-drag-surface]") as HTMLElement | null)?.releasePointerCapture?.(pointerId);
+      } catch {}
+    }
+    if (drag?.moved) window.cloudMusicElectron?.endOverlayDrag?.();
+  }, []);
+
+  const handleDragPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      endDrag(e.pointerId);
+    },
+    [endDrag],
+  );
+
+  // double click on empty pill area -> back to the preset corner
+  const handleDragDoubleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement | null;
+    if (target?.closest?.("button, a, input, textarea, select, [role='button'], [data-no-overlay-drag]")) return;
+    void window.cloudMusicElectron?.resetOverlayPosition?.();
+  }, []);
+
   return (
     <div
+      data-overlay-drag-surface
       className="flex h-screen w-screen select-none flex-col justify-start bg-transparent antialiased overflow-hidden font-sans p-1 m-0 border-0"
-      style={{ WebkitAppRegion: "drag" } as React.CSSProperties}
+      style={{
+        cursor: "grab",
+        ...(usesNativeDrag ? ({ WebkitAppRegion: "drag" } as React.CSSProperties) : {}),
+      }}
+      onPointerDown={handleDragPointerDown}
+      onPointerMove={handleDragPointerMove}
+      onPointerUp={handleDragPointerUp}
+      onPointerCancel={handleDragPointerUp}
+      onLostPointerCapture={() => endDrag()}
+      onDoubleClick={handleDragDoubleClick}
     >
       {/* ── Main Overlay Card ── */}
       <motion.div
@@ -343,7 +410,8 @@ export function OverlayPlayer() {
           {/* Right: Like Button + Playback Controls (Previous, Play/Pause, Next) */}
           <div
             className="flex items-center gap-0.5 shrink-0 pl-1"
-            style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+            data-no-overlay-drag
+            style={usesNativeDrag ? ({ WebkitAppRegion: "no-drag" } as React.CSSProperties) : undefined}
             onMouseDown={(e) => e.stopPropagation()}
           >
             <button

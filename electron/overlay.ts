@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain, screen, globalShortcut, app } from "electron";
 import path from "node:path";
 import fs from "node:fs";
+import { computeDragBounds, type Rect } from "./window-drag.js";
 
 export type OverlayPosition = "top-left" | "top-center" | "top-right";
 
@@ -11,6 +12,9 @@ export interface OverlaySettings {
   likeShortcut?: string;
   autoShowOnMinimize: boolean;
   alwaysOnTop: boolean;
+  /** where the user dragged the pill; unset = follow `position` */
+  x?: number;
+  y?: number;
 }
 
 const CYRILLIC_TO_QWERTY: Record<string, string> = {
@@ -63,12 +67,17 @@ export class OverlayManager {
   private currentRegisteredLikeShortcut: string | null = null;
   private autoShowOnMinimize = true;
   private alwaysOnTop = true;
+  // set once the user dragged the pill somewhere; wins over the preset corner
+  private customX: number | null = null;
+  private customY: number | null = null;
+  private dragStart: { cursor: { x: number; y: number }; bounds: Rect } | null = null;
   private wasAutoOpened = false;
   private isAuthenticated = false;
   // set once the app is quitting: nothing may create a window or grab a shortcut again
   private disposed = false;
 
   private moveAnimationTimer: NodeJS.Timeout | null = null;
+  private positionSaveTimer: NodeJS.Timeout | null = null;
   private currentAnimatedX: number | null = null;
   private closeTimeout: NodeJS.Timeout | null = null;
 
@@ -113,6 +122,10 @@ export class OverlayManager {
         if (typeof data.alwaysOnTop === "boolean") {
           this.alwaysOnTop = data.alwaysOnTop;
         }
+        if (Number.isFinite(data.x) && Number.isFinite(data.y)) {
+          this.customX = Math.round(data.x);
+          this.customY = Math.round(data.y);
+        }
       }
     } catch (e) {
       console.warn("[overlay] Could not read overlay-settings.json:", e);
@@ -130,6 +143,9 @@ export class OverlayManager {
         likeShortcut: this.likeShortcut,
         autoShowOnMinimize: this.autoShowOnMinimize,
         alwaysOnTop: this.alwaysOnTop,
+        ...(this.customX !== null && this.customY !== null
+          ? { x: this.customX, y: this.customY }
+          : {}),
       };
       fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
     } catch (e) {
@@ -328,7 +344,48 @@ export class OverlayManager {
         break;
     }
 
+    if (this.customX !== null && this.customY !== null) {
+      // keep the dragged spot on a screen that still exists
+      const target = screen.getDisplayNearestPoint({ x: this.customX, y: this.customY }).workArea;
+      return {
+        x: Math.round(Math.min(Math.max(this.customX, target.x - width + 80), target.x + target.width - 80)),
+        y: Math.round(Math.min(Math.max(this.customY, target.y - 20), target.y + target.height - 40)),
+        width,
+        height: finalHeight,
+      };
+    }
+
     return { x, y, width, height: finalHeight };
+  }
+
+  /** the pill was dragged: remember the spot (debounced, drags fire a lot) */
+  private rememberPosition() {
+    const win = this.overlayWindow;
+    if (!win || win.isDestroyed()) return;
+    const bounds = win.getBounds();
+    this.customX = bounds.x;
+    this.customY = bounds.y;
+    if (this.positionSaveTimer) clearTimeout(this.positionSaveTimer);
+    this.positionSaveTimer = setTimeout(() => {
+      this.positionSaveTimer = null;
+      this.savePersistedSettings();
+    }, 400);
+  }
+
+  /** back to the preset corner (top-center by default) */
+  public resetPosition(): boolean {
+    this.customX = null;
+    this.customY = null;
+    this.savePersistedSettings();
+    if (this.positionSaveTimer) {
+      clearTimeout(this.positionSaveTimer);
+      this.positionSaveTimer = null;
+    }
+    const win = this.overlayWindow;
+    if (!win || win.isDestroyed()) return true;
+    this.stopMoveAnimation();
+    win.setBounds(this.getWindowBounds());
+    return true;
   }
 
   private stopMoveAnimation() {
@@ -619,6 +676,12 @@ export class OverlayManager {
       },
     });
 
+    // a native (css app-region) drag on linux: remember where it landed too
+    this.overlayWindow.on("moved", () => {
+      if (this.dragStart) return; // our own ipc drag already tracked it
+      this.rememberPosition();
+    });
+
     this.overlayWindow.once("ready-to-show", () => {
       if (this.overlayWindow && !this.overlayWindow.isDestroyed()) {
         // created ahead of time: stay hidden until something actually opens it
@@ -717,6 +780,37 @@ export class OverlayManager {
       this.closeOverlay();
     });
 
+    // dragging the pill: the window has no title bar, so the renderer reports
+    // pointer travel and we move the window with the size pinned at drag start
+    ipcMain.on("overlay:drag-start", () => {
+      const win = this.overlayWindow;
+      if (!win || win.isDestroyed()) return;
+      this.stopMoveAnimation();
+      this.dragStart = { cursor: screen.getCursorScreenPoint(), bounds: win.getBounds() };
+    });
+
+    ipcMain.on("overlay:drag-move", () => {
+      const win = this.overlayWindow;
+      if (!win || win.isDestroyed()) return;
+      if (!this.dragStart) {
+        this.dragStart = { cursor: screen.getCursorScreenPoint(), bounds: win.getBounds() };
+        return;
+      }
+      const next = computeDragBounds(this.dragStart.bounds, this.dragStart.cursor, screen.getCursorScreenPoint());
+      const current = win.getBounds();
+      if (next.x !== current.x || next.y !== current.y) {
+        win.setBounds(next);
+      }
+    });
+
+    ipcMain.on("overlay:drag-end", () => {
+      if (!this.dragStart) return;
+      this.dragStart = null;
+      this.rememberPosition();
+    });
+
+    ipcMain.handle("overlay:reset-position", () => this.resetPosition());
+
     ipcMain.on("overlay:pause-shortcuts", (_event, paused: boolean) => {
       this.pauseShortcuts(Boolean(paused));
     });
@@ -742,6 +836,11 @@ export class OverlayManager {
       ) {
         const changed = this.position !== settings.position;
         this.position = settings.position;
+        if (changed) {
+          // picking a corner in settings means "put it there", not "keep my drag"
+          this.customX = null;
+          this.customY = null;
+        }
         if (changed && this.overlayWindow && !this.overlayWindow.isDestroyed() && this.overlayWindow.isVisible()) {
           shouldAnimate = true;
         }

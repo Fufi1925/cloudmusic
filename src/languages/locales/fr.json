@@ -263,7 +263,8 @@
       "title": "{count} dans le salon",
       "host": "Hôte",
       "empty": "Personne pour l'instant – partage ton code.",
-      "offline": "hors ligne"
+      "offline": "hors ligne",
+      "kick": "Exclure"
     },
     "requests": {
       "title": "{count} en attente",
@@ -275,7 +276,10 @@
       "description": "Touche une chanson pour la faire remonter – l'hôte voit les votes.",
       "action": "Voter",
       "current": "Lecture en cours : {title}",
-      "skip": "Passer la chanson"
+      "skip": "Passer la chanson",
+      "voted": "Voté",
+      "skip_hint": "Clique encore pour retirer ton vote",
+      "withdraw_hint": "Clique encore pour retirer ton vote"
     },
     "server": {
       "title": "Serveur du salon",
@@ -304,15 +308,77 @@
       "label": "Salon",
       "listeners": "{count} à l'écoute",
       "listeners_one": "{count} à l'écoute",
-      "listeners_zero": "Personne n'écoute encore",      "listening_to": "À l'écoute de {name}"
+      "listeners_zero": "Personne n'écoute encore",
+      "listening_to": "À l'écoute de {name}"
     },
     "notice": {
       "skip_passed": "Assez de votes – passage.",
       "closed": "Le salon a été fermé.",
       "expired": "Le salon a expiré.",
-      "guest_gone": "Cet auditeur est déjà parti."
+      "guest_gone": "Cet auditeur est déjà parti.",
+      "request_accepted": "Souhait accepté : le titre rejoint la file.",
+      "request_denied": "L'hôte a refusé ce souhait.",
+      "requests_disabled": "L'hôte a désactivé les souhaits.",
+      "requests_full": "Trop de souhaits, réessaie plus tard.",
+      "kicked": "L'hôte t'a retiré de la lobby."
     },
-    "tab_description": "Écouter ensemble : crée un code ou rejoins un salon."
+    "tab_description": "Écouter ensemble : crée un code ou rejoins un salon.",
+    "wish": {
+      "title": "{count} souhaits",
+      "description": "Soutiens un souhait : plus il a de votes, plus vite l'hôte le joue.",
+      "description_host": "Tes auditeurs demandent des titres. Dis oui ou non, ta musique continue.",
+      "from": "de {name}",
+      "votes": "{count} votes",
+      "prompt_title": "Souhait de titre",
+      "unknown_artist": "Artiste inconnu",
+      "accept": "Le jouer",
+      "decline": "Non",
+      "more": "+{count} autres",
+      "withdraw": "Retirer le souhait",
+      "title_one": "Souhait de titre",
+      "votes_one": "{count} vote"
+    },
+    "search": {
+      "title": "Souhaiter un titre",
+      "title_host": "Ajouter un titre",
+      "description": "Cherche un titre et envoie-le à l'hôte : il décide s'il passe.",
+      "description_host": "Cherche un titre et ajoute-le directement à la file.",
+      "placeholder": "Rechercher des titres …",
+      "loading": "Recherche …",
+      "empty": "Aucun résultat.",
+      "wish": "Souhaiter",
+      "voted": "Voté · {count}",
+      "queue": "Ajouter",
+      "already_queued": "Ce titre est déjà dans la file.",
+      "added": "Ajouté à la file",
+      "disabled": "L'hôte a désactivé les souhaits.",
+      "vote_hint": "Appuie encore pour retirer ton vote"
+    },
+    "overlay": {
+      "title": "Lobby",
+      "empty": "Aucune lobby",
+      "nothing": "Rien en lecture",
+      "next": "À suivre",
+      "wishes": "{count} souhaits",
+      "skip_votes": "Passer {votes}/{needed}",
+      "members": "Auditeurs",
+      "kick": "Exclure",
+      "open": "Ouvrir la lobby",
+      "hide": "Masquer",
+      "show": "Afficher l'overlay",
+      "reset_position": "Réinitialiser la position",
+      "you": "toi",
+      "host_hint": "Clic droit pour exclure",
+      "listener_hint": "Clic droit pour les options",
+      "right_click": "Clic droit pour les options",
+      "settings_hint": "Petite fenêtre avec les auditeurs et le prochain titre, déplaçable – en haut à droite par défaut.",
+      "wishes_one": "{count} souhait"
+    },
+    "settings": {
+      "title": "Réglages de la lobby",
+      "allow_requests": "Autoriser les souhaits",
+      "allow_requests_hint": "Les auditeurs peuvent proposer des titres, tu décides via une fenêtre."
+    }
   },
   "login": {
     "welcome_back": "Bon retour",
@@ -490,23 +556,14 @@
     "reverb_hint": "Espace atmosphérique et profondeur d'ambiance",
     "reverb_amount": "Réverbération",
     "queue_save_button": "Enregistrer comme playlist",
-
     "queue_save_title": "Enregistrer la file d’attente",
-
     "queue_save_description": "Crée une nouvelle playlist avec {count} titres de votre file d’attente.",
-
     "queue_save_action": "Enregistrer",
-
     "queue_saving": "Enregistrement…",
-
     "queue_save_success": "Playlist enregistrée · {count} titres",
-
     "queue_save_failed": "Impossible d’enregistrer la playlist",
-
     "queue_empty_hint": "Lancez un titre ou ajoutez-en pour créer une file d’attente.",
-
     "queue_play_next_hint": "Clic droit sur un titre → « Lire ensuite »"
-
   },
   "playlist": {
     "playlist": "Playlist",
@@ -694,7 +751,6 @@
       "file_too_large": "Le fichier doit faire moins de 30 Mo",
       "read_error": "Impossible de lire le fichier image"
     },
-
     "audio_data": {
       "description": "Qualité du streaming, cache hors ligne et diagnostic de connexion."
     },
@@ -803,65 +859,35 @@
       "system": "Système"
     },
     "appearance": {
-
       "accent": "Couleur d’accent",
-
       "accent_desc": "Colore le cœur des favoris, les anneaux de focus et les messages. Le rouge CloudMusic par défaut.",
-
       "accent_default": "Standard",
-
       "accent_custom": "Couleur personnalisée",
-
       "accent_custom_value": "{color}",
-
       "blue": "Bleu",
-
       "violet": "Violet",
-
       "green": "Vert",
-
       "amber": "Ambre",
-
       "rose": "Rose",
-
       "teal": "Turquoise",
-
       "corners": "Angles",
-
       "corners_desc": "Arrondi des cartes, champs et fenêtres.",
-
       "corners_soft": "Nets",
-
       "corners_default": "Standard",
-
       "corners_round": "Arrondis",
-
       "surface": "Surfaces",
-
       "surface_desc": "Séparation entre l’arrière-plan, les panneaux et les cartes.",
-
       "surface_default": "Standard",
-
       "surface_contrast": "Contraste",
-
       "surface_oled": "Noir OLED",
-
       "compact": "Listes compactes",
-
       "compact_desc": "Lignes plus serrées dans les listes de titres et la file, pour en voir plus à l’écran.",
-
       "reduce_motion": "Réduire les animations",
-
       "reduce_motion_desc": "Désactive les transitions et animations (utile en cas de vertige ou sur un téléphone lent).",
-
       "reset": "Réinitialiser l’apparence",
-
       "reset_desc": "Rétablit les coins, surfaces, densité et mouvement par défaut.",
-
       "reset_action": "Réinitialiser"
-
     },
-
     "branding": {
       "title": "Logo",
       "description": "Choisissez la couleur d'accent du logo.",
@@ -895,9 +921,7 @@
       "high": "Haute qualité (AAC 256kbps)",
       "lossless": "Sans perte (FLAC/ALAC) - Indisponible",
       "equalizer_title": "Égaliseur",
-
       "equalizer_description": "Égaliseur graphique 10 bandes avec presets. Aussi disponible dans la barre du lecteur."
-
     },
     "profile": {
       "title": "Profil",

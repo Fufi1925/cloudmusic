@@ -36,6 +36,7 @@ import {
 } from "./netdiag.js";
 import { TouchBarManager } from "./touchbar.js";
 import { OverlayManager } from "./overlay.js";
+import { LobbyOverlayManager } from "./lobby-overlay.js";
 import { BundleManager } from "./bundle-manager.js";
 import { createBundleErrorStamp } from "./bundle-stamp.js";
 import { createSleepBlocker } from "./sleep-blocker.js";
@@ -76,6 +77,7 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
 let mainWindow: BrowserWindow | null = null;
 let touchBarManager: TouchBarManager | null = null;
 let overlayManager: OverlayManager | null = null;
+let lobbyOverlayManager: LobbyOverlayManager | null = null;
 let bundleManager: BundleManager | null = null;
 // CloudMusic: both upstream update channels (installer releases and OTA renderer
 // bundles) ship the original client and would silently revert this build, so they
@@ -135,6 +137,7 @@ const shutdown = createShutdown({
   cleanup: [
     () => touchBarManager?.unregisterShortcut(),
     () => overlayManager?.dispose(),
+    () => lobbyOverlayManager?.dispose(),
     () => {
       // drop the discord ipc socket so presence clears and nothing keeps the process alive
       discordRpcManager?.destroy();
@@ -362,6 +365,8 @@ function createWindow() {
     if (process.platform === "darwin") {
       // macOS keeps the app alive without windows; the overlay can be rebuilt on activate
       overlayManager?.destroy();
+      lobbyOverlayManager?.dispose();
+      lobbyOverlayManager = null;
     } else {
       // closing the main window (title bar button, taskbar, alt+f4) ends the whole app
       shutdown.quit();
@@ -445,6 +450,13 @@ if (!gotTheLock) {
       } else restore();
     });
     overlayManager.registerShortcut();
+
+    // desktop-only: small lobby card (members, next track, right-click to kick)
+    lobbyOverlayManager = new LobbyOverlayManager(
+      path.join(__dirname, "preload.cjs"),
+      RENDERER_DIST,
+    );
+    lobbyOverlayManager.setMainWindow(mainWindow);
 
     discordRpcManager = new DiscordRpcManager();
     poTokenService = new PoTokenService(path.join(__dirname, "preload.cjs"));

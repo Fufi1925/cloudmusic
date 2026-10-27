@@ -12,6 +12,7 @@ import { usePresenceSync } from "@/shared/presence";
 import { useThemeCustomizationSync, useAppearanceSync, useAppearanceStore } from "@/features/settings";
 import { useTouchBarSync } from "@/features/touchbar";
 import { OverlayPlayer, useOverlaySync } from "@/features/overlay";
+import { LobbyOverlayPanel, useLobbyOverlaySync } from "@/features/lobby";
 import { useDiscordSync } from "@/features/discord";
 import { useLobbySync } from "@/features/lobby";
 import { AppRoutes } from "./routes";
@@ -59,11 +60,21 @@ function DiscordSync() {
 
 function LobbySync() {
   useLobbySync();
+  useLobbyOverlaySync();
   return null;
 }
 
 export default function App() {
   const isOverlay = window.location.hash.startsWith("#/overlay");
+  const isLobbyOverlay = window.location.hash.startsWith("#/lobby-overlay");
+
+  if (isLobbyOverlay) {
+    return (
+      <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
+        <LobbyOverlayPanel />
+      </ThemeProvider>
+    );
+  }
 
   if (isOverlay) {
     if (!getAuthSession()) {

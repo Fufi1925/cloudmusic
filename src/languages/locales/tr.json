@@ -261,7 +261,8 @@
       "title": "Odada {count} kişi",
       "host": "Sunucu",
       "empty": "Henüz kimse yok – kodunu paylaş.",
-      "offline": "çevrimdışı"
+      "offline": "çevrimdışı",
+      "kick": "At"
     },
     "requests": {
       "title": "{count} bekliyor",
@@ -273,7 +274,10 @@
       "description": "Bir şarkıya dokunarak öne çıkar – sunucu sahibi oyları görür.",
       "action": "Oy ver",
       "current": "Şimdi çalıyor: {title}",
-      "skip": "Şarkıyı atla"
+      "skip": "Şarkıyı atla",
+      "voted": "Oy verildi",
+      "skip_hint": "Oy vermekten vazgeçmek için tekrar tıkla",
+      "withdraw_hint": "Oy vermekten vazgeçmek için tekrar tıkla"
     },
     "server": {
       "title": "Oda sunucusu",
@@ -302,15 +306,77 @@
       "label": "Oda",
       "listeners": "{count} dinliyor",
       "listeners_one": "{count} dinliyor",
-      "listeners_zero": "Henüz kimse dinlemiyor",      "listening_to": "{name} dinleniyor"
+      "listeners_zero": "Henüz kimse dinlemiyor",
+      "listening_to": "{name} dinleniyor"
     },
     "notice": {
       "skip_passed": "Yeterli oy – atlanıyor.",
       "closed": "Oda kapatıldı.",
       "expired": "Odanın süresi doldu.",
-      "guest_gone": "Bu dinleyici zaten ayrıldı."
+      "guest_gone": "Bu dinleyici zaten ayrıldı.",
+      "request_accepted": "İstek kabul edildi – şarkı kuyruğa eklendi.",
+      "request_denied": "Sunucu isteği reddetti.",
+      "requests_disabled": "Sunucu şarkı isteklerini kapattı.",
+      "requests_full": "Çok fazla istek – sonra tekrar dene.",
+      "kicked": "Sunucu seni lobiden çıkardı."
     },
-    "tab_description": "Birlikte dinleyin: kod oluşturun veya bir odaya katılın."
+    "tab_description": "Birlikte dinleyin: kod oluşturun veya bir odaya katılın.",
+    "wish": {
+      "title": "{count} istek",
+      "description": "Bir isteği destekle: oy arttıkça sunucu onu daha çabuk çalar.",
+      "description_host": "Dinleyiciler şarkı istiyor. Evet ya da hayır de, kendi müziğin çalmaya devam eder.",
+      "from": "{name} kişisinden",
+      "votes": "{count} oy",
+      "prompt_title": "Şarkı isteği",
+      "unknown_artist": "Bilinmeyen sanatçı",
+      "accept": "Çal",
+      "decline": "Hayır",
+      "more": "+{count} tane daha",
+      "withdraw": "İsteği geri çek",
+      "title_one": "Şarkı isteği",
+      "votes_one": "{count} oy"
+    },
+    "search": {
+      "title": "Şarkı iste",
+      "title_host": "Şarkı ekle",
+      "description": "Bir şarkı ara ve sunucuya gönder – çalıp çalmayacağına o karar verir.",
+      "description_host": "Bir şarkı ara ve doğrudan kuyruğa ekle.",
+      "placeholder": "Şarkı ara …",
+      "loading": "Aranıyor …",
+      "empty": "Sonuç yok.",
+      "wish": "İste",
+      "voted": "Oy verildi · {count}",
+      "queue": "Ekle",
+      "already_queued": "Bu şarkı zaten kuyrukta.",
+      "added": "Kuyruğa eklendi",
+      "disabled": "Sunucu şarkı isteklerini kapattı.",
+      "vote_hint": "Oy vermekten vazgeçmek için tekrar dokun"
+    },
+    "overlay": {
+      "title": "Lobi",
+      "empty": "Lobi yok",
+      "nothing": "Çalan bir şey yok",
+      "next": "Sıradaki",
+      "wishes": "{count} istek",
+      "skip_votes": "Geç {votes}/{needed}",
+      "members": "Dinleyiciler",
+      "kick": "At",
+      "open": "Lobiyi aç",
+      "hide": "Gizle",
+      "show": "Kaplamayı göster",
+      "reset_position": "Konumu sıfırla",
+      "you": "sen",
+      "host_hint": "Atmak için sağ tıkla",
+      "listener_hint": "Seçenekler için sağ tıkla",
+      "right_click": "Seçenekler için sağ tıkla",
+      "settings_hint": "Dinleyicileri ve sıradaki şarkıyı gösteren küçük pencere, sürükleyebilirsin – varsayılan olarak sağ üstte.",
+      "wishes_one": "{count} istek"
+    },
+    "settings": {
+      "title": "Lobi ayarları",
+      "allow_requests": "Şarkı isteklerine izin ver",
+      "allow_requests_hint": "Dinleyiciler şarkı önerebilir, kararı açılır pencerede sen verirsin."
+    }
   },
   "login": {
     "welcome_back": "Tekrar hoş geldin",
@@ -488,23 +554,14 @@
     "reverb_hint": "Atmosferik alan ve ortam derinliği",
     "reverb_amount": "Yankı",
     "queue_save_button": "Çalma listesi olarak kaydet",
-
     "queue_save_title": "Kuyruğu çalma listesi olarak kaydet",
-
     "queue_save_description": "Kuyruğunuzdaki {count} parçayla yeni bir çalma listesi oluşturur.",
-
     "queue_save_action": "Kaydet",
-
     "queue_saving": "Kaydediliyor…",
-
     "queue_save_success": "Çalma listesi kaydedildi · {count} parça",
-
     "queue_save_failed": "Çalma listesi kaydedilemedi",
-
     "queue_empty_hint": "Kuyruk oluşturmak için bir şey çalın veya parça ekleyin.",
-
     "queue_play_next_hint": "Bir parçaya sağ tıklayın → “Sırada çal”"
-
   },
   "playlist": {
     "playlist": "Çalma listesi",
@@ -692,7 +749,6 @@
       "file_too_large": "Dosya boyutu 30 MB'tan küçük olmalı",
       "read_error": "Görsel dosyası okunamadı"
     },
-
     "audio_data": {
       "description": "Yayın kalitesi, çevrimdışı önbellek ve bağlantı tanılama."
     },
@@ -801,65 +857,35 @@
       "system": "Sistem"
     },
     "appearance": {
-
       "accent": "Vurgu rengi",
-
       "accent_desc": "Beğeni kalbini, odak halkalarını ve ipuçlarını renklendirir. Varsayılan CloudMusic kırmızısıdır.",
-
       "accent_default": "Varsayılan",
-
       "accent_custom": "Özel renk",
-
       "accent_custom_value": "{color}",
-
       "blue": "Mavi",
-
       "violet": "Mor",
-
       "green": "Yeşil",
-
       "amber": "Amber",
-
       "rose": "Gül",
-
       "teal": "Turkuaz",
-
       "corners": "Köşeler",
-
       "corners_desc": "Kartların, alanların ve pencerelerin ne kadar yuvarlak olacağı.",
-
       "corners_soft": "Keskin",
-
       "corners_default": "Varsayılan",
-
       "corners_round": "Yuvarlak",
-
       "surface": "Yüzeyler",
-
       "surface_desc": "Arka plan, paneller ve kartlar arasındaki ayrım.",
-
       "surface_default": "Varsayılan",
-
       "surface_contrast": "Kontrast",
-
       "surface_oled": "OLED siyahı",
-
       "compact": "Kompakt listeler",
-
       "compact_desc": "Şarkı ve kuyruk listelerinde daha sıkı satırlar — ekrana daha fazlası sığar.",
-
       "reduce_motion": "Hareketi azalt",
-
       "reduce_motion_desc": "Geçişleri ve animasyonları kapatır (hareket rahatsızlığı veya yavaş telefonlar için).",
-
       "reset": "Görünümü sıfırla",
-
       "reset_desc": "Köşeleri, yüzeyleri, yoğunluğu ve hareketi varsayılana döndürür.",
-
       "reset_action": "Sıfırla"
-
     },
-
     "branding": {
       "title": "Marka",
       "description": "Logonun vurgu rengini seç.",
@@ -893,9 +919,7 @@
       "high": "Yüksek Kalite (AAC 256kbps)",
       "lossless": "Kayıpsız (FLAC/ALAC) - Kullanılamıyor",
       "equalizer_title": "Ekolayzer",
-
       "equalizer_description": "Ön ayarlı 10 bantlı grafik ekolayzer. Oynatıcı çubuğundan da kullanılabilir."
-
     },
     "profile": {
       "title": "Profil",

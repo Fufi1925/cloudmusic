@@ -139,6 +139,23 @@ export interface CloudMusicElectronApi {
   onOverlaySettingsChanged: (cb: (settings: any) => void) => () => void;
   onOverlayVisibility: (cb: (visible: boolean) => void) => () => void;
   setOverlayAuthenticated?: (authenticated: boolean) => void;
+  /** dragging the floating media pill around the screen */
+  startOverlayDrag?: () => void;
+  moveOverlayDrag?: () => void;
+  endOverlayDrag?: () => void;
+  resetOverlayPosition?: () => Promise<boolean>;
+  // desktop-only lobby card (PC overlay)
+  lobbyOverlayUpdateState?: (state: any) => void;
+  onLobbyOverlayState?: (cb: (state: any) => void) => () => void;
+  onLobbyOverlayVisibility?: (cb: (visible: boolean) => void) => () => void;
+  sendLobbyOverlayAction?: (action: any) => void;
+  onLobbyOverlayAction?: (cb: (action: any) => void) => () => void;
+  toggleLobbyOverlay?: () => Promise<boolean>;
+  isLobbyOverlayOpen?: () => Promise<boolean>;
+  closeLobbyOverlay?: () => void;
+  setLobbyOverlayEnabled?: (enabled: boolean) => void;
+  resetLobbyOverlayPosition?: () => void;
+  getLobbyOverlayInitialState?: () => Promise<any>;
   discordUpdateState: (state: any) => void;
   discordUpdateSettings: (settings: any) => void;
   getDiscordStatus: () => Promise<DiscordRpcStatus>;
@@ -336,6 +353,10 @@ const api: CloudMusicElectronApi = {
     };
   },
   getOverlayInitialState: () => ipcRenderer.invoke("overlay:get-initial-state"),
+  startOverlayDrag: () => ipcRenderer.send("overlay:drag-start"),
+  moveOverlayDrag: () => ipcRenderer.send("overlay:drag-move"),
+  endOverlayDrag: () => ipcRenderer.send("overlay:drag-end"),
+  resetOverlayPosition: () => ipcRenderer.invoke("overlay:reset-position"),
   updateOverlaySettings: (settings) => {
     ipcRenderer.send("overlay:update-settings", settings);
   },
@@ -359,6 +380,45 @@ const api: CloudMusicElectronApi = {
   setOverlayAuthenticated: (authenticated) => {
     ipcRenderer.send("overlay:set-authenticated", authenticated);
   },
+  lobbyOverlayUpdateState: (state) => {
+    ipcRenderer.send("lobby-overlay:update-state", state);
+  },
+  onLobbyOverlayState: (cb) => {
+    const listener = (_event: unknown, state: any) => cb(state);
+    ipcRenderer.on("lobby-overlay:state", listener);
+    return () => {
+      ipcRenderer.removeListener("lobby-overlay:state", listener);
+    };
+  },
+  onLobbyOverlayVisibility: (cb) => {
+    const listener = (_event: unknown, visible: boolean) => cb(visible);
+    ipcRenderer.on("lobby-overlay:visibility", listener);
+    return () => {
+      ipcRenderer.removeListener("lobby-overlay:visibility", listener);
+    };
+  },
+  sendLobbyOverlayAction: (action) => {
+    ipcRenderer.send("lobby-overlay:send-action", action);
+  },
+  onLobbyOverlayAction: (cb) => {
+    const listener = (_event: unknown, action: any) => cb(action);
+    ipcRenderer.on("lobby-overlay:action", listener);
+    return () => {
+      ipcRenderer.removeListener("lobby-overlay:action", listener);
+    };
+  },
+  toggleLobbyOverlay: () => ipcRenderer.invoke("lobby-overlay:toggle"),
+  isLobbyOverlayOpen: () => ipcRenderer.invoke("lobby-overlay:is-open"),
+  closeLobbyOverlay: () => {
+    ipcRenderer.send("lobby-overlay:close");
+  },
+  setLobbyOverlayEnabled: (enabled) => {
+    ipcRenderer.send("lobby-overlay:set-enabled", enabled);
+  },
+  resetLobbyOverlayPosition: () => {
+    ipcRenderer.send("lobby-overlay:reset-position");
+  },
+  getLobbyOverlayInitialState: () => ipcRenderer.invoke("lobby-overlay:get-initial-state"),
   discordUpdateState: (state) => {
     ipcRenderer.send("discord:update-state", state);
   },

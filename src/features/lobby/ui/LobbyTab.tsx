@@ -1,10 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, UsersGroupRounded, CheckCircle, CloseCircle, Logout2 } from "@solar-icons/react";
+import {
+  Copy,
+  UsersGroupRounded,
+  CheckCircle,
+  CloseCircle,
+  Logout2,
+  DoubleAltArrowUp,
+  UserCross,
+  Monitor,
+  SliderVertical,
+  TrashBinMinimalistic,
+} from "@solar-icons/react";
 import { useTranslation } from "@/languages";
 import { showToast } from "@/shared/ui";
 import { usePlayerStore } from "@/features/player";
-import { useLobbyStore } from "../store/lobbyStore";
+import { useLobbyStore, getLobbyUserId } from "../store/lobbyStore";
 import { LobbyCodeField } from "./LobbyCodeField";
+import LobbyTrackSearch from "./LobbyTrackSearch";
 
 const font = { fontFamily: "var(--font-inter), sans-serif" } as const;
 
@@ -15,13 +27,7 @@ function formatRemaining(ms: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-function Card({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
       className={`rounded-xl border border-solid border-border-primary bg-border-alpha-08 p-[14px] ${className}`}
@@ -45,6 +51,49 @@ function Description({ children }: { children: React.ReactNode }) {
     <p className="m-0 mb-[12px] text-[12.5px] leading-snug text-text-tertiary" style={font}>
       {children}
     </p>
+  );
+}
+
+function Toggle({
+  checked,
+  onChange,
+  label,
+  hint,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  label: string;
+  hint?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center gap-[10px] border-0 bg-transparent p-0 text-left"
+      style={font}
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12.5px] text-text-primary" style={font}>
+          {label}
+        </span>
+        {hint ? (
+          <span className="block text-[11.5px] leading-snug text-text-tertiary" style={font}>
+            {hint}
+          </span>
+        ) : null}
+      </span>
+      <span
+        className={`flex h-[20px] w-[34px] shrink-0 items-center rounded-full p-[2px] transition-colors ${
+          checked ? "bg-text-primary" : "bg-border-alpha-20"
+        }`}
+      >
+        <span
+          className={`h-[16px] w-[16px] rounded-full transition-transform ${
+            checked ? "translate-x-[14px] bg-bg-primary" : "translate-x-0 bg-text-tertiary"
+          }`}
+        />
+      </span>
+    </button>
   );
 }
 
@@ -86,6 +135,144 @@ function CopyCodeButton({ code }: { code: string }) {
   );
 }
 
+/** the skip vote – the vote stays visible until the room really moves on */
+function SkipVoteButton() {
+  const { t } = useTranslation();
+  const votes = useLobbyStore((state) => state.votes);
+  const vote = useLobbyStore((state) => state.vote);
+  const myId = getLobbyUserId();
+  const voted = Boolean(myId && votes.skip.includes(myId));
+
+  return (
+    <button
+      type="button"
+      onClick={() => vote("skip")}
+      className={`inline-flex items-center gap-[6px] rounded-lg border-0 px-[11px] py-[7px] text-[12.5px] transition-colors ${
+        voted
+          ? "bg-text-primary text-bg-primary"
+          : "bg-border-alpha-14 text-text-secondary hover:text-text-primary"
+      }`}
+      style={font}
+      title={t("lobby.vote.skip_hint")}
+    >
+      <DoubleAltArrowUp size={14} />
+      {t("lobby.vote.skip")}
+      {votes.skipNeeded > 0 ? ` · ${votes.skip.length}/${votes.skipNeeded}` : ""}
+    </button>
+  );
+}
+
+/** open song wishes: vote for them, or answer them as the host */
+function WishesCard() {
+  const { t } = useTranslation();
+  const role = useLobbyStore((state) => state.role);
+  const requests = useLobbyStore((state) => state.requests);
+  const voteRequest = useLobbyStore((state) => state.voteRequest);
+  const withdrawRequest = useLobbyStore((state) => state.withdrawRequest);
+  const answerRequest = useLobbyStore((state) => state.answerRequest);
+  const myId = getLobbyUserId();
+
+  if (requests.length === 0) return null;
+
+  return (
+    <Card>
+      <SectionTitle>
+        {t(requests.length === 1 ? "lobby.wish.title_one" : "lobby.wish.title", {
+          count: String(requests.length),
+        })}
+      </SectionTitle>
+      <Description>
+        {role === "host" ? t("lobby.wish.description_host") : t("lobby.wish.description")}
+      </Description>
+      <div className="flex flex-col gap-[5px]">
+        {requests.map((request) => {
+          const voted = Boolean(myId && request.voters.includes(myId));
+          const mine = request.userId === myId;
+          return (
+            <div
+              key={request.id}
+              className={`flex items-center gap-[8px] rounded-lg px-[8px] py-[6px] ${
+                voted ? "bg-border-alpha-14" : "bg-border-alpha-08"
+              }`}
+            >
+              <span className="flex h-[28px] w-[28px] shrink-0 items-center justify-center overflow-hidden rounded-[5px] bg-border-alpha-14 text-[11px] text-text-tertiary">
+                {request.track.coverUrl ? (
+                  <img src={request.track.coverUrl} alt="" className="h-full w-full object-cover" draggable={false} />
+                ) : (
+                  "♪"
+                )}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[12.5px] text-text-primary" style={font}>
+                  {request.track.title}
+                </span>
+                <span className="block truncate text-[11px] text-text-tertiary" style={font}>
+                  {t("lobby.wish.from", { name: request.name })} ·{" "}
+                  {t(request.voteCount === 1 ? "lobby.wish.votes_one" : "lobby.wish.votes", {
+                    count: String(request.voteCount),
+                  })}
+                </span>
+              </span>
+
+              {role === "host" ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => answerRequest(request.id, false)}
+                    className="inline-flex shrink-0 items-center gap-[4px] rounded-md border-0 bg-border-alpha-14 px-[8px] py-[5px] text-[11.5px] text-text-secondary transition-colors hover:bg-[#E81123]/15 hover:text-[#E81123]"
+                    style={font}
+                  >
+                    <CloseCircle size={12} />
+                    {t("lobby.wish.decline")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => answerRequest(request.id, true)}
+                    className="inline-flex shrink-0 items-center gap-[4px] rounded-md border-0 bg-text-primary px-[8px] py-[5px] text-[11.5px] font-[500] text-bg-primary"
+                    style={font}
+                  >
+                    <CheckCircle size={12} />
+                    {t("lobby.wish.accept")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => voteRequest(request.id)}
+                    className={`inline-flex shrink-0 items-center gap-[4px] rounded-md border-0 px-[8px] py-[4px] text-[11.5px] transition-colors ${
+                      voted
+                        ? "bg-text-primary text-bg-primary"
+                        : "bg-border-alpha-14 text-text-secondary hover:text-text-primary"
+                    }`}
+                    style={font}
+                    title={voted ? t("lobby.vote.withdraw_hint") : undefined}
+                  >
+                    <DoubleAltArrowUp size={12} />
+                    {voted ? t("lobby.vote.voted") : t("lobby.vote.action")}
+                    {request.voteCount > 0 ? ` · ${request.voteCount}` : ""}
+                  </button>
+                  {mine ? (
+                    <button
+                      type="button"
+                      onClick={() => withdrawRequest(request.id)}
+                      title={t("lobby.wish.withdraw")}
+                      className="inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md border-0 bg-transparent p-0 text-text-tertiary transition-colors hover:bg-border-alpha-14 hover:text-text-primary"
+                    >
+                      <TrashBinMinimalistic size={13} />
+                    </button>
+                  ) : null}
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
+/** next songs in the room – listeners can push one up the queue */
 function QueueVotes() {
   const { t } = useTranslation();
   const role = useLobbyStore((state) => state.role);
@@ -95,6 +282,7 @@ function QueueVotes() {
   const currentTrack = usePlayerStore((state) => state.currentTrack);
   const queue = usePlayerStore((state) => state.queue);
   const currentIndex = usePlayerStore((state) => state.currentIndex);
+  const myId = getLobbyUserId();
 
   const upcoming = useMemo(() => {
     const list = playback?.queue?.length ? playback.queue : queue;
@@ -110,7 +298,8 @@ function QueueVotes() {
       <Description>{t("lobby.vote.description")}</Description>
       <div className="flex flex-col gap-[4px]">
         {upcoming.map((track, position) => {
-          const count = votes.tracks[track.id]?.length ?? 0;
+          const voters = votes.tracks[track.id] ?? [];
+          const voted = Boolean(myId && voters.includes(myId));
           return (
             <div
               key={`${track.id}-${position}`}
@@ -126,14 +315,17 @@ function QueueVotes() {
                 type="button"
                 onClick={() => vote(track.id)}
                 className={`inline-flex shrink-0 items-center gap-[4px] rounded-md border-0 px-[8px] py-[4px] text-[11.5px] transition-colors ${
-                  count > 0
+                  voted
                     ? "bg-text-primary text-bg-primary"
-                    : "bg-border-alpha-14 text-text-secondary hover:text-text-primary"
+                    : voters.length > 0
+                      ? "bg-border-alpha-20 text-text-primary"
+                      : "bg-border-alpha-14 text-text-secondary hover:text-text-primary"
                 }`}
                 style={font}
               >
-                {t("lobby.vote.action")}
-                {count > 0 ? ` · ${count}` : ""}
+                <DoubleAltArrowUp size={12} />
+                {voted ? t("lobby.vote.voted") : t("lobby.vote.action")}
+                {voters.length > 0 ? ` · ${voters.length}` : ""}
               </button>
             </div>
           );
@@ -153,12 +345,11 @@ function MemberList() {
   const role = useLobbyStore((state) => state.role);
   const hostName = useLobbyStore((state) => state.hostName);
   const members = useLobbyStore((state) => state.members);
+  const kickMember = useLobbyStore((state) => state.kickMember);
 
   return (
     <Card>
-      <SectionTitle>
-        {t("lobby.members.title", { count: String(members.length + 1) })}
-      </SectionTitle>
+      <SectionTitle>{t("lobby.members.title", { count: String(members.length + 1) })}</SectionTitle>
       <div className="flex flex-col gap-[3px]">
         <div className="flex items-center gap-[8px] py-[3px]">
           <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-text-primary text-[11px] font-[600] text-bg-primary">
@@ -172,7 +363,7 @@ function MemberList() {
           </span>
         </div>
         {members.map((member) => (
-          <div key={member.userId} className="flex items-center gap-[8px] py-[3px]">
+          <div key={member.userId} className="group flex items-center gap-[8px] py-[3px]">
             <span
               className={`flex h-[22px] w-[22px] items-center justify-center rounded-full text-[11px] ${
                 member.online === false
@@ -194,6 +385,18 @@ function MemberList() {
               <span className="shrink-0 text-[10.5px] text-text-tertiary" style={font}>
                 {t("lobby.members.offline")}
               </span>
+            ) : null}
+            {role === "host" ? (
+              <button
+                type="button"
+                onClick={() => kickMember(member.userId)}
+                title={t("lobby.members.kick")}
+                className="inline-flex h-[22px] items-center gap-[4px] rounded-md border-0 bg-transparent px-[6px] text-[10.5px] text-text-tertiary opacity-0 transition-all hover:bg-[#E81123]/15 hover:text-[#E81123] group-hover:opacity-100"
+                style={font}
+              >
+                <UserCross size={12} />
+                {t("lobby.members.kick")}
+              </button>
             ) : null}
           </div>
         ))}
@@ -250,6 +453,75 @@ function PendingRequests() {
   );
 }
 
+/** host switches for the room */
+function HostSettings() {
+  const { t } = useTranslation();
+  const role = useLobbyStore((state) => state.role);
+  const settings = useLobbyStore((state) => state.settings);
+  const setAllowRequests = useLobbyStore((state) => state.setAllowRequests);
+
+  if (role !== "host") return null;
+
+  return (
+    <Card>
+      <SectionTitle>{t("lobby.settings.title")}</SectionTitle>
+      <div className="flex flex-col gap-[10px]">
+        <Toggle
+          checked={settings.allowRequests}
+          onChange={setAllowRequests}
+          label={t("lobby.settings.allow_requests")}
+          hint={t("lobby.settings.allow_requests_hint")}
+        />
+      </div>
+    </Card>
+  );
+}
+
+/** desktop only: the small always-on-top lobby card */
+function OverlayCard() {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [available, setAvailable] = useState(false);
+
+  useEffect(() => {
+    const api = window.cloudMusicElectron;
+    if (!api?.toggleLobbyOverlay) return;
+    setAvailable(true);
+    void api.isLobbyOverlayOpen?.().then((value) => setOpen(Boolean(value)));
+  }, []);
+
+  if (!available) return null;
+
+  return (
+    <Card>
+      <SectionTitle>{t("lobby.overlay.title")}</SectionTitle>
+      <Description>{t("lobby.overlay.settings_hint")}</Description>
+      <div className="flex flex-wrap items-center gap-[8px]">
+        <button
+          type="button"
+          onClick={() => {
+            void window.cloudMusicElectron?.toggleLobbyOverlay?.().then((value) => setOpen(Boolean(value)));
+          }}
+          className="inline-flex items-center gap-[6px] rounded-lg border-0 bg-border-alpha-14 px-[11px] py-[7px] text-[12.5px] text-text-secondary transition-colors hover:text-text-primary"
+          style={font}
+        >
+          <Monitor size={14} />
+          {open ? t("lobby.overlay.hide") : t("lobby.overlay.show")}
+        </button>
+        <button
+          type="button"
+          onClick={() => window.cloudMusicElectron?.resetLobbyOverlayPosition?.()}
+          className="inline-flex items-center gap-[6px] rounded-lg border-0 bg-transparent px-[8px] py-[7px] text-[12px] text-text-tertiary transition-colors hover:text-text-primary"
+          style={font}
+        >
+          <SliderVertical size={13} />
+          {t("lobby.overlay.reset_position")}
+        </button>
+      </div>
+    </Card>
+  );
+}
+
 export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string }) {
   void searchQuery;
   const { t } = useTranslation();
@@ -265,8 +537,6 @@ export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string })
   const joinLobby = useLobbyStore((state) => state.joinLobby);
   const cancelJoin = useLobbyStore((state) => state.cancelJoin);
   const leaveLobby = useLobbyStore((state) => state.leaveLobby);
-  const votes = useLobbyStore((state) => state.votes);
-  const vote = useLobbyStore((state) => state.vote);
 
   const [draftCode, setDraftCode] = useState("");
   const [serverDraft, setServerDraft] = useState(serverUrl);
@@ -293,10 +563,7 @@ export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string })
             </div>
             <div className="flex shrink-0 flex-col items-end gap-[6px]">
               {code ? <CopyCodeButton code={code} /> : null}
-              <span
-                className="inline-flex items-center gap-[4px] text-[11px] text-text-tertiary"
-                style={font}
-              >
+              <span className="inline-flex items-center gap-[4px] text-[11px] text-text-tertiary" style={font}>
                 <span
                   className={`h-[6px] w-[6px] rounded-full ${
                     connection === "connected" ? "bg-[#12B76A]" : "bg-[#F79009]"
@@ -315,7 +582,7 @@ export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string })
             {isHost ? t("lobby.host_hint") : t("lobby.listener_hint")}
           </p>
 
-          <div className="mt-[12px] flex items-center gap-[8px]">
+          <div className="mt-[12px] flex flex-wrap items-center gap-[8px]">
             <button
               type="button"
               onClick={leaveLobby}
@@ -325,27 +592,18 @@ export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string })
               <Logout2 size={14} />
               {t("lobby.leave")}
             </button>
-            {!isHost ? (
-              <button
-                type="button"
-                onClick={() => vote("skip")}
-                className={`inline-flex items-center gap-[6px] rounded-lg border-0 px-[11px] py-[7px] text-[12.5px] transition-colors ${
-                  votes.skip.length > 0
-                    ? "bg-text-primary text-bg-primary"
-                    : "bg-border-alpha-14 text-text-secondary hover:text-text-primary"
-                }`}
-                style={font}
-              >
-                {t("lobby.vote.skip")}
-                {votes.skipNeeded > 0 ? ` · ${votes.skip.length}/${votes.skipNeeded}` : ""}
-              </button>
-            ) : null}
+            {!isHost ? <SkipVoteButton /> : null}
           </div>
         </Card>
 
         <PendingRequests />
+        {!isHost ? <LobbyTrackSearch /> : null}
+        <WishesCard />
         <MemberList />
         <QueueVotes />
+        {isHost ? <LobbyTrackSearch /> : null}
+        <HostSettings />
+        <OverlayCard />
 
         <Card>
           <SectionTitle>{t("lobby.server.title")}</SectionTitle>

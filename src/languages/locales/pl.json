@@ -265,7 +265,8 @@
       "title": "{count} w pokoju",
       "host": "Gospodarz",
       "empty": "Nikogo jeszcze nie ma – udostępnij kod.",
-      "offline": "offline"
+      "offline": "offline",
+      "kick": "Wyrzuć"
     },
     "requests": {
       "title": "Oczekuje: {count}",
@@ -277,7 +278,10 @@
       "description": "Dotknij utworu, aby przesunąć go wyżej – gospodarz widzi głosy.",
       "action": "Głosuj",
       "current": "Teraz gra: {title}",
-      "skip": "Pomiń utwór"
+      "skip": "Pomiń utwór",
+      "voted": "Zagłosowano",
+      "skip_hint": "Kliknij ponownie, aby cofnąć głos",
+      "withdraw_hint": "Kliknij ponownie, aby cofnąć głos"
     },
     "server": {
       "title": "Serwer pokoi",
@@ -306,15 +310,77 @@
       "label": "Pokój",
       "listeners": "Słucha: {count}",
       "listeners_one": "Słucha: {count}",
-      "listeners_zero": "Nikt jeszcze nie słucha",      "listening_to": "Słuchasz: {name}"
+      "listeners_zero": "Nikt jeszcze nie słucha",
+      "listening_to": "Słuchasz: {name}"
     },
     "notice": {
       "skip_passed": "Wystarczająco głosów – pomijam.",
       "closed": "Pokój został zamknięty.",
       "expired": "Pokój wygasł.",
-      "guest_gone": "Ten słuchacz już wyszedł."
+      "guest_gone": "Ten słuchacz już wyszedł.",
+      "request_accepted": "Życzenie przyjęte – utwór trafia do kolejki.",
+      "request_denied": "Host odrzucił to życzenie.",
+      "requests_disabled": "Host wyłączył życzenia utworów.",
+      "requests_full": "Zbyt wiele życzeń – spróbuj później.",
+      "kicked": "Host usunął Cię z lobby."
     },
-    "tab_description": "Słuchajcie razem: utwórz kod lub dołącz do pokoju."
+    "tab_description": "Słuchajcie razem: utwórz kod lub dołącz do pokoju.",
+    "wish": {
+      "title": "{count} życzeń",
+      "description": "Poprzyj życzenie – im więcej głosów, tym szybciej host je puści.",
+      "description_host": "Słuchacze życzą sobie utwory. Powiedz tak lub nie, a Twoja muzyka leci dalej.",
+      "from": "od {name}",
+      "votes": "{count} głosów",
+      "prompt_title": "Życzenie utworu",
+      "unknown_artist": "Nieznany wykonawca",
+      "accept": "Puść",
+      "decline": "Nie",
+      "more": "+{count} więcej",
+      "withdraw": "Wycofaj życzenie",
+      "title_one": "Życzenie utworu",
+      "votes_one": "{count} głos"
+    },
+    "search": {
+      "title": "Życz utwór",
+      "title_host": "Dodaj utwór",
+      "description": "Wyszukaj utwór i wyślij go hostowi – on decyduje, czy zagra.",
+      "description_host": "Wyszukaj utwór i dodaj go od razu do kolejki.",
+      "placeholder": "Szukaj utworów …",
+      "loading": "Szukam …",
+      "empty": "Nic nie znaleziono.",
+      "wish": "Życz",
+      "voted": "Zagłosowano · {count}",
+      "queue": "Dodaj",
+      "already_queued": "Ten utwór jest już w kolejce.",
+      "added": "Dodano do kolejki",
+      "disabled": "Host wyłączył życzenia utworów.",
+      "vote_hint": "Dotknij ponownie, aby cofnąć głos"
+    },
+    "overlay": {
+      "title": "Lobby",
+      "empty": "Brak lobby",
+      "nothing": "Nic nie gra",
+      "next": "Następnie",
+      "wishes": "{count} życzeń",
+      "skip_votes": "Pomiń {votes}/{needed}",
+      "members": "Słuchacze",
+      "kick": "Wyrzuć",
+      "open": "Otwórz lobby",
+      "hide": "Ukryj",
+      "show": "Pokaż overlay",
+      "reset_position": "Przywróć pozycję",
+      "you": "ty",
+      "host_hint": "Prawy klik, aby wyrzucić",
+      "listener_hint": "Prawy klik – opcje",
+      "right_click": "Prawy klik – opcje",
+      "settings_hint": "Małe okno ze słuchaczami i następnym utworem, można je przesuwać – domyślnie w prawym górnym rogu.",
+      "wishes_one": "{count} życzenie"
+    },
+    "settings": {
+      "title": "Ustawienia lobby",
+      "allow_requests": "Zezwalaj na życzenia",
+      "allow_requests_hint": "Słuchacze mogą proponować utwory, Ty decydujesz w okienku."
+    }
   },
   "login": {
     "welcome_back": "Witaj ponownie",
@@ -492,23 +558,14 @@
     "reverb_hint": "Przestrzeń i głębia brzmienia",
     "reverb_amount": "Pogłos",
     "queue_save_button": "Zapisz jako playlistę",
-
     "queue_save_title": "Zapisz kolejkę jako playlistę",
-
     "queue_save_description": "Tworzy nową playlistę z {count} utworami z kolejki.",
-
     "queue_save_action": "Zapisz",
-
     "queue_saving": "Zapisywanie…",
-
     "queue_save_success": "Playlista zapisana · {count} utworów",
-
     "queue_save_failed": "Nie udało się zapisać playlisty",
-
     "queue_empty_hint": "Włącz coś lub dodaj utwory, aby zbudować kolejkę.",
-
     "queue_play_next_hint": "Kliknij prawym na utwór → „Odtwórz następny”"
-
   },
   "playlist": {
     "playlist": "Playlista",
@@ -696,7 +753,6 @@
       "file_too_large": "Plik musi mieć mniej niż 30 MB",
       "read_error": "Nie udało się odczytać pliku obrazu"
     },
-
     "audio_data": {
       "description": "Jakość streamingu, pamięć podręczna offline i diagnostyka połączenia."
     },
@@ -805,65 +861,35 @@
       "system": "Systemowy"
     },
     "appearance": {
-
       "accent": "Kolor akcentu",
-
       "accent_desc": "Koloruje serce polubień, obwódki fokusu i podpowiedzi. Domyślnie czerwień CloudMusic.",
-
       "accent_default": "Domyślny",
-
       "accent_custom": "Własny kolor",
-
       "accent_custom_value": "{color}",
-
       "blue": "Niebieski",
-
       "violet": "Fioletowy",
-
       "green": "Zielony",
-
       "amber": "Bursztynowy",
-
       "rose": "Różowy",
-
       "teal": "Morski",
-
       "corners": "Narożniki",
-
       "corners_desc": "Jak mocno zaokrąglone są karty, pola i okna.",
-
       "corners_soft": "Ostre",
-
       "corners_default": "Domyślne",
-
       "corners_round": "Zaokrąglone",
-
       "surface": "Powierzchnie",
-
       "surface_desc": "Kontrast między tłem, panelami i kartami.",
-
       "surface_default": "Domyślne",
-
       "surface_contrast": "Kontrast",
-
       "surface_oled": "Czerń OLED",
-
       "compact": "Kompaktowe listy",
-
       "compact_desc": "Ciaśniejsze wiersze na listach utworów i kolejki — więcej mieści się na ekranie.",
-
       "reduce_motion": "Ogranicz animacje",
-
       "reduce_motion_desc": "Wyłącza przejścia i animacje (pomaga przy chorobie lokomocyjnej i na słabszych telefonach).",
-
       "reset": "Przywróć wygląd",
-
       "reset_desc": "Przywraca domyślne narożniki, powierzchnie, gęstość i ruch.",
-
       "reset_action": "Przywróć"
-
     },
-
     "branding": {
       "title": "Logo",
       "description": "Wybierz kolor akcentu logo.",
@@ -897,9 +923,7 @@
       "high": "Wysoka jakość (AAC 256kbps)",
       "lossless": "Bezstratna (FLAC/ALAC) - Niedostępna",
       "equalizer_title": "Korektor",
-
       "equalizer_description": "10-pasmowy korektor graficzny z presetami. Dostępny także na pasku odtwarzacza."
-
     },
     "profile": {
       "title": "Profil",

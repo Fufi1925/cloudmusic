@@ -265,7 +265,8 @@
       "title": "{count} in der Lobby",
       "host": "Host",
       "empty": "Noch niemand dabei – teile deinen Code.",
-      "offline": "offline"
+      "offline": "offline",
+      "kick": "Kicken"
     },
     "requests": {
       "title": "{count} offen",
@@ -277,7 +278,10 @@
       "description": "Tippe einen Song an, um ihn nach vorne zu holen – der Host sieht die Stimmen.",
       "action": "Voten",
       "current": "Läuft gerade: {title}",
-      "skip": "Song überspringen"
+      "skip": "Song überspringen",
+      "voted": "Gewählt",
+      "skip_hint": "Nochmal klicken nimmt deine Stimme zurück",
+      "withdraw_hint": "Nochmal klicken nimmt deine Stimme zurück"
     },
     "server": {
       "title": "Lobby-Server",
@@ -306,15 +310,77 @@
       "label": "Lobby",
       "listeners": "{count} hören zu",
       "listeners_one": "{count} hört zu",
-      "listeners_zero": "Noch niemand hört zu",      "listening_to": "Du hörst bei {name}"
+      "listeners_zero": "Noch niemand hört zu",
+      "listening_to": "Du hörst bei {name}"
     },
     "notice": {
       "skip_passed": "Genug Stimmen – Song wird übersprungen.",
       "closed": "Die Lobby wurde geschlossen.",
       "expired": "Die Lobby ist abgelaufen.",
-      "guest_gone": "Dieser Hörer ist schon wieder weg."
+      "guest_gone": "Dieser Hörer ist schon wieder weg.",
+      "request_accepted": "Song-Wunsch angenommen – der Song kommt in die Warteschlange.",
+      "request_denied": "Der Host hat den Song-Wunsch abgelehnt.",
+      "requests_disabled": "Der Host hat Song-Wünsche ausgeschaltet.",
+      "requests_full": "Zu viele Wünsche – versuch es später nochmal.",
+      "kicked": "Der Host hat dich aus der Lobby entfernt."
     },
-    "tab_description": "Gemeinsam hören: Code erstellen oder einer Lobby beitreten."
+    "tab_description": "Gemeinsam hören: Code erstellen oder einer Lobby beitreten.",
+    "wish": {
+      "title": "{count} Song-Wünsche",
+      "description": "Stimme für einen Wunsch ab – je mehr Stimmen, desto eher spielt der Host ihn.",
+      "description_host": "Deine Hörer wünschen sich Songs. Sag Ja oder Nein – danach läuft deine Musik weiter.",
+      "from": "von {name}",
+      "votes": "{count} Stimmen",
+      "prompt_title": "Song-Wunsch",
+      "unknown_artist": "Unbekannter Interpret",
+      "accept": "Abspielen",
+      "decline": "Nein",
+      "more": "+{count} weitere",
+      "withdraw": "Wunsch zurückziehen",
+      "title_one": "Song-Wunsch",
+      "votes_one": "{count} Stimme"
+    },
+    "search": {
+      "title": "Song wünschen",
+      "title_host": "Song hinzufügen",
+      "description": "Such einen Song und schick ihn dem Host – er entscheidet, ob er läuft.",
+      "description_host": "Such einen Song und häng ihn direkt an die Warteschlange.",
+      "placeholder": "Song suchen …",
+      "loading": "Suche läuft …",
+      "empty": "Nichts gefunden.",
+      "wish": "Wünschen",
+      "voted": "Gewählt · {count}",
+      "queue": "Anhängen",
+      "already_queued": "Der Song ist schon in der Warteschlange.",
+      "added": "Zur Warteschlange hinzugefügt",
+      "disabled": "Der Host hat Song-Wünsche ausgeschaltet.",
+      "vote_hint": "Nochmal tippen nimmt deine Stimme zurück"
+    },
+    "overlay": {
+      "title": "Lobby",
+      "empty": "Keine Lobby aktiv",
+      "nothing": "Nichts läuft",
+      "next": "Als Nächstes",
+      "wishes": "{count} Wünsche",
+      "skip_votes": "Skip {votes}/{needed}",
+      "members": "Hörer",
+      "kick": "Kicken",
+      "open": "Lobby öffnen",
+      "hide": "Ausblenden",
+      "show": "Overlay zeigen",
+      "reset_position": "Position zurücksetzen",
+      "you": "du",
+      "host_hint": "Rechtsklick zum Kicken",
+      "listener_hint": "Rechtsklick für Optionen",
+      "right_click": "Rechtsklick für Optionen",
+      "settings_hint": "Kleines Fenster mit Hörern und nächstem Song, frei verschiebbar – standardmäßig oben rechts.",
+      "wishes_one": "{count} Wunsch"
+    },
+    "settings": {
+      "title": "Lobby-Einstellungen",
+      "allow_requests": "Song-Wünsche erlauben",
+      "allow_requests_hint": "Hörer dürfen Songs vorschlagen, du entscheidest per Pop-up."
+    }
   },
   "login": {
     "welcome_back": "Willkommen zurück!",
@@ -497,23 +563,14 @@
     "reverb_hint": "Atmosphärischer Raum & Tiefe",
     "reverb_amount": "Hall",
     "queue_save_button": "Als Playlist speichern",
-
     "queue_save_title": "Queue als Playlist speichern",
-
     "queue_save_description": "Erstellt eine neue Playlist mit {count} Tracks aus deiner Queue.",
-
     "queue_save_action": "Speichern",
-
     "queue_saving": "Speichern…",
-
     "queue_save_success": "Playlist gespeichert · {count} Tracks",
-
     "queue_save_failed": "Playlist konnte nicht gespeichert werden",
-
     "queue_empty_hint": "Spiele etwas ab oder füge Tracks hinzu, um eine Queue aufzubauen.",
-
     "queue_play_next_hint": "Rechtsklick auf einen Track → „Als Nächstes“"
-
   },
   "playlist": {
     "playlist": "Playlist",
@@ -763,65 +820,35 @@
       "system": "System"
     },
     "appearance": {
-
       "accent": "Akzentfarbe",
-
       "accent_desc": "Färbt Favoriten-Herz, Fokus-Ringe und Hinweise. Standard ist das CloudMusic-Rot.",
-
       "accent_default": "Standard",
-
       "accent_custom": "Eigene Farbe",
-
       "accent_custom_value": "{color}",
-
       "blue": "Blau",
-
       "violet": "Violett",
-
       "green": "Grün",
-
       "amber": "Bernstein",
-
       "rose": "Rosé",
-
       "teal": "Türkis",
-
       "corners": "Ecken",
-
       "corners_desc": "Wie rund Ecken von Karten, Feldern und Dialogen sind.",
-
       "corners_soft": "Scharf",
-
       "corners_default": "Standard",
-
       "corners_round": "Rund",
-
       "surface": "Flächen",
-
       "surface_desc": "Abstufung zwischen Hintergrund, Panels und Karten.",
-
       "surface_default": "Standard",
-
       "surface_contrast": "Kontrast",
-
       "surface_oled": "OLED-Schwarz",
-
       "compact": "Kompakte Listen",
-
       "compact_desc": "Engere Zeilen in Song- und Queue-Listen, damit mehr auf den Schirm passt.",
-
       "reduce_motion": "Bewegung reduzieren",
-
       "reduce_motion_desc": "Blendet Übergänge und Animationen aus (gut bei Reisekrankheit oder auf schwächeren Handys).",
-
       "reset": "Darstellung zurücksetzen",
-
       "reset_desc": "Setzt Ecken, Flächen, Dichte und Bewegung auf die Standardwerte zurück.",
-
       "reset_action": "Zurücksetzen"
-
     },
-
     "branding": {
       "title": "Branding",
       "description": "Wähle die Akzentfarbe des Logos.",
@@ -855,7 +882,6 @@
       "high": "Hoch (bestes Format)",
       "lossless": "Verlustfrei (FLAC/ALAC) – derzeit nicht verfügbar",
       "equalizer_title": "Equalizer",
-
       "equalizer_description": "10-Band-Grafik-EQ mit Presets. Auch direkt in der Player-Leiste.",
       "quality_hint_low": "Datensparmodus – begrenzt den Stream auf ca. 96 kbit/s.",
       "quality_hint_standard": "Ausgewogen – begrenzt den Stream auf ca. 160 kbit/s.",
@@ -892,7 +918,6 @@
         "description": "Setzt Qualität, Überblenden, Normalisierung, Balance und Equalizer auf Standard.",
         "done": "Audioeinstellungen zurückgesetzt"
       }
-
     },
     "sleep_timer": {
       "title": "Sleep-Timer",

@@ -267,7 +267,8 @@
       "title": "{count} in the lobby",
       "host": "Host",
       "empty": "Nobody has joined yet – share your code.",
-      "offline": "offline"
+      "offline": "offline",
+      "kick": "Kick"
     },
     "requests": {
       "title": "{count} waiting",
@@ -279,7 +280,10 @@
       "description": "Tap a song to push it up – the host sees the votes.",
       "action": "Vote",
       "current": "Playing now: {title}",
-      "skip": "Skip song"
+      "skip": "Skip song",
+      "voted": "Voted",
+      "skip_hint": "Click again to take your vote back",
+      "withdraw_hint": "Click again to take your vote back"
     },
     "server": {
       "title": "Lobby server",
@@ -308,15 +312,77 @@
       "label": "Lobby",
       "listeners": "{count} listening",
       "listeners_one": "{count} listening",
-      "listeners_zero": "Nobody listening yet",      "listening_to": "Listening to {name}"
+      "listeners_zero": "Nobody listening yet",
+      "listening_to": "Listening to {name}"
     },
     "notice": {
       "skip_passed": "Enough votes – skipping.",
       "closed": "The lobby was closed.",
       "expired": "The lobby expired.",
-      "guest_gone": "That listener already left."
+      "guest_gone": "That listener already left.",
+      "request_accepted": "Wish accepted – the song is added to the queue.",
+      "request_denied": "The host declined that wish.",
+      "requests_disabled": "The host turned song wishes off.",
+      "requests_full": "Too many wishes – try again later.",
+      "kicked": "The host removed you from the lobby."
     },
-    "tab_description": "Listen together: create a code or join a friend's lobby."
+    "tab_description": "Listen together: create a code or join a friend's lobby.",
+    "wish": {
+      "title": "{count} song wishes",
+      "description": "Back a wish – the more votes, the sooner the host plays it.",
+      "description_host": "Your listeners wish for songs. Say yes or no and your own music keeps playing.",
+      "from": "from {name}",
+      "votes": "{count} votes",
+      "prompt_title": "Song wish",
+      "unknown_artist": "Unknown artist",
+      "accept": "Play it",
+      "decline": "No",
+      "more": "+{count} more",
+      "withdraw": "Withdraw wish",
+      "title_one": "Song wish",
+      "votes_one": "{count} vote"
+    },
+    "search": {
+      "title": "Wish a song",
+      "title_host": "Add a song",
+      "description": "Search a song and send it to the host – they decide whether it plays.",
+      "description_host": "Search a song and add it straight to the room's queue.",
+      "placeholder": "Search songs …",
+      "loading": "Searching …",
+      "empty": "Nothing found.",
+      "wish": "Wish",
+      "voted": "Voted · {count}",
+      "queue": "Add",
+      "already_queued": "That song is already queued.",
+      "added": "Added to the queue",
+      "disabled": "The host turned song wishes off.",
+      "vote_hint": "Tap again to take your vote back"
+    },
+    "overlay": {
+      "title": "Lobby",
+      "empty": "No lobby yet",
+      "nothing": "Nothing playing",
+      "next": "Up next",
+      "wishes": "{count} wishes",
+      "skip_votes": "Skip {votes}/{needed}",
+      "members": "Listeners",
+      "kick": "Kick",
+      "open": "Open lobby",
+      "hide": "Hide",
+      "show": "Show overlay",
+      "reset_position": "Reset position",
+      "you": "you",
+      "host_hint": "Right-click to kick",
+      "listener_hint": "Right-click for options",
+      "right_click": "Right-click for options",
+      "settings_hint": "Small window with the listeners and the next song, drag it anywhere – top right by default.",
+      "wishes_one": "{count} wish"
+    },
+    "settings": {
+      "title": "Lobby settings",
+      "allow_requests": "Allow song wishes",
+      "allow_requests_hint": "Listeners may suggest songs, you decide in a pop-up."
+    }
   },
   "login": {
     "welcome_back": "Welcome back",
@@ -499,23 +565,14 @@
     "reverb_hint": "Atmospheric space & ambient depth",
     "reverb_amount": "Reverb",
     "queue_save_button": "Save as playlist",
-
     "queue_save_title": "Save queue as playlist",
-
     "queue_save_description": "Creates a new playlist with {count} tracks from your queue.",
-
     "queue_save_action": "Save",
-
     "queue_saving": "Saving…",
-
     "queue_save_success": "Playlist saved · {count} tracks",
-
     "queue_save_failed": "Could not save the playlist",
-
     "queue_empty_hint": "Play something or add tracks to build a queue.",
-
     "queue_play_next_hint": "Right-click a track → “Play next”"
-
   },
   "playlist": {
     "playlist": "Playlist",
@@ -895,65 +952,35 @@
       "system": "System"
     },
     "appearance": {
-
       "accent": "Accent color",
-
       "accent_desc": "Tints the like heart, focus rings and hints. Default is the CloudMusic red.",
-
       "accent_default": "Default",
-
       "accent_custom": "Custom color",
-
       "accent_custom_value": "{color}",
-
       "blue": "Blue",
-
       "violet": "Violet",
-
       "green": "Green",
-
       "amber": "Amber",
-
       "rose": "Rose",
-
       "teal": "Teal",
-
       "corners": "Corners",
-
       "corners_desc": "How round cards, fields and dialogs are.",
-
       "corners_soft": "Sharp",
-
       "corners_default": "Default",
-
       "corners_round": "Round",
-
       "surface": "Surfaces",
-
       "surface_desc": "Separation between canvas, panels and cards.",
-
       "surface_default": "Default",
-
       "surface_contrast": "Contrast",
-
       "surface_oled": "OLED black",
-
       "compact": "Compact lists",
-
       "compact_desc": "Tighter rows in song and queue lists so more fits on screen.",
-
       "reduce_motion": "Reduce motion",
-
       "reduce_motion_desc": "Turns off transitions and animations (helps with motion sickness or on slower phones).",
-
       "reset": "Reset appearance",
-
       "reset_desc": "Restores corners, surfaces, density and motion to their defaults.",
-
       "reset_action": "Reset"
-
     },
-
     "branding": {
       "title": "Branding",
       "description": "Choose the logo accent color.",
@@ -987,7 +1014,6 @@
       "high": "High (best available)",
       "lossless": "Lossless (FLAC/ALAC) - Unavailable",
       "equalizer_title": "Equalizer",
-
       "equalizer_description": "10-band graphic EQ with presets. Also available from the player bar.",
       "quality_hint_low": "Data saver — caps the stream at about 96 kbit/s.",
       "quality_hint_standard": "Balanced — caps the stream at about 160 kbit/s.",
@@ -1024,7 +1050,6 @@
         "description": "Restore quality, crossfade, normalization, balance and equalizer to their defaults.",
         "done": "Audio settings reset"
       }
-
     },
     "sleep_timer": {
       "title": "Sleep timer",

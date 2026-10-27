@@ -1,7 +1,7 @@
 import { playerEngine, usePlayerStore } from "@/features/player";
 import { setTransportLocked } from "@/features/player/engine/transportLock";
 import { lobbyClient } from "@/shared/lobby";
-import type { LobbyClientMessage, LobbyPlayback, LobbyServerMessage } from "@/shared/lobby";
+import type { LobbyClientMessage, LobbyPlayback, LobbyServerMessage, Track } from "@/shared/lobby";
 import { useLobbyStore } from "../store/lobbyStore";
 import { isNoopPlan, planLobbySync } from "./lobbySyncMath";
 
@@ -97,12 +97,41 @@ async function applyRemotePlayback(playback: LobbyPlayback): Promise<void> {
   }
 }
 
+/** append a wish the host just accepted to the room's queue */
+async function queueAcceptedRequest(track: Track): Promise<void> {
+  const player = usePlayerStore.getState();
+  const queue = player.queue ?? [];
+  if (queue.some((entry) => entry.id === track.id)) {
+    publishHostPlayback(true);
+    return;
+  }
+  const nextQueue = [...queue, track];
+  usePlayerStore.getState().setQueue(nextQueue);
+  if (!player.currentTrack) {
+    // nothing is playing yet – start with the wish so the room hears something
+    try {
+      await playerEngine.playTrack(track, nextQueue, null, null, nextQueue.length - 1, false);
+    } catch {
+      /* the engine reports the failure itself */
+    }
+  }
+  publishHostPlayback(true);
+}
+
 function handleServerMessage(message: LobbyServerMessage): void {
   const wasHost = useLobbyStore.getState().role === "host";
   useLobbyStore.getState().handleServerMessage(message);
 
   if (message.type === "playback") {
     void applyRemotePlayback(message);
+    return;
+  }
+
+  if (message.type === "request_accepted") {
+    // the host accepted a wish: it goes to the end of the room's queue
+    if (useLobbyStore.getState().role === "host") {
+      void queueAcceptedRequest(message.track);
+    }
     return;
   }
 
@@ -145,6 +174,15 @@ export function startLobbySync(): void {
     lobbyClient.onState((state) => useLobbyStore.getState().handleConnectionState(state)),
   );
   lobbyClient.onReconnect = handleReconnect;
+
+  // the store restored a room from the last session: reconnect and re-attach.
+  // `send` parks the resume in the outbox, which is replayed right after `hello`.
+  const restoredLobby = useLobbyStore.getState();
+  if (restoredLobby.role && restoredLobby.code) {
+    lobbyClient.setUrl(restoredLobby.serverUrl);
+    lobbyClient.start(restoredLobby.serverUrl);
+    lobbyClient.send({ type: "resume", code: restoredLobby.code });
+  }
 
   // host: mirror every transport change into the room
   const unsubscribePlayer = usePlayerStore.subscribe((state, previous) => {

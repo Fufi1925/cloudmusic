@@ -40,9 +40,24 @@ export interface LobbyVotes {
   tracks: Record<string, string[]>;
 }
 
+/** a listener's song wish, waiting for the host's yes/no */
+export interface LobbyTrackRequest {
+  id: string;
+  userId: string;
+  name: string;
+  track: Track;
+  createdAt: number;
+  /** everyone who supports this wish (the requester is included) */
+  voters: string[];
+  voteCount: number;
+}
+
 export interface LobbySettings {
   voteOrder: boolean;
+  allowRequests: boolean;
 }
+
+export type LobbyRequestDenyReason = "denied" | "disabled" | "full";
 
 // ── client → server ──────────────────────────────────────────────────────
 
@@ -57,6 +72,11 @@ export type LobbyClientMessage =
   | { type: "leave" }
   | { type: "lobby_settings"; voteOrder: boolean }
   | { type: "vote"; target: string }
+  | { type: "request_track"; track: Track }
+  | { type: "vote_request"; requestId: string }
+  | { type: "withdraw_request"; requestId: string }
+  | { type: "answer_request"; requestId: string; accept: boolean }
+  | { type: "kick"; userId: string }
   | {
       type: "playback";
       track: Track | null;
@@ -82,6 +102,7 @@ export type LobbyServerMessage =
       members: LobbyMember[];
       pending: LobbyJoinRequest[];
       playback: LobbyPlayback;
+      requests?: LobbyTrackRequest[];
       settings: LobbySettings;
       serverTime: number;
     }
@@ -94,12 +115,22 @@ export type LobbyServerMessage =
       members: LobbyMember[];
       pending: LobbyJoinRequest[];
       playback: LobbyPlayback;
+      requests?: LobbyTrackRequest[];
       settings: LobbySettings;
       serverTime: number;
     }
   | { type: "members"; hostName: string; members: LobbyMember[]; settings: LobbySettings }
   | { type: "playback"; serverTime: number } & LobbyPlayback
   | { type: "votes" } & LobbyVotes
+  | { type: "requests"; requests: LobbyTrackRequest[] }
+  | { type: "request_accepted"; requestId: string; track: Track; requestedBy: string }
+  | {
+      type: "request_denied";
+      requestId?: string;
+      reason: LobbyRequestDenyReason;
+      track?: Track;
+    }
+  | { type: "kicked"; name: string }
   | { type: "join_pending"; code: string }
   | { type: "join_request"; userId: string; name: string; requestedAt: number }
   | { type: "join_request_resolved"; userId: string; accepted: boolean }

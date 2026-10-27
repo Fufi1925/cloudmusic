@@ -4,6 +4,9 @@ import assert from "node:assert/strict";
 import {
   LobbyServer,
   DENY_COOLDOWN_MS,
+  MAX_REQUESTS,
+  REQUEST_TTL_MS,
+  sanitizeTrack,
   HOST_RESUME_GRACE_MS,
   LISTENER_RESUME_GRACE_MS,
   generateCode,
@@ -363,4 +366,192 @@ test("websocket framing round-trips a text payload", () => {
 
 test("accept key matches the RFC example", () => {
   assert.equal(acceptKey("dGhlIHNhbXBsZSBub25jZQ=="), "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=");
+});
+
+// ── wishes + vote reliability (0.1.52) ───────────────────────────────────
+
+function threeWay() {
+  const h = makeHarness();
+  const host = h.session("host-1", "Fufi");
+  const a = h.session("a", "Mira");
+  const b = h.session("b", "Jonas");
+  h.server.handle(host, { type: "create_lobby", name: "Fufi" });
+  const code = host.box.sent.at(-1).code;
+  for (const guest of [a, b]) {
+    h.server.handle(guest, { type: "join_request", code, name: guest.name });
+    h.server.handle(host, { type: "approve", userId: guest.userId });
+  }
+  host.box.sent.length = 0;
+  return { h, host, a, b, code };
+}
+
+test("a skip vote survives the host's one-second playback updates", () => {
+  const { h, host, a } = threeWay();
+  const track = { id: "t1", title: "Midnight Drive" };
+  for (let tick = 0; tick < 5; tick += 1) {
+    h.server.handle(host, {
+      type: "playback",
+      track,
+      queue: [track, { id: "t2" }, { id: "t3" }],
+      index: 0,
+      positionMs: tick * 1000,
+      status: "playing",
+    });
+  }
+
+  h.server.handle(a, { type: "vote", target: "skip" });
+  h.advance(1000);
+  // the host keeps publishing the same track
+  for (let tick = 6; tick < 10; tick += 1) {
+    h.server.handle(host, {
+      type: "playback",
+      track,
+      queue: [track, { id: "t2" }, { id: "t3" }],
+      index: 0,
+      positionMs: tick * 1000,
+      status: "playing",
+    });
+  }
+
+  const votes = a.box.sent.filter((m) => m.type === "votes").at(-1);
+  assert.deepEqual(votes.skip, ["a"], "the vote is still there after 5 updates");
+});
+
+test("a skip vote resets when the room moves to the next track", () => {
+  const { h, host, a } = threeWay();
+  h.server.handle(host, {
+    type: "playback",
+    track: { id: "t1" },
+    queue: [{ id: "t1" }, { id: "t2" }],
+    index: 0,
+    status: "playing",
+  });
+  h.server.handle(a, { type: "vote", target: "skip" });
+  h.server.handle(host, {
+    type: "playback",
+    track: { id: "t2" },
+    queue: [{ id: "t1" }, { id: "t2" }],
+    index: 1,
+    status: "playing",
+  });
+  const votes = a.box.sent.filter((m) => m.type === "votes").at(-1);
+  assert.deepEqual(votes.skip, [], "votes belong to the track they were cast for");
+});
+
+test("tracks are sanitised before they leave the server", () => {
+  const clean = sanitizeTrack({
+    id: " abc ",
+    title: "Song",
+    artists: "A, B",
+    coverUrl: "https://c/x.jpg",
+    durationMs: 213000,
+    secret: "nope",
+  });
+  assert.deepEqual(clean, {
+    id: "abc",
+    title: "Song",
+    artists: "A, B",
+    coverUrl: "https://c/x.jpg",
+    durationMs: 213000,
+  });
+  assert.equal(sanitizeTrack({ title: "no id" }), null);
+  assert.equal(sanitizeTrack(null), null);
+});
+
+test("wish flow: request, support vote, accept", () => {
+  const { h, host, a, b } = threeWay();
+  const track = { id: "w1", title: "Wish", artists: "Someone", durationMs: 200000 };
+
+  h.server.handle(a, { type: "request_track", track });
+  let requests = a.box.sent.filter((m) => m.type === "requests").at(-1).requests;
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].track.title, "Wish");
+  assert.equal(requests[0].name, "Mira");
+  assert.deepEqual(requests[0].voters, ["a"]);
+  assert.ok(host.box.sent.some((m) => m.type === "requests"), "the host is told as well");
+
+  // the second listener supports the same wish instead of creating a second one
+  h.server.handle(b, { type: "request_track", track });
+  requests = b.box.sent.filter((m) => m.type === "requests").at(-1).requests;
+  assert.equal(requests.length, 1);
+  assert.deepEqual(requests[0].voters.sort(), ["a", "b"]);
+
+  // host accepts
+  const requestId = requests[0].id;
+  host.box.sent.length = 0;
+  h.server.handle(host, { type: "answer_request", requestId, accept: true });
+
+  const accepted = a.box.sent.filter((m) => m.type === "request_accepted").at(-1);
+  assert.equal(accepted.track.id, "w1");
+  assert.equal(accepted.requestedBy, "Mira");
+  assert.equal(a.box.sent.filter((m) => m.type === "requests").at(-1).requests.length, 0);
+  assert.equal(host.box.sent.filter((m) => m.type === "request_accepted").at(-1).track.id, "w1");
+});
+
+test("a denied wish tells the requester to keep listening", () => {
+  const { h, host, a } = threeWay();
+  h.server.handle(a, { type: "request_track", track: { id: "w2", title: "Nope" } });
+  const requestId = a.box.sent.filter((m) => m.type === "requests").at(-1).requests[0].id;
+
+  a.box.sent.length = 0;
+  h.server.handle(host, { type: "answer_request", requestId, accept: false });
+
+  const denied = a.box.sent.find((m) => m.type === "request_denied");
+  assert.equal(denied.reason, "denied");
+  assert.equal(denied.track.id, "w2");
+  assert.equal(a.box.sent.filter((m) => m.type === "requests").at(-1).requests.length, 0);
+});
+
+test("listeners cannot answer wishes, the host cannot wish", () => {
+  const { h, host, a } = threeWay();
+  h.server.handle(a, { type: "request_track", track: { id: "w3", title: "Mine" } });
+  const requestId = a.box.sent.filter((m) => m.type === "requests").at(-1).requests[0].id;
+
+  h.server.handle(a, { type: "answer_request", requestId, accept: true });
+  assert.ok(a.box.sent.some((m) => m.type === "error" && m.code === "not_host"));
+
+  host.box.sent.length = 0;
+  h.server.handle(host, { type: "request_track", track: { id: "w4", title: "Mine" } });
+  assert.ok(host.box.sent.some((m) => m.type === "error" && m.code === "host_requests"));
+});
+
+test("wishes can be switched off and withdrawn", () => {
+  const { h, host, a } = threeWay();
+  h.server.handle(host, { type: "lobby_settings", allowRequests: false });
+  a.box.sent.length = 0;
+  h.server.handle(a, { type: "request_track", track: { id: "w5", title: "Off" } });
+  assert.ok(a.box.sent.some((m) => m.type === "request_denied" && m.reason === "disabled"));
+
+  h.server.handle(host, { type: "lobby_settings", allowRequests: true });
+  h.server.handle(a, { type: "request_track", track: { id: "w6", title: "On" } });
+  const requestId = a.box.sent.filter((m) => m.type === "requests").at(-1).requests[0].id;
+  h.server.handle(a, { type: "withdraw_request", requestId });
+  assert.equal(a.box.sent.filter((m) => m.type === "requests").at(-1).requests.length, 0);
+});
+
+test("old wishes are swept away and the list is capped", () => {
+  const { h, a } = threeWay();
+  for (let i = 0; i < MAX_REQUESTS + 3; i += 1) {
+    h.server.handle(a, { type: "request_track", track: { id: `cap-${i}`, title: `T${i}` } });
+  }
+  let requests = a.box.sent.filter((m) => m.type === "requests").at(-1).requests;
+  assert.equal(requests.length, MAX_REQUESTS);
+
+  h.advance(REQUEST_TTL_MS + 1000);
+  h.server.sweep();
+  requests = a.box.sent.filter((m) => m.type === "requests").at(-1).requests;
+  assert.equal(requests.length, 0);
+});
+
+test("the host can kick a member (and only the host)", () => {
+  const { h, host, a, b } = threeWay();
+  b.box.sent.length = 0;
+  h.server.handle(a, { type: "kick", userId: "b" });
+  assert.ok(a.box.sent.some((m) => m.type === "error" && m.code === "not_host"));
+  assert.equal(b.box.sent.length, 0, "nothing happened");
+
+  h.server.handle(host, { type: "kick", userId: "b" });
+  assert.ok(b.box.sent.some((m) => m.type === "kicked"));
+  const members = host.box.sent.filter((m) => m.type === "members").at(-1).members;
+  assert.deepEqual(members.map((m) => m.userId), ["a"]);
 });

@@ -35,9 +35,11 @@ The repository already contains `railway.json` and a `Dockerfile` (plus a
 ## Protocol (short version)
 
 Client → server: `hello`, `ping`, `create_lobby`, `join_request`, `approve`,
-`deny`, `leave`, `resume`, `vote`, `playback`, `lobby_settings`.
+`deny`, `leave`, `resume`, `vote`, `request_track`, `vote_request`,
+`withdraw_request`, `answer_request`, `kick`, `playback`, `lobby_settings`.
 Server → client: `hello`, `hello_ok`, `pong`, `lobby_state`, `welcome`,
-`members`, `playback`, `votes`, `join_pending`, `join_request`,
+`members`, `playback`, `votes`, `requests`, `request_accepted`,
+`request_denied`, `kicked`, `join_pending`, `join_request`,
 `join_request_resolved`, `join_denied`, `skip_passed`, `lobby_closed`,
 `resume_failed`, `left`, `error`.
 
@@ -49,7 +51,14 @@ Rules that matter:
   for 5 minutes.
 * only the host may send `playback`; a listener's own transport buttons are
   locked client-side.
-* skips need a majority of the online listeners (1 listener → 1 vote).
+* skips need a majority of the online listeners (1 listener → 1 vote); a vote
+  belongs to the track it was cast for and survives the host's one-second
+  position updates – it only resets when the room really moves on.
+* listeners may wish for songs (`request_track`, max 20 open, 30 min TTL);
+  everybody can support a wish (`vote_request`), only the host answers it
+  (`answer_request`). An accepted wish is appended to the host's queue, a denied
+  one simply disappears.
+* the host may `kick` a listender; the guest gets `kicked` and a 5 minute cooldown.
 * audio is never proxied – each client resolves and plays the track itself.
 
 Tests: `node --test server/lobby/lobbyServer.test.mjs`.

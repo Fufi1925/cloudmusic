@@ -263,7 +263,8 @@
       "title": "{count} en la sala",
       "host": "Anfitrión",
       "empty": "Aún no hay nadie: comparte tu código.",
-      "offline": "sin conexión"
+      "offline": "sin conexión",
+      "kick": "Expulsar"
     },
     "requests": {
       "title": "{count} esperando",
@@ -275,7 +276,10 @@
       "description": "Toca una canción para subirla: el anfitrión ve los votos.",
       "action": "Votar",
       "current": "Suena ahora: {title}",
-      "skip": "Saltar canción"
+      "skip": "Saltar canción",
+      "voted": "Votado",
+      "skip_hint": "Haz clic otra vez para retirar tu voto",
+      "withdraw_hint": "Haz clic otra vez para retirar tu voto"
     },
     "server": {
       "title": "Servidor de salas",
@@ -304,15 +308,77 @@
       "label": "Sala",
       "listeners": "{count} escuchando",
       "listeners_one": "{count} escuchando",
-      "listeners_zero": "Nadie escucha aún",      "listening_to": "Escuchando a {name}"
+      "listeners_zero": "Nadie escucha aún",
+      "listening_to": "Escuchando a {name}"
     },
     "notice": {
       "skip_passed": "Votos suficientes: se salta.",
       "closed": "La sala se cerró.",
       "expired": "La sala caducó.",
-      "guest_gone": "Ese oyente ya se fue."
+      "guest_gone": "Ese oyente ya se fue.",
+      "request_accepted": "Petición aceptada: la canción entra en la cola.",
+      "request_denied": "El host rechazó la petición.",
+      "requests_disabled": "El host desactivó las peticiones.",
+      "requests_full": "Demasiadas peticiones, inténtalo más tarde.",
+      "kicked": "El host te sacó de la lobby."
     },
-    "tab_description": "Escuchar juntos: crea un código o únete a una sala."
+    "tab_description": "Escuchar juntos: crea un código o únete a una sala.",
+    "wish": {
+      "title": "{count} peticiones",
+      "description": "Apoya una petición: cuantos más votos, antes la pondrá el host.",
+      "description_host": "Tus oyentes piden canciones. Di sí o no y tu música sigue sonando.",
+      "from": "de {name}",
+      "votes": "{count} votos",
+      "prompt_title": "Petición de canción",
+      "unknown_artist": "Artista desconocido",
+      "accept": "Ponerla",
+      "decline": "No",
+      "more": "+{count} más",
+      "withdraw": "Retirar petición",
+      "title_one": "Petición de canción",
+      "votes_one": "{count} voto"
+    },
+    "search": {
+      "title": "Pedir una canción",
+      "title_host": "Añadir una canción",
+      "description": "Busca una canción y envíasela al host: él decide si suena.",
+      "description_host": "Busca una canción y añádela directamente a la cola.",
+      "placeholder": "Buscar canciones …",
+      "loading": "Buscando …",
+      "empty": "Sin resultados.",
+      "wish": "Pedir",
+      "voted": "Votado · {count}",
+      "queue": "Añadir",
+      "already_queued": "Esa canción ya está en la cola.",
+      "added": "Añadida a la cola",
+      "disabled": "El host desactivó las peticiones.",
+      "vote_hint": "Toca otra vez para retirar tu voto"
+    },
+    "overlay": {
+      "title": "Lobby",
+      "empty": "No hay lobby",
+      "nothing": "Nada sonando",
+      "next": "A continuación",
+      "wishes": "{count} peticiones",
+      "skip_votes": "Saltar {votes}/{needed}",
+      "members": "Oyentes",
+      "kick": "Expulsar",
+      "open": "Abrir lobby",
+      "hide": "Ocultar",
+      "show": "Mostrar overlay",
+      "reset_position": "Restablecer posición",
+      "you": "tú",
+      "host_hint": "Clic derecho para expulsar",
+      "listener_hint": "Clic derecho para opciones",
+      "right_click": "Clic derecho para opciones",
+      "settings_hint": "Ventana pequeña con los oyentes y la próxima canción, se puede arrastrar – arriba a la derecha por defecto.",
+      "wishes_one": "{count} petición"
+    },
+    "settings": {
+      "title": "Ajustes de lobby",
+      "allow_requests": "Permitir peticiones",
+      "allow_requests_hint": "Los oyentes pueden sugerir canciones, tú decides en un aviso."
+    }
   },
   "login": {
     "welcome_back": "Te damos la bienvenida",
@@ -490,23 +556,14 @@
     "reverb_hint": "Espacio atmosférico y profundidad ambiental",
     "reverb_amount": "Reverberación",
     "queue_save_button": "Guardar como playlist",
-
     "queue_save_title": "Guardar cola como playlist",
-
     "queue_save_description": "Crea una nueva playlist con {count} pistas de tu cola.",
-
     "queue_save_action": "Guardar",
-
     "queue_saving": "Guardando…",
-
     "queue_save_success": "Playlist guardada · {count} pistas",
-
     "queue_save_failed": "No se pudo guardar la playlist",
-
     "queue_empty_hint": "Reproduce algo o añade pistas para crear una cola.",
-
     "queue_play_next_hint": "Clic derecho en una pista → «Reproducir siguiente»"
-
   },
   "playlist": {
     "playlist": "Lista de reproducción",
@@ -795,65 +852,35 @@
       "system": "Sistema"
     },
     "appearance": {
-
       "accent": "Color de acento",
-
       "accent_desc": "Tiñe el corazón de favorito, los anillos de foco y los avisos. El rojo de CloudMusic es el estándar.",
-
       "accent_default": "Estándar",
-
       "accent_custom": "Color personalizado",
-
       "accent_custom_value": "{color}",
-
       "blue": "Azul",
-
       "violet": "Violeta",
-
       "green": "Verde",
-
       "amber": "Ámbar",
-
       "rose": "Rosa",
-
       "teal": "Turquesa",
-
       "corners": "Esquinas",
-
       "corners_desc": "Cuánto se redondean tarjetas, campos y diálogos.",
-
       "corners_soft": "Rectas",
-
       "corners_default": "Estándar",
-
       "corners_round": "Redondas",
-
       "surface": "Superficies",
-
       "surface_desc": "Separación entre fondo, paneles y tarjetas.",
-
       "surface_default": "Estándar",
-
       "surface_contrast": "Contraste",
-
       "surface_oled": "Negro OLED",
-
       "compact": "Listas compactas",
-
       "compact_desc": "Filas más ajustadas en listas de canciones y cola, para que quepa más en pantalla.",
-
       "reduce_motion": "Reducir movimiento",
-
       "reduce_motion_desc": "Desactiva transiciones y animaciones (útil con mareo o en móviles lentos).",
-
       "reset": "Restablecer apariencia",
-
       "reset_desc": "Restaura esquinas, superficies, densidad y movimiento a sus valores predeterminados.",
-
       "reset_action": "Restablecer"
-
     },
-
     "branding": {
       "title": "Color de énfasis",
       "description": "Elige el color de acento para el logotipo y detalles.",
@@ -887,9 +914,7 @@
       "high": "Calidad alta (AAC 256kbps)",
       "lossless": "Sin pérdida (FLAC/ALAC) - No disponible",
       "equalizer_title": "Ecualizador",
-
       "equalizer_description": "Ecualizador gráfico de 10 bandas con presets. También disponible en la barra del reproductor."
-
     },
     "profile": {
       "title": "Perfil",

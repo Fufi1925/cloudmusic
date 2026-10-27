@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getAuthSession } from "@/shared/api/auth-session";
 import {
   getDefaultLobbyUrl,
   lobbyClient,
@@ -14,11 +15,48 @@ import type {
   LobbyRole,
   LobbyServerMessage,
   LobbySettings,
+  LobbyTrackRequest,
   LobbyVotes,
+  Track,
 } from "@/shared/lobby";
 
 const EMPTY_VOTES: LobbyVotes = { skip: [], skipNeeded: 0, tracks: {} };
-const DEFAULT_SETTINGS: LobbySettings = { voteOrder: true };
+const DEFAULT_SETTINGS: LobbySettings = { voteOrder: true, allowRequests: true };
+
+const SESSION_KEY = "cloudmusic_lobby_session";
+
+/** the lobby survives a reload: the code + role are enough to re-attach */
+export function persistLobbySession(code: string | null, role: LobbyRole | null): void {
+  try {
+    if (code && role) localStorage.setItem(SESSION_KEY, JSON.stringify({ code, role }));
+    else localStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* private mode – the lobby just won't survive a reload */
+  }
+}
+
+function readLobbySession(): { code: string; role: LobbyRole } | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.code !== "string" || (parsed.role !== "host" && parsed.role !== "listener")) {
+      return null;
+    }
+    return { code: parsed.code, role: parsed.role };
+  } catch {
+    return null;
+  }
+}
+
+/** the signed-in account, as the lobby server knows it */
+export function getLobbyUserId(): string | null {
+  try {
+    return getAuthSession()?.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export interface LobbyStoreState {
   role: LobbyRole | null;
@@ -32,6 +70,8 @@ export interface LobbyStoreState {
   joinReason: string | null;
   retryAt: number | null;
   votes: LobbyVotes;
+  /** open song wishes, most supported first */
+  requests: LobbyTrackRequest[];
   settings: LobbySettings;
   playback: LobbyPlayback | null;
   serverUrl: string;
@@ -46,6 +86,12 @@ export interface LobbyStoreState {
   approve: (userId: string) => void;
   deny: (userId: string) => void;
   vote: (target: string) => void;
+  requestTrack: (track: Track) => void;
+  voteRequest: (requestId: string) => void;
+  withdrawRequest: (requestId: string) => void;
+  answerRequest: (requestId: string, accept: boolean) => void;
+  kickMember: (userId: string) => void;
+  setAllowRequests: (allow: boolean) => void;
   setNotice: (key: string | null) => void;
   handleServerMessage: (message: LobbyServerMessage) => void;
   handleConnectionState: (state: "connecting" | "connected" | "closed") => void;
@@ -63,13 +109,20 @@ const initial = {
   joinReason: null as string | null,
   retryAt: null as number | null,
   votes: EMPTY_VOTES,
+  requests: [] as LobbyTrackRequest[],
   settings: DEFAULT_SETTINGS,
   playback: null as LobbyPlayback | null,
   notice: null as { key: string; at: number } | null,
 };
 
+const restored = readLobbySession();
+
 export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
   ...initial,
+  // a reload drops straight back into the lobby (the server resumes the seat)
+  role: restored?.role ?? null,
+  code: restored?.code ?? null,
+  connection: restored ? "connecting" : "idle",
   serverUrl: getDefaultLobbyUrl(),
 
   setServerUrl: (url) => {
@@ -97,6 +150,7 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
       members: [],
       pending: [],
       votes: EMPTY_VOTES,
+      requests: [],
       playback: null,
     });
     lobbyClient.send({ type: "create_lobby" });
@@ -146,6 +200,39 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
     lobbyClient.send({ type: "vote", target });
   },
 
+  requestTrack: (track) => {
+    if (get().role !== "listener" || !track?.id) return;
+    lobbyClient.send({ type: "request_track", track });
+  },
+
+  voteRequest: (requestId) => {
+    if (get().role !== "listener" || !requestId) return;
+    lobbyClient.send({ type: "vote_request", requestId });
+  },
+
+  withdrawRequest: (requestId) => {
+    if (!get().role || !requestId) return;
+    lobbyClient.send({ type: "withdraw_request", requestId });
+  },
+
+  answerRequest: (requestId, accept) => {
+    if (get().role !== "host" || !requestId) return;
+    lobbyClient.send({ type: "answer_request", requestId, accept });
+    set((state) => ({ requests: state.requests.filter((request) => request.id !== requestId) }));
+  },
+
+  kickMember: (userId) => {
+    if (get().role !== "host" || !userId) return;
+    lobbyClient.send({ type: "kick", userId });
+  },
+
+  setAllowRequests: (allow) => {
+    if (get().role !== "host") return;
+    const settings = { ...get().settings, allowRequests: Boolean(allow) };
+    set({ settings });
+    lobbyClient.send({ type: "lobby_settings", ...settings });
+  },
+
   setNotice: (key) => set({ notice: key ? { key, at: Date.now() } : null }),
 
   handleConnectionState: (state) => {
@@ -164,16 +251,19 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
     });
   },
 
-  reset: () =>
+  reset: () => {
+    persistLobbySession(null, null);
     set({
       ...initial,
       serverUrl: get().serverUrl,
-    }),
+    });
+  },
 
   handleServerMessage: (message) => {
     switch (message.type) {
       case "lobby_state":
       case "welcome": {
+        persistLobbySession(message.code, message.role);
         set({
           role: message.role,
           code: message.code,
@@ -181,6 +271,7 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
           members: message.members,
           pending: message.role === "host" ? message.pending : [],
           playback: message.playback,
+          requests: message.requests ?? [],
           settings: message.settings,
           joinState: "idle",
           joinReason: null,
@@ -208,6 +299,39 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
       case "votes":
         set({
           votes: { skip: message.skip, skipNeeded: message.skipNeeded, tracks: message.tracks },
+        });
+        break;
+      case "requests":
+        set({ requests: message.requests });
+        break;
+      case "request_accepted":
+        set((state) => ({
+          requests: state.requests.filter((request) => request.id !== message.requestId),
+          notice: { key: "lobby.notice.request_accepted", at: Date.now() },
+        }));
+        break;
+      case "request_denied":
+        set((state) => ({
+          requests: message.requestId
+            ? state.requests.filter((request) => request.id !== message.requestId)
+            : state.requests,
+          notice: {
+            key:
+              message.reason === "disabled"
+                ? "lobby.notice.requests_disabled"
+                : message.reason === "full"
+                  ? "lobby.notice.requests_full"
+                  : "lobby.notice.request_denied",
+            at: Date.now(),
+          },
+        }));
+        break;
+      case "kicked":
+        persistLobbySession(null, null);
+        set({
+          ...initial,
+          serverUrl: get().serverUrl,
+          notice: { key: "lobby.notice.kicked", at: Date.now() },
         });
         break;
       case "join_pending":
@@ -249,6 +373,7 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
         set({ notice: { key: "lobby.notice.skip_passed", at: Date.now() } });
         break;
       case "lobby_closed":
+        persistLobbySession(null, null);
         set({
           ...initial,
           serverUrl: get().serverUrl,
@@ -259,6 +384,7 @@ export const useLobbyStore = create<LobbyStoreState>((set, get) => ({
         });
         break;
       case "resume_failed":
+        persistLobbySession(null, null);
         set({
           ...initial,
           serverUrl: get().serverUrl,

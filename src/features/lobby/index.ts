@@ -1,8 +1,12 @@
 export { default as LobbyTab } from "./ui/LobbyTab";
 export { default as LobbyJoinPrompt } from "./ui/LobbyJoinPrompt";
+export { default as LobbyRequestPrompt } from "./ui/LobbyRequestPrompt";
+export { LobbyOverlayPanel, type LobbyOverlayState } from "./ui/LobbyOverlayPanel";
+export { default as LobbyTrackSearch } from "./ui/LobbyTrackSearch";
+export { useLobbyOverlaySync } from "./hooks/useLobbyOverlaySync";
 export { default as LobbyStrip } from "./ui/LobbyStrip";
 export { LobbyCodeField } from "./ui/LobbyCodeField";
 export { useLobbySync } from "./hooks/useLobbySync";
-export { useLobbyStore, selectIsInLobby, selectIsListener } from "./store/lobbyStore";
+export { useLobbyStore, selectIsInLobby, selectIsListener, getLobbyUserId } from "./store/lobbyStore";
 export { startLobbySync, stopLobbySync, publishHostPlayback } from "./sync/lobbySync";
 export * from "./sync/lobbySyncMath";

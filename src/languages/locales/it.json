@@ -261,7 +261,8 @@
       "title": "{count} nella stanza",
       "host": "Host",
       "empty": "Ancora nessuno: condividi il codice.",
-      "offline": "offline"
+      "offline": "offline",
+      "kick": "Espelli"
     },
     "requests": {
       "title": "{count} in attesa",
@@ -273,7 +274,10 @@
       "description": "Tocca un brano per farlo salire: l'host vede i voti.",
       "action": "Vota",
       "current": "In riproduzione: {title}",
-      "skip": "Salta brano"
+      "skip": "Salta brano",
+      "voted": "Votato",
+      "skip_hint": "Clicca di nuovo per ritirare il voto",
+      "withdraw_hint": "Clicca di nuovo per ritirare il voto"
     },
     "server": {
       "title": "Server della stanza",
@@ -302,15 +306,77 @@
       "label": "Stanza",
       "listeners": "{count} in ascolto",
       "listeners_one": "{count} in ascolto",
-      "listeners_zero": "Nessuno in ascolto",      "listening_to": "In ascolto di {name}"
+      "listeners_zero": "Nessuno in ascolto",
+      "listening_to": "In ascolto di {name}"
     },
     "notice": {
       "skip_passed": "Voti sufficienti: salto.",
       "closed": "La stanza è stata chiusa.",
       "expired": "La stanza è scaduta.",
-      "guest_gone": "Quell'ascoltatore è già uscito."
+      "guest_gone": "Quell'ascoltatore è già uscito.",
+      "request_accepted": "Richiesta accettata: il brano entra in coda.",
+      "request_denied": "L'host ha rifiutato la richiesta.",
+      "requests_disabled": "L'host ha disattivato le richieste.",
+      "requests_full": "Troppe richieste, riprova più tardi.",
+      "kicked": "L'host ti ha rimosso dalla lobby."
     },
-    "tab_description": "Ascoltare insieme: crea un codice o entra in una stanza."
+    "tab_description": "Ascoltare insieme: crea un codice o entra in una stanza.",
+    "wish": {
+      "title": "{count} richieste",
+      "description": "Sostieni una richiesta: più voti, prima l'host la mette.",
+      "description_host": "I tuoi ascoltatori chiedono brani. Dì sì o no e la tua musica continua.",
+      "from": "da {name}",
+      "votes": "{count} voti",
+      "prompt_title": "Richiesta brano",
+      "unknown_artist": "Artista sconosciuto",
+      "accept": "Riproduci",
+      "decline": "No",
+      "more": "+{count} altre",
+      "withdraw": "Ritira richiesta",
+      "title_one": "Richiesta brano",
+      "votes_one": "{count} voto"
+    },
+    "search": {
+      "title": "Richiedi un brano",
+      "title_host": "Aggiungi un brano",
+      "description": "Cerca un brano e invialo all'host: decide lui se va in onda.",
+      "description_host": "Cerca un brano e aggiungilo subito alla coda.",
+      "placeholder": "Cerca brani …",
+      "loading": "Ricerca …",
+      "empty": "Nessun risultato.",
+      "wish": "Richiedi",
+      "voted": "Votato · {count}",
+      "queue": "Aggiungi",
+      "already_queued": "Il brano è già in coda.",
+      "added": "Aggiunto alla coda",
+      "disabled": "L'host ha disattivato le richieste.",
+      "vote_hint": "Tocca di nuovo per ritirare il voto"
+    },
+    "overlay": {
+      "title": "Lobby",
+      "empty": "Nessuna lobby",
+      "nothing": "Niente in riproduzione",
+      "next": "In arrivo",
+      "wishes": "{count} richieste",
+      "skip_votes": "Salta {votes}/{needed}",
+      "members": "Ascoltatori",
+      "kick": "Espelli",
+      "open": "Apri lobby",
+      "hide": "Nascondi",
+      "show": "Mostra overlay",
+      "reset_position": "Ripristina posizione",
+      "you": "tu",
+      "host_hint": "Clic destro per espellere",
+      "listener_hint": "Clic destro per le opzioni",
+      "right_click": "Clic destro per le opzioni",
+      "settings_hint": "Piccola finestra con gli ascoltatori e il prossimo brano, trascinabile – in alto a destra per impostazione predefinita.",
+      "wishes_one": "{count} richiesta"
+    },
+    "settings": {
+      "title": "Impostazioni lobby",
+      "allow_requests": "Consenti richieste",
+      "allow_requests_hint": "Gli ascoltatori possono proporre brani, decidi tu con un avviso."
+    }
   },
   "login": {
     "welcome_back": "Bentornato",
@@ -488,23 +554,14 @@
     "reverb_hint": "Spazio atmosferico e profondità ambientale",
     "reverb_amount": "Riverbero",
     "queue_save_button": "Salva come playlist",
-
     "queue_save_title": "Salva coda come playlist",
-
     "queue_save_description": "Crea una nuova playlist con {count} brani dalla tua coda.",
-
     "queue_save_action": "Salva",
-
     "queue_saving": "Salvataggio…",
-
     "queue_save_success": "Playlist salvata · {count} brani",
-
     "queue_save_failed": "Impossibile salvare la playlist",
-
     "queue_empty_hint": "Riproduci qualcosa o aggiungi brani per creare una coda.",
-
     "queue_play_next_hint": "Clic destro su un brano → «Riproduci dopo»"
-
   },
   "playlist": {
     "playlist": "Playlist",
@@ -692,7 +749,6 @@
       "file_too_large": "Il file deve essere inferiore a 30 MB",
       "read_error": "Impossibile leggere il file immagine"
     },
-
     "audio_data": {
       "description": "Qualità dello streaming, cache offline e diagnostica della connessione."
     },
@@ -801,65 +857,35 @@
       "system": "Sistema"
     },
     "appearance": {
-
       "accent": "Colore accento",
-
       "accent_desc": "Colora il cuore dei preferiti, gli anelli di focus e gli avvisi. Il rosso CloudMusic è lo standard.",
-
       "accent_default": "Standard",
-
       "accent_custom": "Colore personalizzato",
-
       "accent_custom_value": "{color}",
-
       "blue": "Blu",
-
       "violet": "Viola",
-
       "green": "Verde",
-
       "amber": "Ambra",
-
       "rose": "Rosa",
-
       "teal": "Turchese",
-
       "corners": "Angoli",
-
       "corners_desc": "Quanto sono arrotondati schede, campi e finestre.",
-
       "corners_soft": "Neti",
-
       "corners_default": "Standard",
-
       "corners_round": "Arrotondati",
-
       "surface": "Superfici",
-
       "surface_desc": "Separazione tra sfondo, pannelli e schede.",
-
       "surface_default": "Standard",
-
       "surface_contrast": "Contrasto",
-
       "surface_oled": "Nero OLED",
-
       "compact": "Liste compatte",
-
       "compact_desc": "Righe più strette nelle liste di brani e coda, per vederne di più sullo schermo.",
-
       "reduce_motion": "Riduci il movimento",
-
       "reduce_motion_desc": "Disattiva transizioni e animazioni (utile in caso di capogiri o su telefoni lenti).",
-
       "reset": "Reimposta aspetto",
-
       "reset_desc": "Ripristina angoli, superfici, densità e movimento ai valori predefiniti.",
-
       "reset_action": "Reimposta"
-
     },
-
     "branding": {
       "title": "Branding",
       "description": "Scegli il colore d'accento del logo.",
@@ -893,9 +919,7 @@
       "high": "Qualità alta (AAC 256kbps)",
       "lossless": "Lossless (FLAC/ALAC) - Non disponibile",
       "equalizer_title": "Equalizzatore",
-
       "equalizer_description": "Equalizzatore grafico a 10 bande con preset. Disponibile anche nella barra del lettore."
-
     },
     "profile": {
       "title": "Profilo",

@@ -55,7 +55,7 @@ import {
   useModalStore,
 } from "@/features/library";
 import { SettingsModal, useCustomizationStore, getBlockStyle } from "@/features/settings";
-import { LobbyStrip, LobbyJoinPrompt } from "@/features/lobby";
+import { LobbyStrip, LobbyJoinPrompt, LobbyRequestPrompt } from "@/features/lobby";
 import { UpdateModal, UpdateToastBridge } from "@/features/updater";
 import CompactPlayerBar from "@/features/player/ui/CompactPlayerBar";
 import { useIsCompact } from "@/shared/hooks/useCompactLayout";
@@ -1193,6 +1193,7 @@ export default function AppFrame({ children }: AppFrameProps) {
       <ImportReviewModal />
       <SettingsModal />
       <LobbyJoinPrompt />
+      <LobbyRequestPrompt />
       <UpdateModal />
       <UpdateToastBridge />
       {!isCompact && (

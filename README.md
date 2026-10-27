@@ -113,6 +113,29 @@ node --test server/lobby/lobbyServer.test.mjs     # protocol tests
 Everyone in a lobby has to use the **same** server address; the “host” is simply whoever
 created the lobby.
 
+## What's new in 0.1.52 (lobby: wishes, kicking, desktop overlay)
+
+* **Song wishes with a real vote flow.** Listeners search a track inside the lobby
+  and wish for it; everyone else can back the wish. Nothing disappears after a
+  vote any more – the vote sticks to the wish (and a skip vote sticks to the
+  track) until the room really moves on.
+* **The host decides.** Every wish pops up on the right edge of the window with
+  *Nein* / *Abspielen*. Yes appends the song to the room's queue, no simply
+  continues the current music.
+* **Kicking.** The host can remove a listener from the member list (or from the
+  desktop overlay's right-click menu); the guest is told and dropped.
+* **Desktop-only lobby overlay.** A small always-on-top card, styled like the
+  media overlay, top-right by default and draggable anywhere. It shows the room,
+  who is listening, the next songs, open wishes and the skip votes. Right-click a
+  person to kick (host) or to reset the position. Toggle it in
+  *Settings → Lobby*; the spot is remembered in `lobby-overlay-settings.json`.
+* **The media overlay is draggable now.** Grab the playing pill anywhere except its
+  buttons and drop it wherever you like; the spot survives restarts
+  (`overlay-settings.json`). Double-click the pill to snap it back to the corner
+  picked in *Settings → Playback*. Windows/macOS move the window through the main
+  process, Linux keeps the compositor drag, so it also works under Wayland.
+* Android has no overlay – only the desktop app does.
+
 ## What's new in 0.1.50 (lobby: listen together)
 
 - **Lobby tab in the settings** – create a lobby and you get a **4-digit code**; everyone who

@@ -12,6 +12,7 @@ const player = {
   currentIndex: 0,
   shuffle: false,
   setShuffle: vi.fn(),
+  setQueue: vi.fn(),
 };
 
 const playTrack = vi.fn(async (_track: any, _queue?: any[], _context?: string | null, _cover?: string | null, _index?: number, _preserve?: boolean) => undefined);
@@ -69,6 +70,7 @@ beforeEach(() => {
   pause.mockClear();
   resume.mockClear();
   skipNext.mockClear();
+  player.setQueue.mockClear();
   useLobbyStore.setState({ role: null, code: null, playback: null, joinState: "idle" });
   startLobbySync();
 });
@@ -186,5 +188,34 @@ describe("lobby sync bridge", () => {
     expect(playback).toBeTruthy();
     expect(playback.track.id).toBe("mine");
     expect(playback.status).toBe("playing");
+  });
+});
+
+describe("accepted wishes", () => {
+  it("queues the song the host accepted", async () => {
+    useLobbyStore.setState({ role: "host", code: "4821" });
+    player.currentTrack = track("now");
+    player.queue = [track("now"), track("later")];
+    player.currentIndex = 0;
+
+    emit({
+      type: "request_accepted",
+      requestId: "r1",
+      track: track("wish"),
+      requestedBy: "Mira",
+    });
+    await flush();
+
+    expect(player.setQueue).toHaveBeenCalledTimes(1);
+    const queue = player.setQueue.mock.calls[0][0];
+    expect(queue.map((entry: any) => entry.id)).toEqual(["now", "later", "wish"]);
+  });
+
+  it("does not queue anything for a listener", async () => {
+    useLobbyStore.setState({ role: "listener", code: "4821" });
+    player.queue = [];
+    emit({ type: "request_accepted", requestId: "r2", track: track("wish"), requestedBy: "Mira" });
+    await flush();
+    expect(player.setQueue).not.toHaveBeenCalled();
   });
 });
