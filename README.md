@@ -79,6 +79,38 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## Lobby server
+
+The *Lobby* feature needs one small server; everything else in the app keeps talking to
+`api.tryliner.fun`. The server lives in this repository (`server/lobby/`), has **zero
+dependencies** and keeps its rooms in memory.
+
+### Deploy on Railway (once)
+
+1. <https://railway.app> → **New Project → Deploy from GitHub repo** → pick this repository.
+2. Name the service **`cloudmusic`** (that gives you `cloudmusic.up.railway.app`).
+3. Settings → **Networking → Generate Domain**. If Railway appends a suffix, copy the real
+   hostname and either rename the service or fix the address in the app (see below).
+4. Nothing else to configure – `railway.json` + `nixpacks.toml` in the repo root already
+   build nothing and start `node server/lobby/index.mjs`. Check the deploy with
+   `https://cloudmusic.up.railway.app/health` → `{"ok":true,...}`.
+
+The app points at `wss://cloudmusic.up.railway.app/v1/lobby/ws` by default, so after the
+deploy the lobby works without touching a single setting. To use a different server, either
+build with `VITE_LOBBY_URL=wss://…/v1/lobby/ws` or type the address into
+*Einstellungen → Lobby → Lobby-Server* (it is remembered per device).
+
+### Run it locally
+
+```bash
+node server/lobby/index.mjs                       # ws://localhost:4300/v1/lobby/ws
+PORT=8080 node server/lobby/index.mjs             # different port
+node --test server/lobby/lobbyServer.test.mjs     # protocol tests
+```
+
+Everyone in a lobby has to use the **same** server address; the “host” is simply whoever
+created the lobby.
+
 ## What's new in 0.1.50 (lobby: listen together)
 
 - **Lobby tab in the settings** – create a lobby and you get a **4-digit code**; everyone who

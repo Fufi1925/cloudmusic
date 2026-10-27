@@ -1,5 +1,4 @@
 import { getAuthSession } from "../api/auth-session";
-import { getApiBaseUrl } from "../api/baseUrl";
 import { APP_VERSION } from "../config/version";
 import type { LobbyClientMessage, LobbyServerMessage } from "./types";
 
@@ -7,6 +6,14 @@ const INITIAL_RECONNECT_DELAY_MS = 1_500;
 const MAX_RECONNECT_DELAY_MS = 20_000;
 const PING_INTERVAL_MS = 20_000;
 const URL_STORAGE_KEY = "cloudmusic_lobby_url";
+
+/**
+ * The lobby server lives in this repo (`server/lobby/`) and is deployed on
+ * Railway. Override it per build with `VITE_LOBBY_URL` or per device in
+ * *Einstellungen → Lobby → Lobby-Server*.
+ */
+export const DEFAULT_LOBBY_HOST = "cloudmusic.up.railway.app";
+export const DEFAULT_LOBBY_URL = `wss://${DEFAULT_LOBBY_HOST}/v1/lobby/ws`;
 
 /** `https://api.example.com` → `wss://api.example.com/v1/lobby/ws` */
 export function deriveLobbyUrl(apiBase: string): string {
@@ -50,9 +57,14 @@ export function storeLobbyUrl(url: string): void {
 }
 
 export function getDefaultLobbyUrl(): string {
+  // 1. whatever the user typed in the lobby tab
   const stored = getStoredLobbyUrl();
   if (stored) return normalizeLobbyUrl(stored);
-  return deriveLobbyUrl(getApiBaseUrl());
+  // 2. a build-time override (e.g. a self-hosted instance)
+  const fromEnv = (import.meta.env?.VITE_LOBBY_URL as string | undefined)?.trim();
+  if (fromEnv) return normalizeLobbyUrl(fromEnv);
+  // 3. the lobby server that ships with this repository
+  return DEFAULT_LOBBY_URL;
 }
 
 type Listener = (message: LobbyServerMessage) => void;

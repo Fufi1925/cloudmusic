@@ -1,0 +1,17 @@
+# Railway / Nixpacks build for the lobby server only.
+#
+# The lobby server in server/lobby has **no dependencies**, so the heavy
+# pnpm/electron install of the desktop app is skipped entirely and the image
+# only contains Node plus a few files.
+
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+[phases.install]
+cmds = ["echo 'lobby server has no dependencies – nothing to install'"]
+
+[phases.build]
+cmds = ["echo 'nothing to build'"]
+
+[start]
+cmd = "node server/lobby/index.mjs"

@@ -356,7 +356,7 @@ export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string })
               value={serverDraft}
               onChange={(event) => setServerDraft(event.target.value)}
               onBlur={() => setServerUrl(serverDraft)}
-              placeholder={t("lobby.server.placeholder")}
+              placeholder="wss://cloudmusic.up.railway.app/v1/lobby/ws"
               className="h-[34px] min-w-0 flex-1 rounded-lg border-0 bg-border-alpha-14 px-[10px] text-[12.5px] text-text-primary outline-none placeholder:text-text-tertiary"
               style={font}
             />
@@ -461,7 +461,7 @@ export default function LobbyTab({ searchQuery = "" }: { searchQuery?: string })
             value={serverDraft}
             onChange={(event) => setServerDraft(event.target.value)}
             onBlur={() => setServerUrl(serverDraft)}
-            placeholder={t("lobby.server.placeholder")}
+            placeholder="wss://cloudmusic.up.railway.app/v1/lobby/ws"
             className="h-[34px] min-w-0 flex-1 rounded-lg border-0 bg-border-alpha-14 px-[10px] text-[12.5px] text-text-primary outline-none placeholder:text-text-tertiary"
             style={font}
           />

@@ -26,6 +26,22 @@ const httpServer = http.createServer((req, res) => {
     res.end(JSON.stringify({ ok: true, ...lobbyServer.stats(), version: 1 }));
     return;
   }
+  if (url.pathname === "/") {
+    // a quick "is anything running here?" page for the Railway domain
+    res.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
+    res.end(
+      [
+        "CloudMusic lobby server",
+        "",
+        `websocket: ${PATH}`,
+        `lobbies:   ${lobbyServer.stats().lobbies}`,
+        `listeners: ${lobbyServer.stats().listeners}`,
+        "",
+        "Open CloudMusic → Einstellungen → Lobby and enter a code.",
+      ].join("\n"),
+    );
+    return;
+  }
   res.writeHead(404, { "content-type": "text/plain" });
   res.end("CloudMusic lobby server\n");
 });
