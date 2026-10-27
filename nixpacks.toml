@@ -1,3 +1,4 @@
+# Fallback build (only used if Railway is switched from "Dockerfile" to "Nixpacks").
 # Railway / Nixpacks build for the lobby server only.
 #
 # The lobby server in server/lobby has **no dependencies**, so the heavy

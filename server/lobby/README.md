@@ -20,9 +20,9 @@ Railway health check.
 
 ## Railway
 
-The repository already contains `railway.json` and `nixpacks.toml`, so Railway
-skips the desktop build entirely (nothing to install) and only starts the
-server:
+The repository already contains `railway.json` and a `Dockerfile` (plus a
+`nixpacks.toml` fallback), so Railway skips the desktop build entirely
+(nothing to install) and only starts the server:
 
 1. Railway → **New Project → Deploy from GitHub repo** → this repository.
 2. Service name **`cloudmusic`** → domain `cloudmusic.up.railway.app`.

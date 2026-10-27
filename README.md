@@ -91,9 +91,11 @@ dependencies** and keeps its rooms in memory.
 2. Name the service **`cloudmusic`** (that gives you `cloudmusic.up.railway.app`).
 3. Settings → **Networking → Generate Domain**. If Railway appends a suffix, copy the real
    hostname and either rename the service or fix the address in the app (see below).
-4. Nothing else to configure – `railway.json` + `nixpacks.toml` in the repo root already
-   build nothing and start `node server/lobby/index.mjs`. Check the deploy with
+4. Nothing else to configure – `railway.json` + the tiny `Dockerfile` in the repo root
+   already build only the dependency-free lobby server and start
+   `node server/lobby/index.mjs`. Check the deploy with
    `https://cloudmusic.up.railway.app/health` → `{"ok":true,...}`.
+   (`nixpacks.toml` is the equivalent fallback if you switch the builder to Nixpacks.)
 
 The app points at `wss://cloudmusic.up.railway.app/v1/lobby/ws` by default, so after the
 deploy the lobby works without touching a single setting. To use a different server, either
