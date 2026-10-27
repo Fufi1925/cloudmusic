@@ -240,6 +240,84 @@
     "no_artists_desc": "Salve artistas para acessar a discografia rapidamente",
     "search_music": "Pesquisar música"
   },
+  "lobby": {
+    "create": {
+      "title": "Criar uma sala",
+      "description": "Recebes um código de 4 dígitos. Quem o introduzir ouve contigo – a música escolhes tu.",
+      "action": "Criar sala"
+    },
+    "join": {
+      "title": "Entrar com um código",
+      "description": "Introduz o código de 4 dígitos de uma sala. O anfitrião tem de te aceitar.",
+      "action": "Pedir para entrar",
+      "pending": "À espera do anfitrião…"
+    },
+    "your_code": "O teu código",
+    "joined_code": "Código da sala",
+    "host_hint": "Tudo o que reproduzes é replicado nos ouvintes. A reprodução continua local em cada dispositivo.",
+    "listener_hint": "Segues a reprodução do anfitrião, com letras. Usa os botões abaixo para votar.",
+    "leave": "Sair da sala",
+    "connected": "Ligado",
+    "reconnecting": "A reconectar…",
+    "connecting": "A ligar…",
+    "copy_code": "Copiar",
+    "code_copied": "Código copiado",
+    "code_copy_failed": "Não foi possível copiar o código",
+    "members": {
+      "title": "{count} na sala",
+      "host": "Anfitrião",
+      "empty": "Ainda ninguém – partilha o teu código.",
+      "offline": "offline"
+    },
+    "requests": {
+      "title": "{count} à espera",
+      "accept": "Aceitar",
+      "decline": "Recusar"
+    },
+    "vote": {
+      "title": "Vota na próxima música",
+      "description": "Toca numa música para a subir – o anfitrião vê os votos.",
+      "action": "Votar",
+      "current": "A tocar: {title}",
+      "skip": "Saltar música"
+    },
+    "server": {
+      "title": "Servidor das salas",
+      "description": "Todos numa sala têm de usar o mesmo servidor.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Aplicar"
+    },
+    "error": {
+      "not_found": "Não existe sala com este código.",
+      "full": "Esta sala está cheia.",
+      "busy": "Demasiados pedidos – tenta daqui a pouco.",
+      "host_away": "O anfitrião está offline.",
+      "invalid_code": "Introduz quatro dígitos.",
+      "generic": "Algo correu mal. Tenta novamente.",
+      "cooldown": "O anfitrião recusou. Podes pedir de novo em {time}."
+    },
+    "prompt": {
+      "title": "{name} quer entrar",
+      "description": "Permitir que esta pessoa ouça a tua sala?",
+      "more": "Mais {count} à espera",
+      "accept": "Permitir",
+      "decline": "Recusar",
+      "cooldown_hint": "Depois de uma recusa tem de esperar 5 minutos."
+    },
+    "strip": {
+      "label": "Sala",
+      "listeners": "{count} a ouvir",
+      "listeners_one": "{count} a ouvir",
+      "listeners_zero": "Ninguém a ouvir ainda",      "listening_to": "A ouvir {name}"
+    },
+    "notice": {
+      "skip_passed": "Votos suficientes – a saltar.",
+      "closed": "A sala foi fechada.",
+      "expired": "A sala expirou.",
+      "guest_gone": "Esse ouvinte já saiu."
+    },
+    "tab_description": "Ouvir juntos: cria um código ou entra numa sala."
+  },
   "login": {
     "welcome_back": "Bem-vindo de volta",
     "sign_in_to_account": "Entre na sua conta",
@@ -483,6 +561,7 @@
     "support": "Suporte",
     "manage_account": "Gerenciar conta",
     "tabs": {
+      "lobby": "Sala",
       "general": "Geral",
       "appearance": "Aparência",
       "customization": "Personalização",

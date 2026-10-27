@@ -236,6 +236,84 @@
     "no_artists_desc": "Enregistrez des artistes pour accéder rapidement à leur discographie",
     "search_music": "Rechercher de la musique"
   },
+  "lobby": {
+    "create": {
+      "title": "Créer un salon",
+      "description": "Tu reçois un code à 4 chiffres. Celui qui le saisit écoute avec toi : c'est toi qui choisis la musique.",
+      "action": "Créer le salon"
+    },
+    "join": {
+      "title": "Rejoindre avec un code",
+      "description": "Saisis le code à 4 chiffres d'un salon. L'hôte doit t'accepter.",
+      "action": "Demander à rejoindre",
+      "pending": "En attente de l'hôte…"
+    },
+    "your_code": "Ton code",
+    "joined_code": "Code du salon",
+    "host_hint": "Tout ce que tu lances est reflété chez tes auditeurs. La lecture reste locale sur chaque appareil.",
+    "listener_hint": "Tu suis la lecture de l'hôte, paroles comprises. Utilise les boutons ci-dessous pour voter.",
+    "leave": "Quitter le salon",
+    "connected": "Connecté",
+    "reconnecting": "Reconnexion…",
+    "connecting": "Connexion…",
+    "copy_code": "Copier",
+    "code_copied": "Code copié",
+    "code_copy_failed": "Impossible de copier le code",
+    "members": {
+      "title": "{count} dans le salon",
+      "host": "Hôte",
+      "empty": "Personne pour l'instant – partage ton code.",
+      "offline": "hors ligne"
+    },
+    "requests": {
+      "title": "{count} en attente",
+      "accept": "Accepter",
+      "decline": "Refuser"
+    },
+    "vote": {
+      "title": "Voter pour la prochaine chanson",
+      "description": "Touche une chanson pour la faire remonter – l'hôte voit les votes.",
+      "action": "Voter",
+      "current": "Lecture en cours : {title}",
+      "skip": "Passer la chanson"
+    },
+    "server": {
+      "title": "Serveur du salon",
+      "description": "Tout le monde dans un salon doit utiliser le même serveur.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Appliquer"
+    },
+    "error": {
+      "not_found": "Aucun salon avec ce code.",
+      "full": "Ce salon est complet.",
+      "busy": "Trop de demandes – réessaie dans un instant.",
+      "host_away": "L'hôte est hors ligne.",
+      "invalid_code": "Saisis quatre chiffres.",
+      "generic": "Une erreur est survenue. Réessaie.",
+      "cooldown": "L'hôte a refusé. Tu peux redemander dans {time}."
+    },
+    "prompt": {
+      "title": "{name} veut rejoindre",
+      "description": "Autoriser cette personne à écouter ton salon ?",
+      "more": "{count} autres en attente",
+      "accept": "Autoriser",
+      "decline": "Refuser",
+      "cooldown_hint": "Après un refus, la personne doit attendre 5 minutes."
+    },
+    "strip": {
+      "label": "Salon",
+      "listeners": "{count} à l'écoute",
+      "listeners_one": "{count} à l'écoute",
+      "listeners_zero": "Personne n'écoute encore",      "listening_to": "À l'écoute de {name}"
+    },
+    "notice": {
+      "skip_passed": "Assez de votes – passage.",
+      "closed": "Le salon a été fermé.",
+      "expired": "Le salon a expiré.",
+      "guest_gone": "Cet auditeur est déjà parti."
+    },
+    "tab_description": "Écouter ensemble : crée un code ou rejoins un salon."
+  },
   "login": {
     "welcome_back": "Bon retour",
     "sign_in_to_account": "Connectez-vous à votre compte",
@@ -473,6 +551,7 @@
     "support": "Assistance",
     "manage_account": "Gérer le compte",
     "tabs": {
+      "lobby": "Salon",
       "general": "Général",
       "appearance": "Apparence",
       "customization": "Personnalisation",

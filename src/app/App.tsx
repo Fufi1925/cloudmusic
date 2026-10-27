@@ -13,6 +13,7 @@ import { useThemeCustomizationSync, useAppearanceSync, useAppearanceStore } from
 import { useTouchBarSync } from "@/features/touchbar";
 import { OverlayPlayer, useOverlaySync } from "@/features/overlay";
 import { useDiscordSync } from "@/features/discord";
+import { useLobbySync } from "@/features/lobby";
 import { AppRoutes } from "./routes";
 import DeeplinkHandler from "./DeeplinkHandler";
 import EnvironmentWarning from "./EnvironmentWarning";
@@ -56,6 +57,11 @@ function DiscordSync() {
   return null;
 }
 
+function LobbySync() {
+  useLobbySync();
+  return null;
+}
+
 export default function App() {
   const isOverlay = window.location.hash.startsWith("#/overlay");
 
@@ -96,6 +102,7 @@ export default function App() {
         <TouchBarSync />
         <OverlaySync />
         <DiscordSync />
+        <LobbySync />
         <AppleEmojiProvider>
           <I18nProvider>
             <ToastProvider>

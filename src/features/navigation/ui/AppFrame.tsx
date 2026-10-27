@@ -55,6 +55,7 @@ import {
   useModalStore,
 } from "@/features/library";
 import { SettingsModal, useCustomizationStore, getBlockStyle } from "@/features/settings";
+import { LobbyStrip, LobbyJoinPrompt } from "@/features/lobby";
 import { UpdateModal, UpdateToastBridge } from "@/features/updater";
 import CompactPlayerBar from "@/features/player/ui/CompactPlayerBar";
 import { useIsCompact } from "@/shared/hooks/useCompactLayout";
@@ -854,6 +855,8 @@ export default function AppFrame({ children }: AppFrameProps) {
           )}
         </main>
 
+        <LobbyStrip />
+
         {shouldShowMiniPlayer && !isCompact && (
           <div
             ref={miniPlayerContainerRef}
@@ -1189,6 +1192,7 @@ export default function AppFrame({ children }: AppFrameProps) {
       <CreatePlaylistModal />
       <ImportReviewModal />
       <SettingsModal />
+      <LobbyJoinPrompt />
       <UpdateModal />
       <UpdateToastBridge />
       {!isCompact && (

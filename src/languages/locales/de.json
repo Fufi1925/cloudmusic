@@ -238,6 +238,84 @@
     "no_artists_desc": "Speichere Künstler, um schnell auf ihre Diskografie zuzugreifen",
     "search_music": "Musik suchen"
   },
+  "lobby": {
+    "create": {
+      "title": "Lobby erstellen",
+      "description": "Du bekommst einen 4-stelligen Code. Wer ihn eingibt, hört bei dir mit – die Musik wählst du.",
+      "action": "Lobby erstellen"
+    },
+    "join": {
+      "title": "Mit Code beitreten",
+      "description": "Gib den 4-stelligen Code einer Lobby ein. Der Host muss dich bestätigen.",
+      "action": "Beitritt anfragen",
+      "pending": "Warte auf den Host …"
+    },
+    "your_code": "Dein Code",
+    "joined_code": "Lobby-Code",
+    "host_hint": "Alles, was du startest, wird auf alle Hörer gespiegelt. Die Wiedergabe bleibt auf jedem Gerät lokal.",
+    "listener_hint": "Du folgst der Wiedergabe des Hosts – inklusive Lyrics. Über die Buttons unten kannst du abstimmen.",
+    "leave": "Lobby verlassen",
+    "connected": "Verbunden",
+    "reconnecting": "Verbindung wird hergestellt …",
+    "connecting": "Verbinde …",
+    "copy_code": "Kopieren",
+    "code_copied": "Code kopiert",
+    "code_copy_failed": "Code konnte nicht kopiert werden",
+    "members": {
+      "title": "{count} in der Lobby",
+      "host": "Host",
+      "empty": "Noch niemand dabei – teile deinen Code.",
+      "offline": "offline"
+    },
+    "requests": {
+      "title": "{count} offen",
+      "accept": "Annehmen",
+      "decline": "Ablehnen"
+    },
+    "vote": {
+      "title": "Für den nächsten Song stimmen",
+      "description": "Tippe einen Song an, um ihn nach vorne zu holen – der Host sieht die Stimmen.",
+      "action": "Voten",
+      "current": "Läuft gerade: {title}",
+      "skip": "Song überspringen"
+    },
+    "server": {
+      "title": "Lobby-Server",
+      "description": "Alle in einer Lobby müssen denselben Server nutzen.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Übernehmen"
+    },
+    "error": {
+      "not_found": "Keine Lobby mit diesem Code.",
+      "full": "Diese Lobby ist voll.",
+      "busy": "Zu viele Anfragen – versuch es gleich nochmal.",
+      "host_away": "Der Host ist gerade offline.",
+      "invalid_code": "Bitte vier Ziffern eingeben.",
+      "generic": "Etwas ist schiefgelaufen. Versuch es erneut.",
+      "cooldown": "Der Host hat abgelehnt. In {time} kannst du erneut fragen."
+    },
+    "prompt": {
+      "title": "{name} möchte beitreten",
+      "description": "Dieser Person erlauben, bei dir mitzuhören?",
+      "more": "Noch {count} weitere warten",
+      "accept": "Erlauben",
+      "decline": "Ablehnen",
+      "cooldown_hint": "Nach einer Ablehnung muss 5 Minuten gewartet werden."
+    },
+    "strip": {
+      "label": "Lobby",
+      "listeners": "{count} hören zu",
+      "listeners_one": "{count} hört zu",
+      "listeners_zero": "Noch niemand hört zu",      "listening_to": "Du hörst bei {name}"
+    },
+    "notice": {
+      "skip_passed": "Genug Stimmen – Song wird übersprungen.",
+      "closed": "Die Lobby wurde geschlossen.",
+      "expired": "Die Lobby ist abgelaufen.",
+      "guest_gone": "Dieser Hörer ist schon wieder weg."
+    },
+    "tab_description": "Gemeinsam hören: Code erstellen oder einer Lobby beitreten."
+  },
   "login": {
     "welcome_back": "Willkommen zurück!",
     "sign_in_to_account": "Melde dich bei deinem Konto an",
@@ -480,6 +558,7 @@
     "support": "Support",
     "manage_account": "Konto verwalten",
     "tabs": {
+      "lobby": "Lobby",
       "general": "Allgemein",
       "appearance": "Darstellung",
       "customization": "Anpassung",

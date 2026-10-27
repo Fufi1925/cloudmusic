@@ -79,6 +79,25 @@ The **Website** entry in *Settings → Info* is intentionally disabled and greye
 
 ---
 
+## What's new in 0.1.50 (lobby: listen together)
+
+- **Lobby tab in the settings** – create a lobby and you get a **4-digit code**; everyone who
+  enters that code joins as a listener. The host decides who gets in: each request pops up as a
+  *"Mira möchte beitreten"* card with **Erlauben / Ablehnen**; after a decline the guest has to
+  wait **5 minutes** before asking again.
+- **Synchronised playback** – the host keeps using the whole app; every play, pause, seek and
+  track change is mirrored. Listeners follow with the timestamp-corrected position (drift under
+  400 ms is ignored, up to 2 s is pulled back, anything bigger is a hard seek) so the lyrics keep
+  running in sync on their own. Audio is never streamed: each device resolves the track locally,
+  so EQ, volume and sleep timer stay personal.
+- **Listeners can vote** – *Song überspringen* needs a majority of the listeners, and upcoming
+  songs can be pushed with a vote; the host sees the tally in the lobby tab.
+- **Player strip** – a slim bar above the player shows the code, the connection dot and either
+  *"3 hören zu"* (host) or *"Du hörst bei Fufi"* (listener) plus **Lobby verlassen**.
+- **Lobby server included** – `server/lobby/` is a dependency-free Node server (own RFC-6455
+  WebSocket implementation, in-memory rooms, 4-digit codes, 5-minute deny cooldown). Start it with
+  `node server/lobby/index.mjs`; the address can be changed in the lobby tab.
+
 ## What's new in 0.1.49 (sleep timer, audio depth, more customisation)
 
 - **Phone settings trimmed** – *Shortcuts* and *Overlay* disappear from the settings on a phone

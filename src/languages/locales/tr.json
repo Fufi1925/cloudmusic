@@ -234,6 +234,84 @@
     "no_artists_desc": "Diskografilerine hızlıca ulaşmak için sanatçıları kaydet",
     "search_music": "Müzik ara"
   },
+  "lobby": {
+    "create": {
+      "title": "Oda oluştur",
+      "description": "4 haneli bir kod alırsın. Kodu giren seninle birlikte dinler – müziği sen seçersin.",
+      "action": "Oda oluştur"
+    },
+    "join": {
+      "title": "Kodla katıl",
+      "description": "Bir odanın 4 haneli kodunu gir. Sunucu sahibi seni onaylamalı.",
+      "action": "Katılma isteği gönder",
+      "pending": "Sunucu sahibi bekleniyor…"
+    },
+    "your_code": "Kodun",
+    "joined_code": "Oda kodu",
+    "host_hint": "Başlattığın her şey dinleyicilere yansıtılır. Oynatma her cihazda yerel kalır.",
+    "listener_hint": "Sunucu sahibinin oynatmasını takip edersin – şarkı sözleri dahil. Oylamak için aşağıdaki düğmeleri kullan.",
+    "leave": "Odadan ayrıl",
+    "connected": "Bağlı",
+    "reconnecting": "Yeniden bağlanıyor…",
+    "connecting": "Bağlanıyor…",
+    "copy_code": "Kopyala",
+    "code_copied": "Kod kopyalandı",
+    "code_copy_failed": "Kod kopyalanamadı",
+    "members": {
+      "title": "Odada {count} kişi",
+      "host": "Sunucu",
+      "empty": "Henüz kimse yok – kodunu paylaş.",
+      "offline": "çevrimdışı"
+    },
+    "requests": {
+      "title": "{count} bekliyor",
+      "accept": "Kabul et",
+      "decline": "Reddet"
+    },
+    "vote": {
+      "title": "Sıradaki şarkı için oy ver",
+      "description": "Bir şarkıya dokunarak öne çıkar – sunucu sahibi oyları görür.",
+      "action": "Oy ver",
+      "current": "Şimdi çalıyor: {title}",
+      "skip": "Şarkıyı atla"
+    },
+    "server": {
+      "title": "Oda sunucusu",
+      "description": "Odadaki herkes aynı sunucuyu kullanmalı.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Uygula"
+    },
+    "error": {
+      "not_found": "Bu kodla oda yok.",
+      "full": "Bu oda dolu.",
+      "busy": "Çok fazla istek – birazdan tekrar dene.",
+      "host_away": "Sunucu sahibi çevrimdışı.",
+      "invalid_code": "Lütfen dört hane gir.",
+      "generic": "Bir şeyler ters gitti. Tekrar dene.",
+      "cooldown": "Sunucu sahibi reddetti. {time} sonra tekrar sorabilirsin."
+    },
+    "prompt": {
+      "title": "{name} katılmak istiyor",
+      "description": "Bu kişinin odanı dinlemesine izin verilsin mi?",
+      "more": "{count} kişi daha bekliyor",
+      "accept": "İzin ver",
+      "decline": "Reddet",
+      "cooldown_hint": "Reddedilirse 5 dakika beklemek zorunda."
+    },
+    "strip": {
+      "label": "Oda",
+      "listeners": "{count} dinliyor",
+      "listeners_one": "{count} dinliyor",
+      "listeners_zero": "Henüz kimse dinlemiyor",      "listening_to": "{name} dinleniyor"
+    },
+    "notice": {
+      "skip_passed": "Yeterli oy – atlanıyor.",
+      "closed": "Oda kapatıldı.",
+      "expired": "Odanın süresi doldu.",
+      "guest_gone": "Bu dinleyici zaten ayrıldı."
+    },
+    "tab_description": "Birlikte dinleyin: kod oluşturun veya bir odaya katılın."
+  },
   "login": {
     "welcome_back": "Tekrar hoş geldin",
     "sign_in_to_account": "Hesabına giriş yap",
@@ -471,6 +549,7 @@
     "support": "Destek",
     "manage_account": "Hesabı yönet",
     "tabs": {
+      "lobby": "Oda",
       "general": "Genel",
       "appearance": "Görünüm",
       "customization": "Özelleştirme",

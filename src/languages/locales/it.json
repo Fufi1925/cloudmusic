@@ -234,6 +234,84 @@
     "no_artists_desc": "Salva gli artisti per accedere velocemente alla loro discografia",
     "search_music": "Cerca musica"
   },
+  "lobby": {
+    "create": {
+      "title": "Crea una stanza",
+      "description": "Ricevi un codice di 4 cifre. Chi lo inserisce ascolta con te: la musica la scegli tu.",
+      "action": "Crea stanza"
+    },
+    "join": {
+      "title": "Entra con un codice",
+      "description": "Inserisci il codice di 4 cifre di una stanza. L'host deve accettarti.",
+      "action": "Chiedi di entrare",
+      "pending": "In attesa dell'host…"
+    },
+    "your_code": "Il tuo codice",
+    "joined_code": "Codice stanza",
+    "host_hint": "Tutto ciò che avvii viene rispecchiato sugli ascoltatori. La riproduzione resta locale su ogni dispositivo.",
+    "listener_hint": "Segui la riproduzione dell'host, testi compresi. Usa i pulsanti qui sotto per votare.",
+    "leave": "Esci dalla stanza",
+    "connected": "Connesso",
+    "reconnecting": "Riconnessione…",
+    "connecting": "Connessione…",
+    "copy_code": "Copia",
+    "code_copied": "Codice copiato",
+    "code_copy_failed": "Impossibile copiare il codice",
+    "members": {
+      "title": "{count} nella stanza",
+      "host": "Host",
+      "empty": "Ancora nessuno: condividi il codice.",
+      "offline": "offline"
+    },
+    "requests": {
+      "title": "{count} in attesa",
+      "accept": "Accetta",
+      "decline": "Rifiuta"
+    },
+    "vote": {
+      "title": "Vota il prossimo brano",
+      "description": "Tocca un brano per farlo salire: l'host vede i voti.",
+      "action": "Vota",
+      "current": "In riproduzione: {title}",
+      "skip": "Salta brano"
+    },
+    "server": {
+      "title": "Server della stanza",
+      "description": "Tutti in una stanza devono usare lo stesso server.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Applica"
+    },
+    "error": {
+      "not_found": "Nessuna stanza con questo codice.",
+      "full": "Questa stanza è piena.",
+      "busy": "Troppe richieste: riprova tra poco.",
+      "host_away": "L'host è offline.",
+      "invalid_code": "Inserisci quattro cifre.",
+      "generic": "Qualcosa è andato storto. Riprova.",
+      "cooldown": "L'host ha rifiutato. Puoi riprovare tra {time}."
+    },
+    "prompt": {
+      "title": "{name} vuole entrare",
+      "description": "Permettere a questa persona di ascoltare la tua stanza?",
+      "more": "Altri {count} in attesa",
+      "accept": "Consenti",
+      "decline": "Rifiuta",
+      "cooldown_hint": "Dopo un rifiuto deve attendere 5 minuti."
+    },
+    "strip": {
+      "label": "Stanza",
+      "listeners": "{count} in ascolto",
+      "listeners_one": "{count} in ascolto",
+      "listeners_zero": "Nessuno in ascolto",      "listening_to": "In ascolto di {name}"
+    },
+    "notice": {
+      "skip_passed": "Voti sufficienti: salto.",
+      "closed": "La stanza è stata chiusa.",
+      "expired": "La stanza è scaduta.",
+      "guest_gone": "Quell'ascoltatore è già uscito."
+    },
+    "tab_description": "Ascoltare insieme: crea un codice o entra in una stanza."
+  },
   "login": {
     "welcome_back": "Bentornato",
     "sign_in_to_account": "Accedi al tuo account",
@@ -471,6 +549,7 @@
     "support": "Supporto",
     "manage_account": "Gestisci account",
     "tabs": {
+      "lobby": "Stanza",
       "general": "Generale",
       "appearance": "Aspetto",
       "customization": "Personalizzazione",

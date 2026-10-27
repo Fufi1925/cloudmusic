@@ -9,6 +9,7 @@ import { playerRuntime } from "./playerRuntime";
 import { isRadioContext, shouldRefillRadio } from "./radioMode";
 import { EQ_PRESETS, type EqPresetId } from "./eqMath";
 import { pitchShifter } from "./pitchShifter";
+import { isTransportLocked } from "./transportLock";
 import {
   api,
   type ApiRadioTrack,
@@ -35,6 +36,17 @@ import { createTranslatorSync, getStoredLocale } from "@/languages";
 import type { Track } from "@/shared/types";
 
 const MAX_CONSECUTIVE_AUTO_SKIPS = 3;
+
+/** commands a lobby listener may not trigger (see transportLock.ts) */
+const TRANSPORT_COMMANDS = new Set<PlayerCommand["type"]>([
+  "PLAY_REQUESTED",
+  "PAUSE_REQUESTED",
+  "RESUME_REQUESTED",
+  "SEEK_COMMITTED",
+  "SKIP_NEXT",
+  "SKIP_PREVIOUS",
+  "TOGGLE_PLAY_PAUSE",
+]);
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 export { usePlayerStore, type PlayerStatus, type RepeatMode, type PlayerState };
@@ -371,6 +383,11 @@ class PlayerEngine {
   }
 
   public dispatch(command: PlayerCommand): void {
+    // in a lobby the host drives playback – a listener's own transport
+    // buttons must not desync the room
+    if (isTransportLocked() && TRANSPORT_COMMANDS.has(command.type)) {
+      return;
+    }
     switch (command.type) {
       case "PLAY_REQUESTED":
         void this.playTrack(

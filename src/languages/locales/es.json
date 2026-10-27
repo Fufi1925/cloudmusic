@@ -236,6 +236,84 @@
     "no_artists_desc": "Guarda artistas para acceder rápidamente a su discografía",
     "search_music": "Buscar música"
   },
+  "lobby": {
+    "create": {
+      "title": "Crear una sala",
+      "description": "Recibes un código de 4 dígitos. Quien lo introduzca escucha contigo: tú eliges la música.",
+      "action": "Crear sala"
+    },
+    "join": {
+      "title": "Unirse con un código",
+      "description": "Introduce el código de 4 dígitos de una sala. El anfitrión debe aceptarte.",
+      "action": "Solicitar entrar",
+      "pending": "Esperando al anfitrión…"
+    },
+    "your_code": "Tu código",
+    "joined_code": "Código de sala",
+    "host_hint": "Todo lo que reproduces se refleja en tus oyentes. La reproducción sigue siendo local en cada dispositivo.",
+    "listener_hint": "Sigues la reproducción del anfitrión, letras incluidas. Usa los botones de abajo para votar.",
+    "leave": "Salir de la sala",
+    "connected": "Conectado",
+    "reconnecting": "Reconectando…",
+    "connecting": "Conectando…",
+    "copy_code": "Copiar",
+    "code_copied": "Código copiado",
+    "code_copy_failed": "No se pudo copiar el código",
+    "members": {
+      "title": "{count} en la sala",
+      "host": "Anfitrión",
+      "empty": "Aún no hay nadie: comparte tu código.",
+      "offline": "sin conexión"
+    },
+    "requests": {
+      "title": "{count} esperando",
+      "accept": "Aceptar",
+      "decline": "Rechazar"
+    },
+    "vote": {
+      "title": "Vota por la siguiente canción",
+      "description": "Toca una canción para subirla: el anfitrión ve los votos.",
+      "action": "Votar",
+      "current": "Suena ahora: {title}",
+      "skip": "Saltar canción"
+    },
+    "server": {
+      "title": "Servidor de salas",
+      "description": "Todos en una sala deben usar el mismo servidor.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Aplicar"
+    },
+    "error": {
+      "not_found": "No hay ninguna sala con ese código.",
+      "full": "Esta sala está llena.",
+      "busy": "Demasiadas solicitudes, inténtalo en un momento.",
+      "host_away": "El anfitrión está desconectado.",
+      "invalid_code": "Introduce cuatro dígitos.",
+      "generic": "Algo salió mal. Inténtalo de nuevo.",
+      "cooldown": "El anfitrión lo rechazó. Podrás preguntar de nuevo en {time}."
+    },
+    "prompt": {
+      "title": "{name} quiere unirse",
+      "description": "¿Permitir que esta persona escuche tu sala?",
+      "more": "{count} más esperando",
+      "accept": "Permitir",
+      "decline": "Rechazar",
+      "cooldown_hint": "Tras un rechazo deberá esperar 5 minutos."
+    },
+    "strip": {
+      "label": "Sala",
+      "listeners": "{count} escuchando",
+      "listeners_one": "{count} escuchando",
+      "listeners_zero": "Nadie escucha aún",      "listening_to": "Escuchando a {name}"
+    },
+    "notice": {
+      "skip_passed": "Votos suficientes: se salta.",
+      "closed": "La sala se cerró.",
+      "expired": "La sala caducó.",
+      "guest_gone": "Ese oyente ya se fue."
+    },
+    "tab_description": "Escuchar juntos: crea un código o únete a una sala."
+  },
   "login": {
     "welcome_back": "Te damos la bienvenida",
     "sign_in_to_account": "Inicia sesión en tu cuenta",
@@ -474,6 +552,7 @@
     "support": "Soporte",
     "manage_account": "Administrar cuenta",
     "tabs": {
+      "lobby": "Sala",
       "general": "General",
       "appearance": "Apariencia",
       "customization": "Personalización",

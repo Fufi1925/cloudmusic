@@ -240,6 +240,84 @@
     "no_artists_desc": "Save artists to quickly access their discography",
     "search_music": "Search music"
   },
+  "lobby": {
+    "create": {
+      "title": "Create a lobby",
+      "description": "You get a 4-digit code. Whoever enters it listens along – you pick the music.",
+      "action": "Create lobby"
+    },
+    "join": {
+      "title": "Join with a code",
+      "description": "Enter the 4-digit code of a lobby. The host has to accept you.",
+      "action": "Request to join",
+      "pending": "Waiting for the host…"
+    },
+    "your_code": "Your code",
+    "joined_code": "Lobby code",
+    "host_hint": "Everything you play is mirrored to your listeners. Playback stays local on every device.",
+    "listener_hint": "You follow the host's playback – lyrics included. Use the buttons below to vote.",
+    "leave": "Leave lobby",
+    "connected": "Connected",
+    "reconnecting": "Reconnecting…",
+    "connecting": "Connecting…",
+    "copy_code": "Copy",
+    "code_copied": "Code copied",
+    "code_copy_failed": "Could not copy the code",
+    "members": {
+      "title": "{count} in the lobby",
+      "host": "Host",
+      "empty": "Nobody has joined yet – share your code.",
+      "offline": "offline"
+    },
+    "requests": {
+      "title": "{count} waiting",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "vote": {
+      "title": "Vote for the next song",
+      "description": "Tap a song to push it up – the host sees the votes.",
+      "action": "Vote",
+      "current": "Playing now: {title}",
+      "skip": "Skip song"
+    },
+    "server": {
+      "title": "Lobby server",
+      "description": "Everyone in a lobby has to use the same server.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Apply"
+    },
+    "error": {
+      "not_found": "No lobby with this code.",
+      "full": "This lobby is full.",
+      "busy": "Too many requests right now – try again in a moment.",
+      "host_away": "The host is offline right now.",
+      "invalid_code": "Please enter four digits.",
+      "generic": "Something went wrong. Try again.",
+      "cooldown": "The host declined. You can ask again in {time}."
+    },
+    "prompt": {
+      "title": "{name} wants to join",
+      "description": "Allow this person to listen to your lobby?",
+      "more": "{count} more waiting",
+      "accept": "Allow",
+      "decline": "Decline",
+      "cooldown_hint": "After a decline they have to wait 5 minutes."
+    },
+    "strip": {
+      "label": "Lobby",
+      "listeners": "{count} listening",
+      "listeners_one": "{count} listening",
+      "listeners_zero": "Nobody listening yet",      "listening_to": "Listening to {name}"
+    },
+    "notice": {
+      "skip_passed": "Enough votes – skipping.",
+      "closed": "The lobby was closed.",
+      "expired": "The lobby expired.",
+      "guest_gone": "That listener already left."
+    },
+    "tab_description": "Listen together: create a code or join a friend's lobby."
+  },
   "login": {
     "welcome_back": "Welcome back",
     "sign_in_to_account": "Sign in to your account",
@@ -483,6 +561,7 @@
     "support": "Support",
     "manage_account": "Manage account",
     "tabs": {
+      "lobby": "Lobby",
       "general": "General",
       "appearance": "Appearance",
       "customization": "Customization",

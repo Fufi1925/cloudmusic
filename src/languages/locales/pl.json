@@ -238,6 +238,84 @@
     "no_artists_desc": "Zapisuj wykonawców, aby mieć szybki dostęp do ich dyskografii",
     "search_music": "Szukaj muzyki"
   },
+  "lobby": {
+    "create": {
+      "title": "Utwórz pokój",
+      "description": "Otrzymasz 4-cyfrowy kod. Kto go wpisze, słucha razem z tobą – muzykę wybierasz ty.",
+      "action": "Utwórz pokój"
+    },
+    "join": {
+      "title": "Dołącz z kodem",
+      "description": "Wpisz 4-cyfrowy kod pokoju. Gospodarz musi cię zaakceptować.",
+      "action": "Poproś o dołączenie",
+      "pending": "Czekam na gospodarza…"
+    },
+    "your_code": "Twój kod",
+    "joined_code": "Kod pokoju",
+    "host_hint": "Wszystko, co włączysz, jest odtwarzane u słuchaczy. Odtwarzanie pozostaje lokalne na każdym urządzeniu.",
+    "listener_hint": "Podążasz za odtwarzaniem gospodarza – wraz z tekstem. Głosuj przyciskami poniżej.",
+    "leave": "Opuść pokój",
+    "connected": "Połączono",
+    "reconnecting": "Ponowne łączenie…",
+    "connecting": "Łączenie…",
+    "copy_code": "Kopiuj",
+    "code_copied": "Skopiowano kod",
+    "code_copy_failed": "Nie udało się skopiować kodu",
+    "members": {
+      "title": "{count} w pokoju",
+      "host": "Gospodarz",
+      "empty": "Nikogo jeszcze nie ma – udostępnij kod.",
+      "offline": "offline"
+    },
+    "requests": {
+      "title": "Oczekuje: {count}",
+      "accept": "Akceptuj",
+      "decline": "Odrzuć"
+    },
+    "vote": {
+      "title": "Głosuj na następny utwór",
+      "description": "Dotknij utworu, aby przesunąć go wyżej – gospodarz widzi głosy.",
+      "action": "Głosuj",
+      "current": "Teraz gra: {title}",
+      "skip": "Pomiń utwór"
+    },
+    "server": {
+      "title": "Serwer pokoi",
+      "description": "Wszyscy w pokoju muszą używać tego samego serwera.",
+      "placeholder": "ws://localhost:4300/v1/lobby/ws",
+      "apply": "Zastosuj"
+    },
+    "error": {
+      "not_found": "Brak pokoju o tym kodzie.",
+      "full": "Ten pokój jest pełny.",
+      "busy": "Zbyt wiele żądań – spróbuj za chwilę.",
+      "host_away": "Gospodarz jest offline.",
+      "invalid_code": "Wpisz cztery cyfry.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+      "cooldown": "Gospodarz odmówił. Możesz zapytać ponownie za {time}."
+    },
+    "prompt": {
+      "title": "{name} chce dołączyć",
+      "description": "Pozwolić tej osobie słuchać w twoim pokoju?",
+      "more": "Czeka jeszcze: {count}",
+      "accept": "Pozwól",
+      "decline": "Odrzuć",
+      "cooldown_hint": "Po odmowie trzeba odczekać 5 minut."
+    },
+    "strip": {
+      "label": "Pokój",
+      "listeners": "Słucha: {count}",
+      "listeners_one": "Słucha: {count}",
+      "listeners_zero": "Nikt jeszcze nie słucha",      "listening_to": "Słuchasz: {name}"
+    },
+    "notice": {
+      "skip_passed": "Wystarczająco głosów – pomijam.",
+      "closed": "Pokój został zamknięty.",
+      "expired": "Pokój wygasł.",
+      "guest_gone": "Ten słuchacz już wyszedł."
+    },
+    "tab_description": "Słuchajcie razem: utwórz kod lub dołącz do pokoju."
+  },
   "login": {
     "welcome_back": "Witaj ponownie",
     "sign_in_to_account": "Zaloguj się na swoje konto",
@@ -475,6 +553,7 @@
     "support": "Pomoc techniczna",
     "manage_account": "Zarządzaj kontem",
     "tabs": {
+      "lobby": "Pokój",
       "general": "Ogólne",
       "appearance": "Wygląd",
       "customization": "Personalizacja",

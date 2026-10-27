@@ -45,7 +45,7 @@ const TRACKS = Array.from({ length: 8 }, (_, i) => ({
 const seen = [];
 page.on("request", (req) => {
   const u = req.url();
-  if (u.includes("127.0.0.1:5199") || u.startsWith("data:")) return req.continue();
+  if (/^https?:\/\/(127\.0\.0\.1|localhost):\d+/.test(u) || u.startsWith("data:") || u.startsWith("blob:")) return req.continue();
   seen.push(u.replace("https://api.tryliner.fun", ""));
   if (u.includes("api.tryliner.fun")) {
     if (req.method() === "OPTIONS") return req.respond({ status: 204, headers: CORS, body: "" });
@@ -227,6 +227,17 @@ if (scrollArg) {
 for (const arg of process.argv.filter((a) => /^--click(\d*)=/.test(a))) {
   const label = arg.split("=")[1];
   const clicked = await page.evaluate((text) => {
+    // a raw css selector wins over the text match when it resolves to a node
+    let direct = null;
+    try {
+      direct = document.querySelector(text);
+    } catch {
+      direct = null;
+    }
+    if (direct) {
+      direct.click();
+      return true;
+    }
     const nodes = [...document.querySelectorAll("button, a, [role='tab'], [role='button'], input")];
     const hit = nodes.find((n) => (n.textContent || "").trim().includes(text) || (n.getAttribute && (n.getAttribute("aria-label") || "").includes(text)));
     if (!hit) return false;

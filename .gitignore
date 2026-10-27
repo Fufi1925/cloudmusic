@@ -6,6 +6,7 @@
 # production / build
 /dist
 /dist-electron
+/dist-web
 /release
 /build/*
 !/build/icons/

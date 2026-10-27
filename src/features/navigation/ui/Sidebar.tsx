@@ -107,6 +107,7 @@ function Sidebar({ searchOpen, onSearchToggle, isEdgeToEdge = false }: SidebarPr
         <button
           type="button"
           aria-pressed={settingsOpen}
+          aria-label={tooltipLabel}
           onClick={toggleSettings}
           className={`group relative inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer active:scale-[0.96] transition-transform duration-100`}
         >
