@@ -1174,5 +1174,15 @@
     "count": "{count} / {total}",
     "no_results": "“{query}” ile eşleşen parça yok",
     "clear": "Aramayı temizle"
+  },
+  "human_check": {
+    "title": "Hızlı doğrulama",
+    "description": "Sunucunun isteği kabul etmesi için insan olduğunuzu doğrulayın.",
+    "expired": "Doğrulama süresi doldu. Yeniden deneyin.",
+    "failed": "Doğrulama yüklenemedi. Yeniden deneyin veya iptal edin.",
+    "retry": "Yeniden dene",
+    "waiting": "Doğrulama bekleniyor…",
+    "skip": "Atla",
+    "cancel": "İptal"
   }
 }

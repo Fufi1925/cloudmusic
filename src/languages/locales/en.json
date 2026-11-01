@@ -1313,5 +1313,15 @@
     "count": "{count} of {total}",
     "no_results": "No tracks match “{query}”",
     "clear": "Clear search"
+  },
+  "human_check": {
+    "title": "Quick check",
+    "description": "Confirm you're a person so the server accepts the request.",
+    "expired": "The check expired. Try again for a fresh one.",
+    "failed": "The check couldn't be loaded. Try again or cancel.",
+    "retry": "Try again",
+    "waiting": "Waiting for the check…",
+    "skip": "Skip",
+    "cancel": "Cancel"
   }
 }

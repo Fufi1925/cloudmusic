@@ -63,3 +63,19 @@ export {
   LOCAL_IMPORT_PREFIX,
   type LocalImportHandler,
 } from "./localImports";
+export {
+  HumanCheckCancelledError,
+  humanCheckOrigin,
+  humanCheckPageUrl,
+  isHumanCheckMode,
+  runHumanCheck,
+  setHumanCheckPrompt,
+} from "./humanCheck";
+export type {
+  HumanCheckAction,
+  HumanCheckMode,
+  HumanCheckPrompt,
+  HumanCheckRequest,
+} from "./humanCheck";
+export { PowTimeoutError, SUPPORTED_POW_ALGORITHM } from "./proofOfWork";
+export type { PowChallenge, PowSolution } from "./proofOfWork";

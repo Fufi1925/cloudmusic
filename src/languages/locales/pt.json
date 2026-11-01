@@ -1238,5 +1238,15 @@
     "count": "{count} de {total}",
     "no_results": "Nenhuma faixa corresponde a “{query}”",
     "clear": "Limpar pesquisa"
+  },
+  "human_check": {
+    "title": "Verificação rápida",
+    "description": "Confirme que você é uma pessoa para o servidor aceitar a solicitação.",
+    "expired": "A verificação expirou. Tente novamente.",
+    "failed": "Não foi possível carregar a verificação. Tente novamente ou cancele.",
+    "retry": "Tentar novamente",
+    "waiting": "Aguardando a verificação…",
+    "skip": "Pular",
+    "cancel": "Cancelar"
   }
 }

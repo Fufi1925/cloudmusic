@@ -113,6 +113,34 @@ node --test server/lobby/lobbyServer.test.mjs     # protocol tests
 Everyone in a lobby has to use the **same** server address; the “host” is simply whoever
 created the lobby.
 
+## What's new in 0.1.53 (sign-in works again: proof of work + human check)
+
+Liner's api started protecting `/v1/auth/login` and `/v1/auth/register` on
+2026-11-01: before it accepts credentials it hands out a challenge and expects a
+solved proof of work, and (when it wants one) a Cloudflare Turnstile token.
+
+* **Proof of work.** `POST /v1/auth/challenge` returns an argon2id challenge
+  (`token`, `salt`, `difficulty`, `memoryKiB`, `iterations`, `parallelism`,
+  `hashLength`, `expiresAt`). The client grinds `<token>:<nonce>` until the hash
+  starts with `difficulty` zero bits and sends `pow: {token, nonce}` with the
+  credentials. Hashing runs in a worker (`src/shared/api/proofOfWork*.ts`,
+  `hash-wasm`), so the form stays responsive; an expired challenge is
+  re-requested and the request retried once (`POW_EXPIRED` / `POW_REUSED`).
+* **Human check.** When the api asks for Turnstile, a small panel embeds
+  `{api}/v1/auth/verify?action=login|register` in an iframe; that page posts the
+  token back (`{source:"liner-turnstile", action, type:"token", token}`) and it is
+  sent as `turnstile` next to the credentials. Skippable when the api only wants
+  it optionally, retry/cancel otherwise. Strings live under `human_check.*` in
+  all ten locales.
+* **Edge cookie.** When the challenge sets `turnstile.edge`, auth requests go out
+  with `credentials: "include"` so Cloudflare's clearance cookie travels along.
+  Electron now keeps the api's own CORS headers on credentialed responses
+  (`electron/cors.ts` - a wildcard origin would break them), Android loads the
+  check page as a real document, stores its cookie in the WebView store and
+  forwards it through the existing credentialed tunnel.
+* Servers without the challenge endpoint keep working unchanged: a `404` simply
+  means "no proof needed", exactly like before.
+
 ## What's new in 0.1.52 (lobby: wishes, kicking, desktop overlay)
 
 * **Song wishes with a real vote flow.** Listeners search a track inside the lobby

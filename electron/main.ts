@@ -42,6 +42,7 @@ import { createBundleErrorStamp } from "./bundle-stamp.js";
 import { createSleepBlocker } from "./sleep-blocker.js";
 import { createShutdown } from "./shutdown.js";
 import { computeDragBounds, isInTopSnapZone, restoreUnderCursor } from "./window-drag.js";
+import { keepsOwnCors, withOpenCors } from "./cors.js";
 import { isWindows11, loadSnapPreviewAddon, NativeSnapPreview } from "./snap-native.js";
 import { DiscordRpcManager } from "./discord.js";
 import { PoTokenService } from "./potoken.js";
@@ -703,12 +704,15 @@ if (!gotTheLock) {
       },
     );
 
+    // the api answers credentialed requests (auth edge cookie) with its own
+    // exact CORS headers - those must survive, a wildcard would break sign-in
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-      const responseHeaders = { ...(details.responseHeaders || {}) };
-      responseHeaders["access-control-allow-origin"] = ["*"];
-      responseHeaders["access-control-allow-headers"] = ["*"];
-      responseHeaders["access-control-allow-methods"] = ["GET, HEAD, OPTIONS"];
-      callback({ responseHeaders });
+      const { responseHeaders, statusLine } = withOpenCors(
+        details.responseHeaders,
+        details.method,
+        keepsOwnCors(details.url),
+      );
+      callback(statusLine ? { responseHeaders, statusLine } : { responseHeaders });
     });
 
     let lastSavedExportPath: string | null = null;

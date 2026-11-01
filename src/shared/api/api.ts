@@ -9,6 +9,15 @@ import {
   type AuthUser,
 } from "./auth-session";
 import { signApiRequest, syncServerTime } from "./requestSigner";
+import { isHumanCheckMode, runHumanCheck } from "./humanCheck";
+import {
+  PowTimeoutError,
+  SUPPORTED_POW_ALGORITHM,
+  isPowChallenge,
+  type PowChallenge,
+  type PowSolution,
+} from "./proofOfWork";
+import { solvePow } from "./proofOfWorkRunner";
 import { clientCatalog } from "./clientCatalog";
 import { getLocalImportHandler } from "./localImports";
 import type { Track } from "@/shared/contracts";
@@ -529,14 +538,116 @@ import type {
   PopularTracksResponse,
 } from "../contracts";
 
+// ---- auth gate (proof of work + turnstile) ----------------------------------
+//
+// the api may require a human check before it accepts credentials. the challenge
+// tells us which parts it wants; anything the server does not ask for is simply
+// left out of the body (older servers don't know the fields at all).
+
+const RETRYABLE_POW_CODES = new Set(["POW_EXPIRED", "POW_REUSED"]);
+
+interface AuthProof {
+  pow?: PowSolution;
+  turnstile?: string;
+  edge?: boolean;
+}
+
+function authBody(proof: AuthProof) {
+  return { pow: proof.pow, turnstile: proof.turnstile };
+}
+
+function authInit(proof: AuthProof, body: unknown): RequestInit {
+  return {
+    method: "POST",
+    body: JSON.stringify(body),
+    // the api sets its edge cookie from the verify page; readable only when the
+    // request is allowed to carry credentials
+    ...(proof.edge ? { credentials: "include" as const } : {}),
+  };
+}
+
+function blockedBeforeOurServer(error: unknown): boolean {
+  return error instanceof TypeError || statusOf(error) === 0;
+}
+
+async function fetchChallenge(
+  purpose: "login" | "register",
+  email: string,
+): Promise<PowChallenge | null> {
+  try {
+    const challenge = await request<unknown>(
+      "/v1/auth/challenge",
+      { method: "POST", body: JSON.stringify({ purpose, email }) },
+      false,
+    );
+    return isPowChallenge(challenge) ? challenge : null;
+  } catch (error) {
+    // no challenge endpoint (older api) or nothing to solve -> plain auth
+    if (error instanceof ApiError && (error.status === 404 || error.status === 405))
+      return null;
+    throw error;
+  }
+}
+
+async function authProofFor(
+  purpose: "login" | "register",
+  email: string,
+): Promise<AuthProof> {
+  const challenge = await fetchChallenge(purpose, email);
+  if (!challenge) return {};
+
+  const work =
+    challenge.mode === "off" || challenge.algorithm !== SUPPORTED_POW_ALGORITHM
+      ? undefined
+      : solvePow(challenge);
+  // don't leave an unhandled rejection behind if the turnstile step fails first
+  void work?.catch(() => undefined);
+
+  const requested = challenge.turnstile?.mode;
+  const mode = isHumanCheckMode(requested) ? requested : "off";
+  const turnstile =
+    mode === "off" && !challenge.turnstile?.edge
+      ? undefined
+      : await runHumanCheck(purpose, mode === "off" ? "optional" : mode);
+
+  return {
+    pow: await work,
+    turnstile,
+    edge: challenge.turnstile?.edge === true,
+  };
+}
+
+async function withAuthProof<T>(
+  purpose: "login" | "register",
+  email: string,
+  send: (proof: AuthProof) => Promise<T>,
+): Promise<T> {
+  let proof: AuthProof | undefined;
+  try {
+    proof = await authProofFor(purpose, email);
+    return await send(proof);
+  } catch (error) {
+    const retryable =
+      error instanceof PowTimeoutError ||
+      (error instanceof ApiError &&
+        !!error.code &&
+        RETRYABLE_POW_CODES.has(error.code)) ||
+      (proof?.edge === true && blockedBeforeOurServer(error));
+    if (!retryable) throw error;
+    return send(await authProofFor(purpose, email));
+  }
+}
+
 // ---- Endpoints --------------------------------------------------------------
 
 export const api = {
   async login(email: string, password: string): Promise<AuthTokens> {
-    const result = await request<AuthTokens>(
-      "/v1/auth/login",
-      { method: "POST", body: JSON.stringify({ email, password }) },
-      false,
+    const result = await withAuthProof("login", email, (proof) =>
+      request<AuthTokens>(
+        "/v1/auth/login",
+        authInit(proof, { email, password, ...authBody(proof) }),
+        false,
+      ),
     );
     setAuthSession(result);
     return result;
@@ -548,18 +659,18 @@ export const api = {
     username: string,
     displayName: string,
   ): Promise<AuthTokens> {
-    const result = await request<AuthTokens>(
-      "/v1/auth/register",
-      {
-        method: "POST",
-        body: JSON.stringify({
+    const result = await withAuthProof("register", email, (proof) =>
+      request<AuthTokens>(
+        "/v1/auth/register",
+        authInit(proof, {
           email,
           password,
           username: username.trim().toLowerCase(),
           displayName: displayName.trim(),
+          ...authBody(proof),
         }),
-      },
-      false,
+        false,
+      ),
     );
     setAuthSession(result);
     return result;

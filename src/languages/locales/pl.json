@@ -1178,5 +1178,15 @@
     "count": "{count} z {total}",
     "no_results": "Brak utworów dla „{query}”",
     "clear": "Wyczyść wyszukiwanie"
+  },
+  "human_check": {
+    "title": "Szybka weryfikacja",
+    "description": "Potwierdź, że jesteś człowiekiem, aby serwer przyjął żądanie.",
+    "expired": "Weryfikacja wygasła. Spróbuj ponownie.",
+    "failed": "Nie udało się wczytać weryfikacji. Spróbuj ponownie lub anuluj.",
+    "retry": "Spróbuj ponownie",
+    "waiting": "Oczekiwanie na weryfikację…",
+    "skip": "Pomiń",
+    "cancel": "Anuluj"
   }
 }

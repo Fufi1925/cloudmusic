@@ -1174,5 +1174,15 @@
     "count": "{count} di {total}",
     "no_results": "Nessun brano corrisponde a “{query}”",
     "clear": "Cancella ricerca"
+  },
+  "human_check": {
+    "title": "Verifica rapida",
+    "description": "Conferma di essere una persona così il server accetta la richiesta.",
+    "expired": "La verifica è scaduta. Riprova per ottenerne una nuova.",
+    "failed": "Impossibile caricare la verifica. Riprova o annulla.",
+    "retry": "Riprova",
+    "waiting": "In attesa della verifica…",
+    "skip": "Salta",
+    "cancel": "Annulla"
   }
 }

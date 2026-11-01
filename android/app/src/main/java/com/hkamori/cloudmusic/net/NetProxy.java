@@ -5,6 +5,7 @@ import android.os.LocaleList;
 import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
+import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -399,6 +401,9 @@ public final class NetProxy {
         }
 
         int code = response.code();
+        // pages loaded as documents (the api's human-check iframe) drop cookies
+        // that later credentialed fetch() calls have to send back
+        storeDocumentCookies(request.getUrl().toString(), response);
         Map<String, String> out = new LinkedHashMap<>();
         copyHeaders(response.headers(), out, true);
         if (hasNoBody(response)) out.remove("content-length");
@@ -411,6 +416,21 @@ public final class NetProxy {
         }
         return new WebResourceResponse(media[0], media[1], code, HttpText.reason(code, response.message()),
                 out, new BodyStream(response, null));
+    }
+
+    /** the WebView ignores set-cookie on intercepted documents; do it by hand */
+    private static void storeDocumentCookies(String url, Response response) {
+        List<String> setCookies = response.headers("Set-Cookie");
+        if (setCookies.isEmpty()) return;
+        try {
+            CookieManager cookies = CookieManager.getInstance();
+            cookies.setAcceptCookie(true);
+            for (String value : setCookies) cookies.setCookie(url, value);
+            cookies.flush();
+        } catch (Exception ignored) {
+            // cookie store unavailable: the proof of work still works, only the
+            // optional edge cookie would be missing
+        }
     }
 
     // electron: onHeadersReceived -> access-control-allow-* on every response

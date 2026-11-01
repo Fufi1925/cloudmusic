@@ -58,6 +58,7 @@ import org.json.JSONObject;
 
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -301,6 +302,15 @@ public class MainActivity extends Activity {
             view.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false);
         }
         view.addJavascriptInterface(CloudMusicApp.get().netProxy().jsInterface(), "CloudMusicNet");
+        // the api's human-check iframe (api host inside our own page) sets the
+        // clearance cookie that sign-in / registration send back afterwards
+        try {
+            CookieManager cookies = CookieManager.getInstance();
+            cookies.setAcceptCookie(true);
+            cookies.setAcceptThirdPartyCookies(view, true);
+        } catch (Exception ignored) {
+            // cookie store not ready
+        }
         return view;
     }
 
@@ -372,7 +382,22 @@ public class MainActivity extends Activity {
             }
             return assetServer.serve(path);
         }
+        // a document navigation inside our own tree = the api's human-check page in
+        // an iframe (turnstile): load it like a real webview would, so its own
+        // scripts run natively and its cookie store stays untouched
+        if (request.isForMainFrame() || isDocumentLoad(request)) return null;
         return net.handleSubresource(request);
+    }
+
+    /** iframe navigations carry "Sec-Fetch-Dest: iframe" */
+    static boolean isDocumentLoad(WebResourceRequest request) {
+        Map<String, String> headers = request.getRequestHeaders();
+        if (headers == null) return false;
+        String dest = null;
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            if ("Sec-Fetch-Dest".equalsIgnoreCase(entry.getKey())) dest = entry.getValue();
+        }
+        return dest != null && ("iframe".equalsIgnoreCase(dest) || "frame".equalsIgnoreCase(dest));
     }
 
     final class AppWebViewClient extends WebViewClient {

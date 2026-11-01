@@ -12,6 +12,7 @@ import { usePresenceSync } from "@/shared/presence";
 import { useThemeCustomizationSync, useAppearanceSync, useAppearanceStore } from "@/features/settings";
 import { useTouchBarSync } from "@/features/touchbar";
 import { OverlayPlayer, useOverlaySync } from "@/features/overlay";
+import { HumanCheckNotice } from "@/features/human-check";
 import { LobbyOverlayPanel, useLobbyOverlaySync } from "@/features/lobby";
 import { useDiscordSync } from "@/features/discord";
 import { useLobbySync } from "@/features/lobby";
@@ -123,6 +124,7 @@ export default function App() {
                     <DeeplinkHandler />
                     <EnvironmentWarning />
                     <ConnectivityWall />
+                    <HumanCheckNotice />
                     <AuthLock>
                       <AppRoutes />
                     </AuthLock>

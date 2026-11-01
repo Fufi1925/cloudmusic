@@ -1241,5 +1241,15 @@
     "count": "{count} von {total}",
     "no_results": "Keine Titel für „{query}“",
     "clear": "Suche löschen"
+  },
+  "human_check": {
+    "title": "Kurze Sicherheitsprüfung",
+    "description": "Bestätige, dass du ein Mensch bist, damit der Server die Anfrage annimmt.",
+    "expired": "Die Prüfung ist abgelaufen. Bitte erneut starten.",
+    "failed": "Die Prüfung ließ sich nicht laden. Erneut versuchen oder abbrechen.",
+    "retry": "Erneut versuchen",
+    "waiting": "Warte auf die Prüfung…",
+    "skip": "Überspringen",
+    "cancel": "Abbrechen"
   }
 }

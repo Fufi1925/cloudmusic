@@ -1228,5 +1228,15 @@
     "count": "{count} de {total}",
     "no_results": "Ninguna canción coincide con «{query}»",
     "clear": "Borrar búsqueda"
+  },
+  "human_check": {
+    "title": "Comprobación rápida",
+    "description": "Confirma que eres una persona para que el servidor acepte la solicitud.",
+    "expired": "La comprobación ha caducado. Inténtalo de nuevo.",
+    "failed": "No se pudo cargar la comprobación. Reintenta o cancela.",
+    "retry": "Reintentar",
+    "waiting": "Esperando la comprobación…",
+    "skip": "Omitir",
+    "cancel": "Cancelar"
   }
 }
