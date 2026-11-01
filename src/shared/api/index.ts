@@ -65,6 +65,7 @@ export {
 } from "./localImports";
 export {
   HumanCheckCancelledError,
+  HumanCheckFailedError,
   humanCheckOrigin,
   humanCheckPageUrl,
   isHumanCheckMode,

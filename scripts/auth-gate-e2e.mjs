@@ -18,6 +18,14 @@ const ROOT = process.env.WEB_ROOT || "/home/user/desktop/dist-web";
 const OUT = process.argv[2] || "/home/user/shots";
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 
+// E2E_SILENT=1: the verify page loads but never posts a token - the exact shape
+// of the bug where the panel stayed grey forever
+const SILENT = process.env.E2E_SILENT === "1";
+// E2E_MOBILE=1: portrait phone viewport, to check the compact (bottom sheet) panel
+const MOBILE = process.env.E2E_MOBILE === "1";
+const SUFFIX = MOBILE ? "-mobile" : "";
+let verifyHits = 0;
+
 const CHECK_TOKEN = "turnstile-e2e-token";
 const SALT_TEXT = "saltsalt";
 const SALT_B64URL = Buffer.from(SALT_TEXT).toString("base64url");
@@ -113,15 +121,19 @@ const server = createServer(async (req, res) => {
 
   if (url.pathname === "/v1/auth/verify") {
     // stands in for the api's turnstile page: solves immediately and posts the token
+    verifyHits += 1;
     const action = url.searchParams.get("action") || "login";
+    const script = SILENT
+      ? ""
+      : `setTimeout(() => {
+    document.getElementById("s").textContent = "verified";
+    parent.postMessage({ source: "liner-turnstile", action: ${JSON.stringify(action)}, type: "token", token: ${JSON.stringify(CHECK_TOKEN)} }, "*");
+  }, 2500);`;
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>Verify</title></head>
 <body style="margin:0;display:grid;place-items:center;height:100vh;font:13px system-ui;background:#101014;color:#eee">
 <div id="s">human check…</div>
 <script>
-  setTimeout(() => {
-    document.getElementById("s").textContent = "verified";
-    parent.postMessage({ source: "liner-turnstile", action: ${JSON.stringify(action)}, type: "token", token: ${JSON.stringify(CHECK_TOKEN)} }, "*");
-  }, 2500);
+  ${script}
 </script>
 </body></html>`;
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -222,7 +234,11 @@ const browser = await puppeteer.launch({
 
 try {
   const page = await browser.newPage();
-  await page.setViewport({ width: 1280, height: 860, deviceScaleFactor: 1 });
+  await page.setViewport(
+    MOBILE
+      ? { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true }
+      : { width: 1280, height: 860, deviceScaleFactor: 1 },
+  );
   const errors = [];
   page.on("pageerror", (err) => errors.push(String(err)));
   page.on("console", (msg) => {
@@ -236,7 +252,7 @@ try {
 
   await page.goto(`${ORIGIN}/`, { waitUntil: "domcontentloaded", timeout: 60_000 });
   await new Promise((r) => setTimeout(r, 2500));
-  await page.screenshot({ path: `${OUT}/0.1.53-auth-login.png` });
+  await page.screenshot({ path: `${OUT}/0.1.54-auth-login${SUFFIX}.png` });
 
   // switch to "Konto erstellen"
   const clickedTab = await page.evaluate(() => {
@@ -272,7 +288,7 @@ try {
   });
   check("step 1 filled", filledStep1.email && filledStep1.passwords >= 2 && filledStep1.next, JSON.stringify(filledStep1));
   await new Promise((r) => setTimeout(r, 700));
-  await page.screenshot({ path: `${OUT}/0.1.53-auth-step2.png` });
+  await page.screenshot({ path: `${OUT}/0.1.54-auth-step2${SUFFIX}.png` });
 
   // watch for the human-check panel from inside the page: the proof is solved in
   // a few hundred ms, so polling from node would miss it
@@ -327,7 +343,7 @@ try {
   }
   // let the panel finish its spring animation before the screenshot
   await new Promise((r) => setTimeout(r, 450));
-  await page.screenshot({ path: `${OUT}/0.1.53-auth-human-check.png` });
+  await page.screenshot({ path: `${OUT}/0.1.54-auth-human-check${SUFFIX}.png` });
 
   // wait for registration to land
   let session = null;
@@ -339,7 +355,8 @@ try {
     if (session?.accessToken === "e2e-access") break;
     await new Promise((r) => setTimeout(r, 250));
   }
-  check("account created (session stored)", session?.accessToken === "e2e-access", JSON.stringify(session?.user || null));
+  if (!SILENT)
+    check("account created (session stored)", session?.accessToken === "e2e-access", JSON.stringify(session?.user || null));
 
   // the panel shows up while the proof is solved / the turnstile page runs
   const panelDebug = await page.evaluate(() => ({
@@ -352,6 +369,34 @@ try {
   const sawPanel = panelDebug.saw === true;
   check("human check panel shown with the turnstile iframe", sawPanel);
 
+  if (SILENT) {
+    // the widget never answers: the panel has to end on its own, once
+    let closed = false;
+    let framesSeen = 0;
+    for (let i = 0; i < 200; i += 1) {
+      const state = await page.evaluate(() => {
+        const frame = document.querySelector('iframe[src*="/v1/auth/verify"]');
+        return { frame: Boolean(frame), text: document.body.innerText };
+      });
+      if (state.frame) framesSeen += 1;
+      else if (framesSeen > 0) {
+        closed = true;
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    check("panel stops spinning (closes on its own)", closed);
+    const text = await page.evaluate(() => document.body.innerText);
+    check("error names the security check", /Sicherheitspr\u00fcfung/i.test(text), text.slice(0, 180).replace(/\n/g, " | "));
+    check("no endless widget reload", verifyHits <= 3, `verify requested ${verifyHits}x`);
+    await page.screenshot({ path: `${OUT}/0.1.54-auth-check-timeout${SUFFIX}.png` });
+    console.log("page errors:", JSON.stringify(errors.slice(0, 8), null, 1));
+    await browser.close().catch(() => {});
+    const failedSilent = checks.filter((c) => !c.ok);
+    console.log(`\n${checks.length - failedSilent.length}/${checks.length} checks passed`);
+    process.exit(failedSilent.length ? 1 : 0);
+  }
+
   const registerCall = log.find((entry) => entry.event === "register");
   check("server accepted a strong proof", Boolean(registerCall) && registerCall.bits >= DIFFICULTY, JSON.stringify(registerCall || null));
   check("challenge requested for register", log.some((e) => e.event === "challenge" && e.purpose === "register"));
@@ -359,7 +404,7 @@ try {
   check("no register rejection", !log.some((e) => e.event === "register-rejected"), JSON.stringify(log.filter((e) => e.event === "register-rejected")));
 
   await new Promise((r) => setTimeout(r, 1500));
-  await page.screenshot({ path: `${OUT}/0.1.53-auth-after.png` });
+  await page.screenshot({ path: `${OUT}/0.1.54-auth-after${SUFFIX}.png` });
 
   // the standalone web build tries third-party things electron normally allows
   console.log("page errors:", JSON.stringify(errors.slice(0, 8), null, 1));

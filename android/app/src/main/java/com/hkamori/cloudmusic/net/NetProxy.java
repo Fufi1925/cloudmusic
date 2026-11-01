@@ -144,6 +144,19 @@ public final class NetProxy {
         return chain.proceed(builder == null ? request : builder.build());
     }
 
+    /**
+     * Hosts the auth widgets talk to. Unlike the media cdn calls these come from a
+     * framed third-party page, so they behave like a normal browser request.
+     */
+    static boolean isBrowserLikeHost(String host) {
+        if (host == null) return false;
+        String h = host.toLowerCase(Locale.ROOT);
+        return h.equals("tryliner.fun")
+                || h.endsWith(".tryliner.fun")
+                || h.equals("challenges.cloudflare.com")
+                || h.endsWith(".challenges.cloudflare.com");
+    }
+
     static boolean isMediaHost(String host) {
         String h = host.toLowerCase(Locale.ROOT);
         return h.endsWith(".googlevideo.com")
@@ -376,7 +389,18 @@ public final class NetProxy {
         }
         if (!hasUserAgent) headers.set("User-Agent", userAgent);
         if (!hasLanguage) headers.set("Accept-Language", acceptLanguage);
-        if (requestOrigin != null) headers.set("Origin", "file://");
+        // the api's turnstile page and cloudflare's challenge platform run inside a
+        // real frame: they must see the cookies that frame just got, and the origin
+        // it actually reports - rewriting those to file:// made the widget die
+        boolean browserLike = isBrowserLikeHost(request.getUrl().getHost());
+        if (browserLike) {
+            // origin and referer are dropped by the loop above: put the real ones back
+            if (requestOrigin != null) headers.set("Origin", requestOrigin);
+            String referer = header(incoming, "Referer");
+            if (referer != null) headers.set("Referer", referer);
+        } else if (requestOrigin != null) {
+            headers.set("Origin", "file://");
+        }
 
         Request upstream;
         try {
@@ -384,7 +408,7 @@ public final class NetProxy {
                     .url(request.getUrl().toString())
                     .headers(headers.build())
                     .method(method, null)
-                    .tag(ProxyTag.class, ProxyTag.ANONYMOUS)
+                    .tag(ProxyTag.class, browserLike ? ProxyTag.WITH_CREDENTIALS : ProxyTag.ANONYMOUS)
                     .build();
         } catch (IllegalArgumentException e) {
             return null;

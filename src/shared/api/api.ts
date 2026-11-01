@@ -18,6 +18,11 @@ import {
   type PowSolution,
 } from "./proofOfWork";
 import { solvePow } from "./proofOfWorkRunner";
+import {
+  describeAuthError,
+  recordAuthStep,
+  resetAuthTrace,
+} from "./authDiagnostics";
 import { clientCatalog } from "./clientCatalog";
 import { getLocalImportHandler } from "./localImports";
 import type { Track } from "@/shared/contracts";
@@ -580,11 +585,22 @@ async function fetchChallenge(
       { method: "POST", body: JSON.stringify({ purpose, email }) },
       false,
     );
-    return isPowChallenge(challenge) ? challenge : null;
+    if (!isPowChallenge(challenge)) {
+      recordAuthStep("challenge", "unexpected payload");
+      return null;
+    }
+    recordAuthStep(
+      "challenge",
+      `mode=${challenge.mode} algo=${challenge.algorithm} bits=${challenge.difficulty} turnstile=${challenge.turnstile?.mode ?? "-"}${challenge.turnstile?.edge ? "+edge" : ""}`,
+    );
+    return challenge;
   } catch (error) {
     // no challenge endpoint (older api) or nothing to solve -> plain auth
-    if (error instanceof ApiError && (error.status === 404 || error.status === 405))
+    if (error instanceof ApiError && (error.status === 404 || error.status === 405)) {
+      recordAuthStep("challenge", "not supported (plain auth)");
       return null;
+    }
+    recordAuthStep("challenge", `failed ${describeAuthError(error) ?? error}`);
     throw error;
   }
 }
@@ -599,7 +615,10 @@ async function authProofFor(
   const work =
     challenge.mode === "off" || challenge.algorithm !== SUPPORTED_POW_ALGORITHM
       ? undefined
-      : solvePow(challenge);
+      : solvePow(challenge).then((solution) => {
+          recordAuthStep("proof", `solved nonce=${solution.nonce}`);
+          return solution;
+        });
   // don't leave an unhandled rejection behind if the turnstile step fails first
   void work?.catch(() => undefined);
 
@@ -609,6 +628,8 @@ async function authProofFor(
     mode === "off" && !challenge.turnstile?.edge
       ? undefined
       : await runHumanCheck(purpose, mode === "off" ? "optional" : mode);
+
+  recordAuthStep("human_check", turnstile ? "token" : mode === "off" ? "not required" : "skipped");
 
   return {
     pow: await work,
@@ -623,10 +644,16 @@ async function withAuthProof<T>(
   send: (proof: AuthProof) => Promise<T>,
 ): Promise<T> {
   let proof: AuthProof | undefined;
+  resetAuthTrace();
+  recordAuthStep(purpose, email ? "start" : "start (no email)");
   try {
     proof = await authProofFor(purpose, email);
-    return await send(proof);
+    recordAuthStep("send", `pow=${proof.pow ? "yes" : "no"} turnstile=${proof.turnstile ? "yes" : "no"} credentials=${proof.edge ? "include" : "-"}`);
+    const result = await send(proof);
+    recordAuthStep("done", "ok");
+    return result;
   } catch (error) {
+    recordAuthStep("failed", describeAuthError(error) ?? String(error));
     const retryable =
       error instanceof PowTimeoutError ||
       (error instanceof ApiError &&
@@ -634,7 +661,10 @@ async function withAuthProof<T>(
         RETRYABLE_POW_CODES.has(error.code)) ||
       (proof?.edge === true && blockedBeforeOurServer(error));
     if (!retryable) throw error;
-    return send(await authProofFor(purpose, email));
+    recordAuthStep("retry", "new challenge");
+    const retried = await send(await authProofFor(purpose, email));
+    recordAuthStep("done", "ok after retry");
+    return retried;
   }
 }
 

@@ -11,6 +11,7 @@ import { CloudMusicMark } from "@/assets/CloudMusicMark";
 import cloudsBanner from "@/assets/wallhaven-5g1yz8.jpg";
 import CircleDitherCanvas from "@/shared/ui/CircleDitherCanvas";
 import {
+  authErrorDetail,
   authErrorMessage,
   getAuthErrorCode,
   useAuthStore,
@@ -39,13 +40,21 @@ export default function LoginPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [errorDetail, setErrorDetail] = useState("");
 
   const selectMode = (next: "login" | "register") => {
     if (submitting || next === mode) return;
     setMode(next);
     setRegisterStep(1);
     setError("");
+    setErrorDetail("");
     setConfirmPassword("");
+  };
+
+  /** error + short technical reason, so a screenshot already explains the failure */
+  const showError = (nextError: unknown, message?: string) => {
+    setError(message ?? resolveErrorMessage(nextError));
+    setErrorDetail(authErrorDetail(nextError));
   };
 
   const resolveErrorMessage = (nextError: unknown): string => {
@@ -64,6 +73,10 @@ export default function LoginPage() {
       return t("login.errors.username_invalid");
     if (code === "invalid_input")
       return t("login.errors.display_name_required");
+    if (code === "human_check_failed")
+      return t("login.errors.human_check_failed");
+    if (code === "human_check_cancelled")
+      return t("login.errors.human_check_cancelled");
     return authErrorMessage(nextError);
   };
 
@@ -119,11 +132,12 @@ export default function LoginPage() {
       }
       setSubmitting(true);
       setError("");
+      setErrorDetail("");
       try {
         await login(normalizedEmail, password);
         navigate("/", { replace: true });
       } catch (nextError) {
-        setError(resolveErrorMessage(nextError));
+        showError(nextError);
       } finally {
         setSubmitting(false);
       }
@@ -152,6 +166,7 @@ export default function LoginPage() {
 
     setSubmitting(true);
     setError("");
+    setErrorDetail("");
     try {
       await register(
         normalizedEmail,
@@ -164,9 +179,9 @@ export default function LoginPage() {
       const code = getAuthErrorCode(nextError);
       if (code === "email_already_used") {
         setRegisterStep(1);
-        setError(t("login.errors.email_already_used"));
+        showError(nextError, t("login.errors.email_already_used"));
       } else {
-        setError(resolveErrorMessage(nextError));
+        showError(nextError);
       }
     } finally {
       setSubmitting(false);
@@ -511,6 +526,17 @@ export default function LoginPage() {
                         className="m-0 text-[12px] font-[500] leading-[1.4] text-accent-primary"
                       >
                         {error}
+                      </motion.p>
+                    )}
+                    {error && errorDetail && (
+                      <motion.p
+                        key={errorDetail}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="m-0 mt-[2px] font-mono text-[10.5px] leading-[1.4] text-text-tertiary"
+                      >
+                        {errorDetail}
                       </motion.p>
                     )}
                   </AnimatePresence>

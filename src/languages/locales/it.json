@@ -477,7 +477,9 @@
       "account_not_found": "Account non trovato o sessione scaduta. Prova a registrarti.",
       "failed_start_auth": "Impossibile avviare l'autenticazione Telegram",
       "registration_failed": "Registrazione non riuscita: {status}",
-      "verification_canceled": "Verifica annullata."
+      "verification_canceled": "Verifica annullata.",
+      "human_check_failed": "La verifica di sicurezza non è terminata. Riprova.",
+      "human_check_cancelled": "La verifica di sicurezza è stata chiusa."
     },
     "toasts": {
       "login_successful": "Accesso riuscito",
@@ -1183,6 +1185,11 @@
     "retry": "Riprova",
     "waiting": "In attesa della verifica…",
     "skip": "Salta",
-    "cancel": "Annulla"
+    "cancel": "Annulla",
+    "stuck": "Impossibile caricare la verifica. Riprova o annulla.",
+    "details_show": "Dettagli",
+    "details_hide": "Nascondi dettagli",
+    "details_copy": "Copia",
+    "details_copied": "Copiato"
   }
 }

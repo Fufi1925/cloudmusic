@@ -481,7 +481,9 @@
       "account_not_found": "Nie znaleziono konta lub sesja wygasła. Spróbuj się zarejestrować.",
       "failed_start_auth": "Nie udało się rozpocząć uwierzytelniania przez Telegram",
       "registration_failed": "Rejestracja nie powiodła się: {status}",
-      "verification_canceled": "Weryfikacja anulowana."
+      "verification_canceled": "Weryfikacja anulowana.",
+      "human_check_failed": "Weryfikacja bezpieczeństwa nie została ukończona. Spróbuj ponownie.",
+      "human_check_cancelled": "Weryfikacja bezpieczeństwa została zamknięta."
     },
     "toasts": {
       "login_successful": "Zalogowano pomyślnie",
@@ -1187,6 +1189,11 @@
     "retry": "Spróbuj ponownie",
     "waiting": "Oczekiwanie na weryfikację…",
     "skip": "Pomiń",
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "stuck": "Nie udało się wczytać weryfikacji. Spróbuj ponownie lub anuluj.",
+    "details_show": "Szczegóły",
+    "details_hide": "Ukryj szczegóły",
+    "details_copy": "Kopiuj",
+    "details_copied": "Skopiowano"
   }
 }

@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { api, ApiError } from "@/shared/api";
+import {
+  api,
+  ApiError,
+  HumanCheckCancelledError,
+  HumanCheckFailedError,
+} from "@/shared/api";
 import {
   clearAuthSession,
   getAuthSession,
@@ -142,6 +147,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 
 export function getAuthErrorCode(error: unknown): string {
+  if (error instanceof HumanCheckFailedError) return "human_check_failed";
+  if (error instanceof HumanCheckCancelledError) return "human_check_cancelled";
   if (!(error instanceof ApiError)) return "server_unavailable";
   if (error.status === 0) return "server_unavailable";
   // 5xx and cloudflare 52x: the server is down, not the user's input or connection
@@ -166,4 +173,23 @@ export function authErrorMessage(error: unknown): string {
     return "Username must be 3-30 lowercase characters (a-z, 0-9, _).";
   // unknown api errors stay generic, never surface raw bodies
   return "Something went wrong. Please try again.";
+}
+
+/**
+ * Compact, screenshot-friendly reason for the error line below the form. Shows
+ * the http status and the server code (both were invisible before) so a failing
+ * sign-in can be diagnosed without a debugger.
+ */
+export function authErrorDetail(error: unknown): string {
+  if (error instanceof HumanCheckFailedError) return `check: ${error.reason}`;
+  if (error instanceof HumanCheckCancelledError) return "check: closed";
+  if (error instanceof ApiError) {
+    const parts: string[] = [];
+    if (error.status > 0) parts.push(`HTTP ${error.status}`);
+    else parts.push("network");
+    if (error.code) parts.push(error.code);
+    return parts.join(" ");
+  }
+  if (error instanceof Error && error.message) return error.message.slice(0, 120);
+  return "";
 }

@@ -12,14 +12,37 @@ export interface HumanCheckRequest {
   siteKey?: string;
 }
 
+/** why the widget ended without a token (kept for the user-facing message) */
+export type HumanCheckFailure = "cancelled" | "timeout" | "error" | "expired";
+
+export interface HumanCheckAnswer {
+  token: string | null;
+  failure?: HumanCheckFailure;
+}
+
 export type HumanCheckPrompt = (
   request: HumanCheckRequest,
-) => Promise<string | null>;
+) => Promise<string | null | HumanCheckAnswer>;
 
 export class HumanCheckCancelledError extends Error {
   constructor() {
     super("The human check was closed.");
     this.name = "HumanCheckCancelledError";
+  }
+}
+
+/**
+ * The widget never produced a token (did not load, failed, or timed out). This is
+ * deliberately *not* retried automatically by the api client: an endless
+ * challenge/retry cycle is exactly what the panel must not do.
+ */
+export class HumanCheckFailedError extends Error {
+  readonly reason: HumanCheckFailure;
+
+  constructor(reason: HumanCheckFailure) {
+    super(`The human check failed (${reason}).`);
+    this.name = "HumanCheckFailedError";
+    this.reason = reason;
   }
 }
 
@@ -51,8 +74,16 @@ export async function runHumanCheck(
   siteKey?: string,
 ): Promise<string | undefined> {
   if (mode === "off") return undefined;
-  const token = prompt ? await prompt({ action, mode, siteKey }) : null;
+  const answer = prompt ? await prompt({ action, mode, siteKey }) : null;
+  const token =
+    typeof answer === "string" ? answer : answer && answer.token ? answer.token : null;
+  const failure = typeof answer === "string" || !answer ? undefined : answer.failure;
   if (token) return token;
+  if (failure === "timeout" || failure === "error" || failure === "expired") {
+    // optional mode stays forgiving: the request simply goes out without a token
+    if (mode === "required") throw new HumanCheckFailedError(failure);
+    return undefined;
+  }
   if (mode === "required") throw new HumanCheckCancelledError();
   return undefined;
 }

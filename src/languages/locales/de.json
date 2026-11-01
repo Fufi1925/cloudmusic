@@ -481,7 +481,9 @@
       "account_not_found": "Konto nicht gefunden oder Sitzung abgelaufen. Versuche dich zu registrieren.",
       "failed_start_auth": "Telegram-Authentifizierung konnte nicht gestartet werden",
       "registration_failed": "Registrierung fehlgeschlagen: {status}",
-      "verification_canceled": "Verifizierung abgebrochen."
+      "verification_canceled": "Verifizierung abgebrochen.",
+      "human_check_failed": "Die Sicherheitsprüfung wurde nicht abgeschlossen. Bitte erneut versuchen.",
+      "human_check_cancelled": "Die Sicherheitsprüfung wurde geschlossen."
     },
     "toasts": {
       "login_successful": "Anmeldung erfolgreich",
@@ -1250,6 +1252,11 @@
     "retry": "Erneut versuchen",
     "waiting": "Warte auf die Prüfung…",
     "skip": "Überspringen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "stuck": "Die Prüfung ließ sich nicht laden. Erneut versuchen oder abbrechen.",
+    "details_show": "Details",
+    "details_hide": "Details ausblenden",
+    "details_copy": "Kopieren",
+    "details_copied": "Kopiert"
   }
 }

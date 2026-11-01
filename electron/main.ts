@@ -223,7 +223,11 @@ function createWindow() {
       sandbox: false,
       devTools: true,
       backgroundThrottling: false, // keeps audio timer and playback ticks running when app is in background or another workspace
-      webSecurity: false,
+      // same-origin policy stays on, like upstream: --disable-web-security also drops
+      // the Origin/Sec-Fetch headers cloudflare's turnstile widget checks, which made
+      // the human check die in the auth panel. cross-origin calls go through the
+      // cors override below (electron/cors.ts) instead
+      webSecurity: true,
     },
   });
 

@@ -483,7 +483,9 @@
       "account_not_found": "Account not found or session expired. Try registering.",
       "failed_start_auth": "Failed to start Telegram auth",
       "registration_failed": "Registration failed: {status}",
-      "verification_canceled": "Verification canceled."
+      "verification_canceled": "Verification canceled.",
+      "human_check_failed": "The security check did not finish. Press the button again.",
+      "human_check_cancelled": "The security check was closed."
     },
     "toasts": {
       "login_successful": "Login successful",
@@ -1322,6 +1324,11 @@
     "retry": "Try again",
     "waiting": "Waiting for the check…",
     "skip": "Skip",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "stuck": "The check couldn't be loaded. Try again or cancel.",
+    "details_show": "Details",
+    "details_hide": "Hide details",
+    "details_copy": "Copy",
+    "details_copied": "Copied"
   }
 }
