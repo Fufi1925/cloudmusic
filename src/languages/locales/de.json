@@ -484,7 +484,7 @@
       "verification_canceled": "Verifizierung abgebrochen.",
       "human_check_failed": "Die Sicherheitsprüfung wurde nicht abgeschlossen. Bitte erneut versuchen.",
       "human_check_cancelled": "Die Sicherheitsprüfung wurde geschlossen.",
-      "blocked": "Cloudflare hat die Anfrage blockiert (403). Bitte gleich noch einmal versuchen – über Mobilfunk hilft manchmal ein anderes Netz."
+      "blocked": "Cloudflare blockt diese Verbindung (403). Wechsle ins WLAN oder in ein anderes Netz und versuche es dann erneut."
     },
     "toasts": {
       "login_successful": "Anmeldung erfolgreich",

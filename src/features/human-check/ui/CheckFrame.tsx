@@ -70,6 +70,27 @@ export default function CheckFrame({ action, attempt }: CheckFrameProps) {
     return () => window.removeEventListener("message", onMessage);
   }, [action, setPhase, solve, fail]);
 
+  // the page itself answered 403 (cloudflare blocking this connection): fail fast
+  // instead of letting the user stare at the webview error page for 15s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const state = useHumanCheckStore.getState();
+      if (!state.request) return;
+      const errors = (window as unknown as {
+        __cloudmusicNetErrors?: Array<{ url?: string; status?: number }>;
+      }).__cloudmusicNetErrors;
+      if (!Array.isArray(errors)) return;
+      const blocked = errors.some(
+        (entry) => entry?.status === 403 && (entry.url ?? "").includes("/v1/auth/verify"),
+      );
+      if (blocked) {
+        clearInterval(timer);
+        state.fail("blocked", "verify 403");
+      }
+    }, 600);
+    return () => clearInterval(timer);
+  }, [attempt]);
+
   // no token after a while: stop pretending to load instead of spinning forever
   useEffect(() => {
     const timer = setTimeout(() => {

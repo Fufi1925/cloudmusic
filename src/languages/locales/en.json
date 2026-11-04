@@ -486,7 +486,7 @@
       "verification_canceled": "Verification canceled.",
       "human_check_failed": "The security check did not finish. Press the button again.",
       "human_check_cancelled": "The security check was closed.",
-      "blocked": "Cloudflare blocked this request (403). Please try again in a moment - on mobile data it can help to switch networks."
+      "blocked": "Cloudflare is blocking this connection (403). Switch to Wi-Fi or another network, then try again."
     },
     "toasts": {
       "login_successful": "Login successful",

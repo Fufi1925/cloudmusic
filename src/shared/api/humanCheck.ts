@@ -13,7 +13,7 @@ export interface HumanCheckRequest {
 }
 
 /** why the widget ended without a token (kept for the user-facing message) */
-export type HumanCheckFailure = "cancelled" | "timeout" | "error" | "expired";
+export type HumanCheckFailure = "cancelled" | "timeout" | "error" | "expired" | "blocked";
 
 export interface HumanCheckAnswer {
   token: string | null;
@@ -79,7 +79,7 @@ export async function runHumanCheck(
     typeof answer === "string" ? answer : answer && answer.token ? answer.token : null;
   const failure = typeof answer === "string" || !answer ? undefined : answer.failure;
   if (token) return token;
-  if (failure === "timeout" || failure === "error" || failure === "expired") {
+  if (failure === "timeout" || failure === "error" || failure === "expired" || failure === "blocked") {
     // optional mode stays forgiving: the request simply goes out without a token
     if (mode === "required") throw new HumanCheckFailedError(failure);
     return undefined;

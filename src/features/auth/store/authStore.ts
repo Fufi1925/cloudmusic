@@ -16,6 +16,7 @@ import {
 } from "@/shared/api";
 import { usePlayerStore, playerRuntime } from "@/features/player";
 import { APP_VERSION } from "@/shared/config/version";
+import { getLastBlockRay } from "@/shared/api/authDiagnostics";
 import { queryCache } from "@/shared/cache/queryCache";
 
 export type AuthStatus = "initializing" | "authenticated" | "anonymous";
@@ -148,7 +149,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 
 export function getAuthErrorCode(error: unknown): string {
-  if (error instanceof HumanCheckFailedError) return "human_check_failed";
+  if (error instanceof HumanCheckFailedError)
+    return error.reason === "blocked" ? "blocked" : "human_check_failed";
   if (error instanceof HumanCheckCancelledError) return "human_check_cancelled";
   if (!(error instanceof ApiError)) return "server_unavailable";
   if (error.status === 0) return "server_unavailable";
@@ -191,6 +193,8 @@ export function authErrorDetail(error: unknown): string {
     if (error.status > 0) parts.push(`HTTP ${error.status}`);
     else parts.push("network");
     if (error.code) parts.push(error.code);
+    const ray = getLastBlockRay();
+    if (ray) parts.push(`ray ${ray.split("-")[0]}`);
     return parts.join(" · ");
   }
   if (error instanceof Error && error.message) return error.message.slice(0, 120);

@@ -36,6 +36,7 @@ import android.webkit.RenderProcessGoneDetail;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -438,6 +439,18 @@ public class MainActivity extends Activity {
         }
 
         @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            reportNetError(view, request, error == null ? 0 : error.getErrorCode(),
+                    error == null ? "" : String.valueOf(error.getDescription()), 0);
+        }
+
+        @Override
+        public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse response) {
+            reportNetError(view, request, 0, "http " + (response == null ? "?" : response.getStatusCode()),
+                    response == null ? 0 : response.getStatusCode());
+        }
+
+        @Override
         public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
             if (main && view == webView) {
                 ui.post(MainActivity.this::recreateMainWebView);
@@ -565,6 +578,27 @@ public class MainActivity extends Activity {
     }
 
     /** Hosts invisible helper views (the BotGuard WebView) inside the window. */
+    /**
+     * WebView network errors never reach the renderer, which is why a blocked
+     * iframe only showed "Webseite nicht verfügbar". Mirror them into the page so
+     * the sign-in diagnostics can name the actual failure.
+     */
+    private void reportNetError(WebView view, WebResourceRequest request, int code, String detail, int status) {
+        if (view == null || view != webView || request == null) return;
+        String url = request.getUrl() == null ? "" : request.getUrl().toString();
+        String entry = "{url:" + JSONObject.quote(url)
+                + ",code:" + code
+                + ",detail:" + JSONObject.quote(detail == null ? "" : detail)
+                + ",status:" + status
+                + ",main:" + request.isForMainFrame()
+                + ",at:" + System.currentTimeMillis() + "}";
+        String script = "window.__cloudmusicNetErrors=(window.__cloudmusicNetErrors||[]).concat([" + entry + "]);"
+                + "window.__cloudmusicNetErrors=window.__cloudmusicNetErrors.slice(-8);";
+        ui.post(() -> {
+            if (view == webView && webView != null) webView.evaluateJavascript(script, null);
+        });
+    }
+
     void attachHiddenView(View view) {
         view.setAlpha(0f);
         root.addView(view, 0, new FrameLayout.LayoutParams(1, 1));

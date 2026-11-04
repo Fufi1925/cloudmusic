@@ -19,9 +19,11 @@ import {
 } from "./proofOfWork";
 import { solvePow } from "./proofOfWorkRunner";
 import {
+  connectionLabel,
   describeAuthError,
   recordAuthStep,
   resetAuthTrace,
+  setLastBlockRay,
 } from "./authDiagnostics";
 import { clientCatalog } from "./clientCatalog";
 import { getLocalImportHandler } from "./localImports";
@@ -375,6 +377,8 @@ async function executeRequest<T>(
       if (raw) recordAuthStep("body", raw.replace(/\s+/g, " ").slice(0, 140));
       const via = res.headers?.get?.("x-cloudmusic-transport");
       if (via) recordAuthStep("transport", via);
+      const ray = res.headers?.get?.("cf-ray");
+      if (ray) setLastBlockRay(ray);
     }
     const resRequestId =
       res.headers?.get?.("x-request-id") ||
@@ -698,7 +702,7 @@ async function withAuthProof<T>(
 ): Promise<T> {
   let proof: AuthProof | undefined;
   resetAuthTrace();
-  recordAuthStep(purpose, email ? "start" : "start (no email)");
+  recordAuthStep(purpose, `${email ? "start" : "start (no email)"} net=${connectionLabel()}`);
   try {
     proof = await authProofFor(purpose, email);
     recordAuthStep("send", `pow=${proof.pow ? "yes" : "no"} turnstile=${proof.turnstile ? "yes" : "no"} credentials=${proof.edge ? "include" : "-"}`);

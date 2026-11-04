@@ -482,7 +482,7 @@
       "verification_canceled": "Vérification annulée.",
       "human_check_failed": "La vérification de sécurité ne s'est pas terminée. Réessayez.",
       "human_check_cancelled": "La vérification de sécurité a été fermée.",
-      "blocked": "Cloudflare a bloqué cette requête (403). Réessaie dans un instant ; sur données mobiles, changer de réseau peut aider."
+      "blocked": "Cloudflare bloque cette connexion (403). Passe au Wi-Fi ou à un autre réseau, puis réessaie."
     },
     "toasts": {
       "login_successful": "Connexion réussie",

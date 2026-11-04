@@ -1,11 +1,12 @@
 import { create } from "zustand";
+import { recordAuthStep } from "@/shared/api/authDiagnostics";
 import {
   setHumanCheckPrompt,
   type HumanCheckFailure,
   type HumanCheckRequest,
 } from "@/shared/api/humanCheck";
 
-export type HumanCheckPhase = "loading" | "ready" | "expired" | "error" | "timeout";
+export type HumanCheckPhase = "loading" | "ready" | "expired" | "error" | "timeout" | "blocked";
 
 interface HumanCheckState {
   request: HumanCheckRequest | null;
@@ -75,6 +76,12 @@ export const useHumanCheckStore = create<HumanCheckState>((set, get) => ({
   fail: (reason, note) => {
     const state = get();
     if (!state.request) return;
+    if (reason === "blocked") {
+      recordAuthStep("check blocked", note ?? "");
+      set({ request: null, phase: "blocked", note: note ?? null });
+      finish({ token: null, failure: "blocked" });
+      return;
+    }
     if (state.autoRestarts < AUTO_RESTARTS) {
       set({
         phase: "loading",
