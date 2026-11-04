@@ -221,47 +221,6 @@ export async function probe(req, res) {
   }
 }
 
-/** POST /api-relay: the app's json calls, forwarded 1:1 */
-export async function relayApi(req, res) {
-  if (limited(req)) return json(res, 429, { ok: false, error: "rate limited" });
-  let payload;
-  try {
-    payload = JSON.parse((await readBody(req)).toString("utf8"));
-  } catch {
-    return json(res, 400, { ok: false, error: "invalid json" });
-  }
-  const path = typeof payload.path === "string" ? payload.path : "";
-  if (!path.startsWith("/") || path.includes("://") || !allowedPath(path.split("?")[0])) {
-    return json(res, 403, { ok: false, error: "path not allowed" });
-  }
-  const method = String(payload.method ?? "GET").toUpperCase();
-  if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) {
-    return json(res, 405, { ok: false, error: "method not allowed" });
-  }
-  const headers = {};
-  if (Array.isArray(payload.headers)) {
-    for (const pair of payload.headers) {
-      if (Array.isArray(pair) && typeof pair[0] === "string") headers[pair[0]] = String(pair[1] ?? "");
-    }
-  }
-  const body = payload.body ? Buffer.from(String(payload.body), "base64") : null;
-  try {
-    const answer = await upstreamRequest({ method, path, headers, body });
-    json(res, 200, {
-      ok: true,
-      status: answer.status,
-      statusText: answer.statusText,
-      headers: Object.entries(answer.headers).map(([name, value]) => [
-        name,
-        Array.isArray(value) ? value.join(", ") : String(value ?? ""),
-      ]),
-      body: answer.body.toString("base64"),
-    });
-  } catch (error) {
-    json(res, 502, { ok: false, error: String(error?.message ?? error) });
-  }
-}
-
 /** GET /api-relay/verify: the turnstile page, rebased so its relative urls stay here */
 export async function relayVerify(req, res, url) {
   if (limited(req)) return json(res, 429, { ok: false, error: "rate limited" });
@@ -313,7 +272,14 @@ export async function relaySubresource(req, res, url) {
   }
 }
 
-/** router hook used by index.mjs */
+/**
+ * Router hook used by index.mjs.
+ *
+ * Only the probe is exposed: measurement showed api.tryliner.fun answers this
+ * server with the same cloudflare block page as the app on mobile data, so a
+ * server side relay cannot work. The probe stays because it is the cheapest way
+ * to see whether that ever changes.
+ */
 export function handleRelay(req, res, url) {
   if (!url.pathname.startsWith("/api-relay")) return false;
   if (req.method === "OPTIONS") {
@@ -325,19 +291,7 @@ export function handleRelay(req, res, url) {
     probe(req, res).catch(() => json(res, 500, { ok: false }));
     return true;
   }
-  if (url.pathname === "/api-relay") {
-    relayApi(req, res).catch(() => json(res, 500, { ok: false }));
-    return true;
-  }
-  if (url.pathname === "/api-relay/verify") {
-    relayVerify(req, res, url).catch(() => json(res, 500, { ok: false }));
-    return true;
-  }
-  if (url.pathname.startsWith("/api-relay/p/")) {
-    relaySubresource(req, res, url).catch(() => json(res, 500, { ok: false }));
-    return true;
-  }
-  json(res, 404, { ok: false, error: "unknown relay route" });
+  json(res, 404, { ok: false, error: "not available" });
   return true;
 }
 
