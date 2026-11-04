@@ -19,6 +19,7 @@ public final class CloudMusicApp extends Application {
     private static CloudMusicApp instance;
     private NetProxy netProxy;
     private DiscordRpc discordRpc;
+    private ApiTransport apiTransport;
     private ExecutorService io;
 
     public static CloudMusicApp get() {
@@ -42,6 +43,15 @@ public final class CloudMusicApp extends Application {
     public synchronized NetProxy netProxy() {
         if (netProxy == null) netProxy = new NetProxy(this, UserAgent.get(this));
         return netProxy;
+    }
+
+    /** browser-backed transport for the api hosts (see ApiTransport) */
+    public synchronized void setApiTransport(ApiTransport transport) {
+        apiTransport = transport;
+    }
+
+    public synchronized ApiTransport apiTransport() {
+        return apiTransport;
     }
 
     public ExecutorService io() {

@@ -1,5 +1,8 @@
 package com.hkamori.cloudmusic.net;
 
+import com.hkamori.cloudmusic.ApiTransport;
+import com.hkamori.cloudmusic.CloudMusicApp;
+
 import android.content.Context;
 import android.os.LocaleList;
 import android.os.SystemClock;
@@ -18,6 +21,7 @@ import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +38,7 @@ import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Headers;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -148,13 +153,53 @@ public final class NetProxy {
      * Hosts the auth widgets talk to. Unlike the media cdn calls these come from a
      * framed third-party page, so they behave like a normal browser request.
      */
-    static boolean isBrowserLikeHost(String host) {
+    public static boolean isBrowserLikeHost(String host) {
         if (host == null) return false;
         String h = host.toLowerCase(Locale.ROOT);
         return h.equals("tryliner.fun")
                 || h.endsWith(".tryliner.fun")
                 || h.equals("challenges.cloudflare.com")
                 || h.endsWith(".challenges.cloudflare.com");
+    }
+
+    private static String originOf(HttpUrl url) {
+        if (url == null) return null;
+        String scheme = url.scheme();
+        String host = url.host();
+        if (scheme == null || host == null) return null;
+        int port = url.port();
+        boolean standard = ("https".equals(scheme) && port == 443) || ("http".equals(scheme) && port == 80);
+        return scheme + "://" + host + (standard ? "" : ":" + port);
+    }
+
+    private static List<String[]> headerPairs(Request request) {
+        List<String[]> pairs = new ArrayList<>();
+        for (int i = 0; i < request.headers().size(); i++) {
+            pairs.add(new String[]{request.headers().name(i), request.headers().value(i)});
+        }
+        return pairs;
+    }
+
+    private static WebResourceResponse transportResponse(ApiTransport.Result result) {
+        Map<String, String> headers = new LinkedHashMap<>();
+        String contentType = null;
+        for (Map.Entry<String, String> entry : result.headers.entrySet()) {
+            String lower = entry.getKey() == null ? "" : entry.getKey().toLowerCase(Locale.ROOT);
+            if (lower.equals("content-type")) {
+                contentType = entry.getValue();
+                continue;
+            }
+            headers.put(entry.getKey(), entry.getValue());
+        }
+        if (result.body != null && result.body.length > 0) {
+            headers.put("content-length", String.valueOf(result.body.length));
+        }
+        int code = HttpText.isAllowedWebStatus(result.status) ? result.status : 200;
+        String[] media = HttpText.mediaType(contentType, "application/octet-stream");
+        return new WebResourceResponse(media[0], media[1], code,
+                HttpText.reason(code, result.statusText),
+                headers,
+                new ByteArrayInputStream(result.body == null ? new byte[0] : result.body));
     }
 
     static boolean isMediaHost(String host) {
@@ -242,6 +287,26 @@ public final class NetProxy {
             request = buildTunnelRequest(parked);
         } catch (Exception e) {
             return errorResponse("invalid request: " + e.getMessage());
+        }
+
+        // cloudflare-fronted hosts: go through the hidden webview (chromium tls +
+        // header stack, shared cookie jar). okhttp gets a 403 there even for the
+        // first challenge call, which is why sign-in never worked on android.
+        ApiTransport transport = CloudMusicApp.get() == null ? null : CloudMusicApp.get().apiTransport();
+        String origin = originOf(request.url());
+        if (transport != null && origin != null && isBrowserLikeHost(request.url().host())) {
+            ApiTransport.Result result = transport.fetch(
+                    request.url().toString(),
+                    origin,
+                    request.method(),
+                    headerPairs(request),
+                    parked.body,
+                    "include".equals(parked.descriptor.optString("credentials", "same-origin")),
+                    30_000L);
+            if (result.error == null && result.status > 0) {
+                return transportResponse(result);
+            }
+            Log.w(TAG, "api transport failed (" + result.error + "), falling back to okhttp");
         }
 
         Call call = ("follow".equals(redirectMode) ? client : noRedirectClient).newCall(request);

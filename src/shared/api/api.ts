@@ -358,10 +358,22 @@ async function executeRequest<T>(
   telemetry.trackNetwork(method, path, res.status, durationMs, requestId);
 
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as Record<
-      string,
-      unknown
-    >;
+    const raw = await res.text().catch(() => "");
+    let body: Record<string, unknown> = {};
+    try {
+      body = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+    } catch {
+      body = {};
+    }
+    // a blocked request (cloudflare page instead of json) has to be visible in the
+    // diagnostics: the status alone does not say who answered
+    if (!raw.startsWith("{")) {
+      recordAuthStep(
+        "response",
+        `${res.status} server=${res.headers?.get?.("server") || "-"} ray=${res.headers?.get?.("cf-ray") || "-"} type=${res.headers?.get?.("content-type") || "-"}`,
+      );
+      if (raw) recordAuthStep("body", raw.replace(/\s+/g, " ").slice(0, 140));
+    }
     const resRequestId =
       res.headers?.get?.("x-request-id") ||
       (typeof body.reqId === "string"

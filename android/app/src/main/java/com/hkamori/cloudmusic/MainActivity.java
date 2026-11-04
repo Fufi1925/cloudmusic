@@ -179,6 +179,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        CloudMusicApp.get().setApiTransport(new ApiTransport(this));
         createMainWebView();
         applyImmersive();
         handleIntent(getIntent());
@@ -243,6 +244,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         PlaybackService.setActionSink(null);
+        ApiTransport transport = CloudMusicApp.get().apiTransport();
+        if (transport != null) {
+            transport.destroy();
+            CloudMusicApp.get().setApiTransport(null);
+        }
         if (isFinishing()) PlaybackService.stop(this);
         overlayController.destroy();
         poTokenService.destroy();
@@ -386,6 +392,10 @@ public class MainActivity extends Activity {
         // an iframe (turnstile): load it like a real webview would, so its own
         // scripts run natively and its cookie store stays untouched
         if (request.isForMainFrame() || isDocumentLoad(request)) return null;
+        // the turnstile page's own assets (api + cloudflare) run through the
+        // webview's network stack: okhttp's tls fingerprint made cloudflare
+        // answer 403 for the whole sign-in flow
+        if (NetProxy.isBrowserLikeHost(uri.getHost())) return null;
         return net.handleSubresource(request);
     }
 
