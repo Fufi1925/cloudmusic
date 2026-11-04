@@ -10,6 +10,7 @@ import http from "node:http";
 import { randomUUID } from "node:crypto";
 import { attachWebSocketServer } from "./ws.mjs";
 import { LobbyServer } from "./lobbyServer.mjs";
+import { handleRelay } from "./relay.mjs";
 
 const PORT = Number(process.env.PORT || 4300);
 const HOST = process.env.HOST || "0.0.0.0";
@@ -21,6 +22,8 @@ const clients = new Set();
 
 const httpServer = http.createServer((req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");
+  // api relay for networks cloudflare blocks (see relay.mjs)
+  if (handleRelay(req, res, url)) return;
   if (url.pathname === "/health" || url.pathname === "/v1/lobby/health") {
     res.writeHead(200, { "content-type": "application/json", "access-control-allow-origin": "*" });
     res.end(JSON.stringify({ ok: true, ...lobbyServer.stats(), version: 1 }));
