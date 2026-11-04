@@ -24,6 +24,13 @@ const SILENT = process.env.E2E_SILENT === "1";
 // E2E_MOBILE=1: portrait phone viewport, to check the compact (bottom sheet) panel
 const MOBILE = process.env.E2E_MOBILE === "1";
 const SUFFIX = MOBILE ? "-mobile" : "";
+// E2E_BLOCKED=1: the challenge endpoint answers like cloudflare does on a fresh
+// install (403 + html) until the verify page has been visited once
+const BLOCKED = process.env.E2E_BLOCKED === "1";
+let blockedHits = 0;
+
+const CF_PAGE = `<!DOCTYPE html><html><head><title>Attention Required! | Cloudflare</title></head>
+<body><h1>Sorry, you have been blocked</h1><p>Cloudflare Ray ID: e2e</p></body></html>`;
 let verifyHits = 0;
 
 const CHECK_TOKEN = "turnstile-e2e-token";
@@ -101,6 +108,18 @@ const server = createServer(async (req, res) => {
 
   if (url.pathname === "/v1/auth/challenge" && req.method === "POST") {
     const body = await readBody(req);
+    if (BLOCKED && verifyHits === 0) {
+      blockedHits += 1;
+      log.push({ event: "challenge-blocked" });
+      res.writeHead(403, {
+        "content-type": "text/html; charset=UTF-8",
+        server: "cloudflare",
+        "cf-ray": "e2e-blocked",
+        "access-control-allow-origin": ORIGIN,
+        "access-control-allow-credentials": "true",
+      });
+      return res.end(CF_PAGE);
+    }
     issued += 1;
     challenge = {
       mode: "required",
@@ -395,6 +414,12 @@ try {
     const failedSilent = checks.filter((c) => !c.ok);
     console.log(`\n${checks.length - failedSilent.length}/${checks.length} checks passed`);
     process.exit(failedSilent.length ? 1 : 0);
+  }
+
+  if (BLOCKED) {
+    check("first challenge was blocked like cloudflare does", blockedHits >= 1, `${blockedHits}x 403`);
+    check("the check ran before the retry", verifyHits >= 1, `${verifyHits}x verify`);
+    check("challenge succeeded after the check", log.filter((e) => e.event === "challenge").length >= 1);
   }
 
   const registerCall = log.find((entry) => entry.event === "register");

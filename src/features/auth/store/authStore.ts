@@ -15,6 +15,7 @@ import {
   type UpdateProfileInput,
 } from "@/shared/api";
 import { usePlayerStore, playerRuntime } from "@/features/player";
+import { APP_VERSION } from "@/shared/config/version";
 import { queryCache } from "@/shared/cache/queryCache";
 
 export type AuthStatus = "initializing" | "authenticated" | "anonymous";
@@ -153,6 +154,8 @@ export function getAuthErrorCode(error: unknown): string {
   if (error.status === 0) return "server_unavailable";
   // 5xx and cloudflare 52x: the server is down, not the user's input or connection
   if (error.status >= 500) return "server_error";
+  // 403 without a server code: the edge blocked us, the api never answered
+  if (error.status === 403 && !error.code) return "blocked";
   if (error.code === "INVALID_CREDENTIALS") return "invalid_credentials";
   if (error.code === "EMAIL_ALREADY_USED") return "email_already_used";
   if (error.code === "USERNAME_TAKEN") return "username_taken";
@@ -184,11 +187,11 @@ export function authErrorDetail(error: unknown): string {
   if (error instanceof HumanCheckFailedError) return `check: ${error.reason}`;
   if (error instanceof HumanCheckCancelledError) return "check: closed";
   if (error instanceof ApiError) {
-    const parts: string[] = [];
+    const parts: string[] = [`v${APP_VERSION}`];
     if (error.status > 0) parts.push(`HTTP ${error.status}`);
     else parts.push("network");
     if (error.code) parts.push(error.code);
-    return parts.join(" ");
+    return parts.join(" · ");
   }
   if (error instanceof Error && error.message) return error.message.slice(0, 120);
   return "";

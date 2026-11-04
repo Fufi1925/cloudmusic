@@ -483,7 +483,8 @@
       "registration_failed": "Rejestracja nie powiodła się: {status}",
       "verification_canceled": "Weryfikacja anulowana.",
       "human_check_failed": "Weryfikacja bezpieczeństwa nie została ukończona. Spróbuj ponownie.",
-      "human_check_cancelled": "Weryfikacja bezpieczeństwa została zamknięta."
+      "human_check_cancelled": "Weryfikacja bezpieczeństwa została zamknięta.",
+      "blocked": "Cloudflare zablokował to żądanie (403). Spróbuj ponownie za chwilę – w sieci komórkowej czasem pomaga zmiana sieci."
     },
     "toasts": {
       "login_successful": "Zalogowano pomyślnie",

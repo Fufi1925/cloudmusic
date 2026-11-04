@@ -73,6 +73,8 @@ export default function LoginPage() {
       return t("login.errors.username_invalid");
     if (code === "invalid_input")
       return t("login.errors.display_name_required");
+    if (code === "blocked")
+      return t("login.errors.blocked");
     if (code === "human_check_failed")
       return t("login.errors.human_check_failed");
     if (code === "human_check_cancelled")

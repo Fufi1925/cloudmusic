@@ -373,6 +373,8 @@ async function executeRequest<T>(
         `${res.status} server=${res.headers?.get?.("server") || "-"} ray=${res.headers?.get?.("cf-ray") || "-"} type=${res.headers?.get?.("content-type") || "-"}`,
       );
       if (raw) recordAuthStep("body", raw.replace(/\s+/g, " ").slice(0, 140));
+      const via = res.headers?.get?.("x-cloudmusic-transport");
+      if (via) recordAuthStep("transport", via);
     }
     const resRequestId =
       res.headers?.get?.("x-request-id") ||
@@ -587,6 +589,23 @@ function blockedBeforeOurServer(error: unknown): boolean {
   return error instanceof TypeError || statusOf(error) === 0;
 }
 
+/** cloudflare answers blocks with an html page, never with our json */
+function isCloudflareBlock(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+  if (error.code === "CLOUDFLARE_BLOCKED") return true;
+  // 403 without a server code on an auth endpoint = the edge, not the api
+  return error.status === 403 && !error.code;
+}
+
+/** a browser on the verify page sends cookies with every auth call */
+function challengeInit(purpose: "login" | "register", email: string): RequestInit {
+  return {
+    method: "POST",
+    body: JSON.stringify({ purpose, email }),
+    credentials: "include",
+  };
+}
+
 async function fetchChallenge(
   purpose: "login" | "register",
   email: string,
@@ -594,7 +613,7 @@ async function fetchChallenge(
   try {
     const challenge = await request<unknown>(
       "/v1/auth/challenge",
-      { method: "POST", body: JSON.stringify({ purpose, email }) },
+      challengeInit(purpose, email),
       false,
     );
     if (!isPowChallenge(challenge)) {
@@ -611,6 +630,28 @@ async function fetchChallenge(
     if (error instanceof ApiError && (error.status === 404 || error.status === 405)) {
       recordAuthStep("challenge", "not supported (plain auth)");
       return null;
+    }
+    // cloudflare blocked the api call itself (no clearance cookie yet on a fresh
+    // install). the verify page is what mints it, so run the check first and ask
+    // the api again - exactly once, never in a loop.
+    if (isCloudflareBlock(error)) {
+      recordAuthStep("challenge", "blocked (403) - running the check first");
+      await runHumanCheck(purpose, "required");
+      recordAuthStep("challenge", "retrying after the check");
+      const retried = await request<unknown>(
+        "/v1/auth/challenge",
+        challengeInit(purpose, email),
+        false,
+      );
+      if (!isPowChallenge(retried)) {
+        recordAuthStep("challenge", "unexpected payload after check");
+        return null;
+      }
+      recordAuthStep(
+        "challenge",
+        `mode=${retried.mode} turnstile=${retried.turnstile?.mode ?? "-"}${retried.turnstile?.edge ? "+edge" : ""} (after check)`,
+      );
+      return retried;
     }
     recordAuthStep("challenge", `failed ${describeAuthError(error) ?? error}`);
     throw error;

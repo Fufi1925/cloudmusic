@@ -479,7 +479,8 @@
       "registration_failed": "Kayıt başarısız: {status}",
       "verification_canceled": "Doğrulama iptal edildi.",
       "human_check_failed": "Güvenlik kontrolü tamamlanmadı. Lütfen tekrar deneyin.",
-      "human_check_cancelled": "Güvenlik kontrolü kapatıldı."
+      "human_check_cancelled": "Güvenlik kontrolü kapatıldı.",
+      "blocked": "Cloudflare bu isteği engelledi (403). Birazdan tekrar deneyin; mobil veride ağ değiştirmek bazen yardımcı olur."
     },
     "toasts": {
       "login_successful": "Giriş başarılı",

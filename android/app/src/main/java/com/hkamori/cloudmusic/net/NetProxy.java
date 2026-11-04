@@ -82,6 +82,9 @@ public final class NetProxy {
             // intercepted responses cannot be 304, so never ask for one
             "if-none-match", "if-modified-since"));
 
+    /** the webview's own origin (AssetServer) - what a page there reports as Origin */
+    private static final String APP_ORIGIN = "https://appassets.androidplatform.net";
+
     private final OkHttpClient client;
     private final OkHttpClient noRedirectClient;
     private final Cache cache;
@@ -194,6 +197,7 @@ public final class NetProxy {
         if (result.body != null && result.body.length > 0) {
             headers.put("content-length", String.valueOf(result.body.length));
         }
+        headers.put("x-cloudmusic-transport", "webview");
         int code = HttpText.isAllowedWebStatus(result.status) ? result.status : 200;
         String[] media = HttpText.mediaType(contentType, "application/octet-stream");
         return new WebResourceResponse(media[0], media[1], code,
@@ -329,6 +333,7 @@ public final class NetProxy {
     private Request buildTunnelRequest(Pending parked) throws Exception {
         JSONObject d = parked.descriptor;
         String url = d.getString("url");
+        String urlHost = HttpUrl.parse(url) == null ? null : HttpUrl.parse(url).host();
         String method = d.optString("method", "GET").toUpperCase(Locale.ROOT);
         String mode = d.optString("mode", "cors");
         String credentials = d.optString("credentials", "same-origin");
@@ -365,7 +370,10 @@ public final class NetProxy {
         boolean simpleMethod = method.equals("GET") || method.equals("HEAD");
         // what chromium attaches to cors-mode / non-GET requests issued from
         // electron's file:// renderer (ElectronHeaders rewrites it per host)
-        if ("cors".equals(mode) || !simpleMethod) headers.set("Origin", "file://");
+        if ("cors".equals(mode) || !simpleMethod) {
+            // api hosts are called from a real page origin, not from file://
+            headers.set("Origin", isBrowserLikeHost(urlHost) ? APP_ORIGIN : "file://");
+        }
 
         RequestBody body = null;
         if (permitsRequestBody(method)) {
@@ -381,7 +389,12 @@ public final class NetProxy {
                 .url(url)
                 .headers(headers.build())
                 .method(method, body)
-                .tag(ProxyTag.class, "include".equals(credentials) ? ProxyTag.WITH_CREDENTIALS : ProxyTag.ANONYMOUS);
+                // api hosts keep the webview cookie jar even without credentials:"include":
+                // the clearance cookie from the verify page is what makes cloudflare
+                // accept the auth calls at all
+                .tag(ProxyTag.class,
+                        "include".equals(credentials) || isBrowserLikeHost(urlHost)
+                                ? ProxyTag.WITH_CREDENTIALS : ProxyTag.ANONYMOUS);
 
         switch (cacheMode) {
             case "no-store":
@@ -409,6 +422,7 @@ public final class NetProxy {
         copyHeaders(response.headers(), headers, false);
         if (hasNoBody(response)) headers.remove("content-length");
         String rawContentType = response.header("Content-Type");
+        headers.put("x-cloudmusic-transport", "okhttp");
         headers.put(META + "status", String.valueOf(code));
         headers.put(META + "status-text", HttpText.percentEncode(response.message()));
         headers.put(META + "url", response.request().url().toString());

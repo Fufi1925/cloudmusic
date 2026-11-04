@@ -477,7 +477,8 @@
       "registration_failed": "Реєстрація не вдалася: {status}",
       "verification_canceled": "Підтвердження скасовано.",
       "human_check_failed": "Перевірку безпеки не завершено. Спробуйте ще раз.",
-      "human_check_cancelled": "Перевірку безпеки закрито."
+      "human_check_cancelled": "Перевірку безпеки закрито.",
+      "blocked": "Cloudflare заблокував цей запит (403). Спробуйте ще раз трохи згодом — у мобільній мережі іноді допомагає зміна мережі."
     },
     "toasts": {
       "login_successful": "Успішний вхід",

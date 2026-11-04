@@ -485,7 +485,8 @@
       "registration_failed": "Falha no registro: {status}",
       "verification_canceled": "Verificação cancelada.",
       "human_check_failed": "A verificação de segurança não terminou. Tente novamente.",
-      "human_check_cancelled": "A verificação de segurança foi fechada."
+      "human_check_cancelled": "A verificação de segurança foi fechada.",
+      "blocked": "A Cloudflare bloqueou esta solicitação (403). Tente novamente em instantes; em dados móveis, trocar de rede às vezes ajuda."
     },
     "toasts": {
       "login_successful": "Login bem-sucedido",
